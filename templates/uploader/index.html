@@ -1,0 +1,5 @@
+<form action="/uploader/image/" method="post">
+{% csrf_token %}
+    Image Url: <input type="text" name="image_url" />
+<input type="submit" value="Upload" />
+</form>

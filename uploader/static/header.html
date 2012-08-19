@@ -1,0 +1,17 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>New Web Project</title>
+    
+     <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
+    
+    <script type="text/javascript">
+        
+        var imgsArray = new Array();
+        
+        {% for frame in frame_list %}
+            imgsArray[{{ frame.index }}] = "{{ frame.url }}";
+        {% endfor %}
+        
+    </script>
+    
+</head>
