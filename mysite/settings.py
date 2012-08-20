@@ -57,11 +57,11 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/home/ubuntu/mysite/static/'
+STATIC_ROOT = "/home/ubuntu/mysite/static/"
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = 'http://54.245.121.15/static/'
+STATIC_URL = "http://54.245.121.15/static/"
 
 # Additional locations of static files
 STATICFILES_DIRS = (os.path.join('/home/ubuntu/mysite/', 'uploader', 'static'),)
