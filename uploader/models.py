@@ -22,6 +22,11 @@ class FOF(models.Model):
     def __unicode__(self):
         return self.name
 
+class Featured_FOF(models.Model):
+    fof = models.ForeignKey(FOF)
+    def __unicode__(self):
+        return self.fof.name
+
 class Frame(models.Model):
     url = models.CharField(max_length=200)
     fof = models.ForeignKey(FOF)

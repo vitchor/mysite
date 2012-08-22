@@ -14,7 +14,7 @@ import random
 import string
 from django.utils import timezone
 
-from uploader.models import User, FOF, Frame
+from uploader.models import User, FOF, Frame, Featured_FOF
 
 def index(request):
     return render_to_response('uploader/index.html', {},
@@ -88,6 +88,41 @@ def fof(request, fof_name):
     return render_to_response('uploader/fof.html', {'frame_list':frame_list},
                                context_instance=RequestContext(request))
 
+
+def featured_fof(request, fof_name_value):
+    
+    featured_fof_list = Featured_FOF.objects.all()
+    
+    i = 0
+    
+    if fof_name_value == "0":
+        featured_fof = featured_fof_list[0]
+        fof = get_object_or_404(FOF, id=featured_fof.fof_id)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    else:
+        for featured_fof in featured_fof_list:
+            if featured_fof.fof.name == fof_name_value:
+                featured_fof.fof.view_count += 1
+                featured_fof.fof.save()
+                frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+                break
+            i = i + 1
+    
+    if len(featured_fof_list) - 1 == i:
+        next_fof_name = featured_fof_list[0].fof.name
+    else:
+        next_fof_name = featured_fof_list[i+1].fof.name
+
+    if i == 0:
+        prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
+    else:
+        prev_fof_name = featured_fof_list[i - 1].fof.name
+
+    return render_to_response('uploader/featured_fof_navigator.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
+                               context_instance=RequestContext(request))
+    
 def user_fof(request, device_id_value, fof_name_value):
     user = get_object_or_404(User, device_id=device_id_value)
     
