@@ -12,6 +12,7 @@ import Image
 import _imaging
 import random
 import string
+from django.utils import timezone
 
 from uploader.models import User, FOF, Frame
 
@@ -34,19 +35,21 @@ def image(request):
     #Gets information from post
     user_device_id = request.POST['device_id']
     frame_index = request.POST['frame_index']
+    frame_focal_point_x = request.POST['frame_focal_point_x']
+    frame_focal_point_y = request.POST['frame_focal_point_y']
     fof_name = request.POST['fof_name']
-    fof_size = request.POST['fof_size']    
+    fof_size = request.POST['fof_size']
     
     try:
         frame_user = User.objects.get(device_id=user_device_id)
     except (KeyError, User.DoesNotExist):
-        frame_user = User(name='', device_id=user_device_id)
+        frame_user = User(name='', device_id=user_device_id, pub_date=timezone.now())
         frame_user.save()
         
     try:
         frame_FOF = FOF.objects.get(name=fof_name)
     except (KeyError, FOF.DoesNotExist):
-        frame_FOF = frame_user.fof_set.create(name = fof_name, size = fof_size)
+        frame_FOF = frame_user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
     
     ###TODO###
     #focal point
@@ -65,7 +68,7 @@ def image(request):
     frame_url = 'http://s3.amazonaws.com/dyfocus/'
     frame_url += frame_name
     
-    frame = frame_FOF.frame_set.create(url = frame_url, index = frame_index)
+    frame = frame_FOF.frame_set.create(url = frame_url, index = frame_index, focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
     
     b = conn.get_bucket('dyfocus')
     k = b.new_key(frame_name)
@@ -94,11 +97,15 @@ def user_fof(request, device_id_value, fof_name_value):
     
     if fof_name_value == "0":
         fof = user.fof_set.all()[0]
+        fof.view_count += 1
+        fof.save()
         frame_list = fof.frame_set.all().order_by('index')[:5]
         
     else:    
         for fof in fof_list:
             if fof.name == fof_name_value:
+                fof.view_count += 1
+                fof.save()
                 frame_list = fof.frame_set.all().order_by('index')[:5]
                 break
             i = i + 1
