@@ -106,7 +106,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         
-        <title>New Web Project</title>
+        <title>dyfocus FOF viewer</title>
         
         <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
         
@@ -124,13 +124,14 @@
         
     </head>
     
-    <body>
+    <body bgcolor="#000000" align="center">
+        <font face="Arial" size="8" color="#FFFFFF">
+		<hr>
+        	<div align="left"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a></div>
+        	<div align="center">dyfocus</div>
+        	<div align="right"><a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">NEXT</a></div>
+      		</hr>  
         
-        <a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a>
-        dyfocus
-        <a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">NEXT</a>
-        
-        <hr/>
         
         <div id="homeimg"/>
         
