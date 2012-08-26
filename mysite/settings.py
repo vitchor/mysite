@@ -61,17 +61,20 @@ STATIC_ROOT = "/home/ubuntu/mysite/static/"
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = "http://54.245.121.15/static/"
+STATIC_URL = "/static/"
 
 # Additional locations of static files
-STATICFILES_DIRS = (os.path.join('/home/ubuntu/mysite/', 'uploader', 'static'),)
+STATICFILES_DIRS = (
+	"/home/ubuntu/mysite/static",
+	"/home/ubuntu/mysite/images",
+)
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
