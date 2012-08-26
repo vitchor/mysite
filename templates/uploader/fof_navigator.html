@@ -106,9 +106,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         
-        <title>New Web Project</title>
+        <title>dyfoc.us FOF Previewer</title>
         
-        <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
+        <!--<script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>-->
         
         <script type="text/javascript">
             
@@ -124,7 +124,7 @@
         
     </head>
     
-    <body>
+    <!--<body>
         
         <a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a>
         dyfocus
@@ -139,6 +139,29 @@
             homefade();
         </script>
         
-    </body>
+    </body>-->
+
+	<body>
+	<table id="Table 01" width="640" height="960" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
+				<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+				<img src="/home/ubuntu/mysite/images/dyfocus_prev_button.gif" width="104" height="113" alt=""></a></td>
+			<td>
+				<img src="/home/ubuntu/mysite/images/dyfocus_logo.gif" width="432" height="113" alt=""></td>
+			<td>
+				<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+				<img src="/home/ubuntu/mysite/images/dyfocus_next.gif" width="104" height="113" alt=""></a></td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<img src="/home/ubuntu/mysite/images/dyfocus_hr.gif" width="640" height="28" alt=""></td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<img src="/home/ubuntu/mysite/images/dyfocus_content_background.gif" width="640" height="819" alt=""></td>
+		</tr>
+	</table>
+	</body>
     
 </html>
