@@ -2,117 +2,16 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     
-    <script type="text/javascript">
-    
-        var newImage;
-        var oldImage;
-
-        var newImageIndex = 0;
-
-        var newImageOpacity = 0.00;
-        var oldImageOpacity = 100.00;            
-
-        var timer = 0;
-
-        var homediv;
-
-        function homefade() {
-            if (!homediv) {
-                homediv = document.getElementById("homeimg");
-
-            } else {
-                
-                if (newImage) {
-                    
-                    if (oldImage) {
-                        homediv.removeChild(oldImage);
-                    }
-                    
-                    oldImage = newImage;
-                }
-                
-                newImage = document.createElement('img');
-                newImage.src = imgsArray[newImageIndex];
-                newImage.id = "newImg"
-                newImage.align = "center"
-                newImage.marginRight = "auto"
-                newImage.marginLeft = "auto"                
-                newImage.style.opacity = "0";
-                newImage.style.filter = "alpha(opacity=0)";
-                newImage.width = "850"
-                
-                homediv.appendChild(newImage);
-                if (oldImage) {
-                    newImage.style.position = 'absolute';
-                    var big_coordinates=getXYpos(oldImage);
-                    var bp_x = big_coordinates['x'];
-                    var bp_y = big_coordinates['y'];
-                    
-                    newImage.style.right = bp_x + 'px';
-                    newImage.style.top = bp_y + 'px';
-                }
-                
-                
-                
-                if (newImageIndex == (imgsArray.length-1)) {
-                    newImageIndex = 0;
-                    
-                } else {
-                    newImageIndex++;
-                };
-                
-                timer = setInterval("homefadeTrans();", 0.25);    
-            }
-        }
+    <!-- OLD JS CODE WAS HERE <script type="text/javascript">
         
-        function homefadeTrans() {
-            if (newImageOpacity >= 100) {
-                clearTimeout(timer);
-                
-                timer = 0;
-                newImageOpacity = 0;
-                oldImageOpacity = 100;
-
-                setTimeout("homefade();", 700);
-
-            } else {
-
-                newImage.style.opacity = newImageOpacity/100;
-                newImage.style.filter = "alpha(opacity="+newImageOpacity+")";
-                newImageOpacity = newImageOpacity+2.5;
-
-                if (oldImage) {
-                    //oldImage.style.opacity = oldImageOpacity/100;
-                    //oldImage.style.filter = "alpha(opacity="+oldImageOpacity+")";
-                    //oldImageOpacity = oldImageOpacity-1;
-                }
-            }
-        }
-
-        function getXYpos(elem) {
-
-           if (!elem) {
-              return {"x":0,"y":0};
-           }
-
-           var xy = {"x":elem.offsetLeft,"y":elem.offsetTop}
-           var par = getXYpos(elem.offsetParent);
-
-           for (var key in par) {
-              xy[key] += par[key];
-           }
-
-           return xy;
-        }
-        
-    </script>
+    </script> -->
     
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />
+        <title>dyfocus FOF viewer</title>
         
-        <title>Featured FOFs</title>
-        
-        <!--<script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>-->
+        <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
         
         <script type="text/javascript">
             
@@ -128,26 +27,67 @@
         
     </head>
     
-    <body align="center" bgcolor="#000000">
-        <font face="Arial" size="10" color="#ffffff">
+	<!--
+    <body>
+        <font face="Arial" size="8" color="#FFFFFF">
+		<hr>
+        	<div align="left"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a></div>
+        	<div align="center">dyfocus</div>
+        	<div align="right"><a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">NEXT</a></div>
+      		</hr>  
         
-        <a href="/uploader/{{prev_fof_name}}/featured_fof/">PREV</a>
-        dyfocus
-        <a href="/uploader/{{next_fof_name}}/featured_fof/">NEXT</a>
-        
-        </font>
-        
-        <div align="center" id="wrapper" marginRight="0px auto" marginLeft="0px auto">
-            
-            <div align="center" id="homeimg"/>
-            
-        </div>
+        <div id="homeimg"/>
         
         <script>
             //call after page loaded
             homefade();
         </script>
         
-    </body>
+    </body>-->
+
+
+	<body width="320">
+	    
+    	<div id="wrapper" align="top">
+    	    
+	    	<table id="Table 01" cellpadding="0" cellspacing="0">
+	    		<tr>
+	    			<td>
+	    				<a href="/uploader/{{prev_fof_name}}/featured_fof"/>
+	    				<img src="{{ STATIC_URL }}dyfocus_prev_button.gif" width="52" height="56" alt=""></a></td>
+	    			<td>
+	    				<img src="{{ STATIC_URL }}dyfocus_logo.gif" width="216" height="56" alt=""></td>
+	    			<td>
+	    				<a href="/uploader/{{next_fof_name}}/featured_fof">
+	    				<img src="{{ STATIC_URL }}dyfocus_next.gif" width="52" height="56" alt=""></a></td>
+	    		</tr>
+	    		<tr>
+	    			<td colspan="3">
+	    				<img src="{{ STATIC_URL }}dyfocus_hr.gif" width="320" height="14" alt="">
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td colspan="3">
+	    			    <div id="homeimg"/>
+	    			</td>
+	    		</tr>
+	    	</table>
+
+	    </div>
+	
+    	<!-- div not working yet 
+    	<body>
+    	<div class="wrapper">
+    		<div class="header">
+    			<div class="prev" onclick="window.location.href('/')"></div>
+    			<div class="logo"></div>
+    			<div class="next"></div>
+    		</div>
+    		<div class="content">
+    		</div>
+    	</div>-->
+	
+    	<script> homefade();</script>
+	</body>
     
 </html>
