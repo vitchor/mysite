@@ -14,37 +14,8 @@ body {
     vertical-align: top;
 }
 
-div.header {
-	height: 113;
+#newImg {
+    width = "100%";
+    max-width = "320";    
+    height = "auto";
 }
-
-div.prev {
-	background: url(/static/dyfocus_prev_button.gif);
-	position:absolute;
-	left:0;
-	top:0;
-	height:113;
-	width:104;
-}
-
-div.logo {
-	background: url(/static/dyfocus_logo.gif);
-	position:absolute;
-	left:104;
-	top:0;
-	height:113;
-	width:432;
-	float:center;
-}
-
-div.next {
-	background: url(/static/dyfocus_next.gif);
-	position:absolute;
-	left:536;
-	top:0;
-	height:113;
-	width:104;
-	float:right;
-	
-}
-
