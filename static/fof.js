@@ -29,6 +29,7 @@ function homefade() {
         
         newImage = document.createElement('img');
         newImage.src = imgsArray[newImageIndex];
+        
         newImage.id = "newImg"
         newImage.align = "center"
         //newImage.marginRight = "auto"
@@ -39,7 +40,7 @@ function homefade() {
         newImage.height = "auto";
         newImage.style.width = "320px";
         newImage.style.height = "auto";
-        newImage.style.max-width = "100%"        
+        
 
         
         homediv.appendChild(newImage);
@@ -53,11 +54,6 @@ function homefade() {
             newImage.style.top = bp_y + 'px';
         }
         
-        newImage.width = "320px";
-        newImage.height = "auto";
-        newImage.style.width = "320px";
-        newImage.style.height = "auto";
-        newImage.style.max-width = "100%"
         if (newImageIndex == (imgsArray.length-1)) {
             newImageIndex = 0;
             
