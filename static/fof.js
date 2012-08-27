@@ -28,19 +28,19 @@ function homefade() {
         }
         
         newImage = document.createElement('img');
-
+        newImage.src = imgsArray[newImageIndex];
         newImage.id = "newImg"
         newImage.align = "center"
         //newImage.marginRight = "auto"
         //newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
-        newImage.width = "100%";
+        newImage.width = "320px";
         newImage.height = "auto";
-        newImage.style.width = "100%";
+        newImage.style.width = "320px";
         newImage.style.height = "auto";
         
-        newImage.src = imgsArray[newImageIndex];
+
         
         homediv.appendChild(newImage);
         if (oldImage) {
