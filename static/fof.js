@@ -35,12 +35,13 @@ function homefade() {
         //newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
+        
+        homediv.appendChild(newImage);
+        
         newImage.width = "100%";
         newImage.height = "auto";
         newImage.style.width = "100%";
         newImage.style.height = "auto";
-        
-        homediv.appendChild(newImage);
         if (oldImage) {
             newImage.style.position = 'absolute';
             var big_coordinates=getXYpos(oldImage);
