@@ -36,11 +36,9 @@ function homefade() {
         //newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
-        newImage.width = "320px";
-        newImage.height = "auto";
-        newImage.style.width = "320px";
+        newImage.style.max-width = "100%%";
         newImage.style.height = "auto";
-        
+        newImage.style.width = "auto";
 
         
         homediv.appendChild(newImage);
