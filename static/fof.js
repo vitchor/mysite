@@ -28,20 +28,21 @@ function homefade() {
         }
         
         newImage = document.createElement('img');
-        newImage.src = imgsArray[newImageIndex];
+
         newImage.id = "newImg"
         newImage.align = "center"
         //newImage.marginRight = "auto"
         //newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
+        newImage.width = "100%";
+        newImage.height = "auto";
+        newImage.style.width = "100%";
+        newImage.style.height = "auto";
+        
+        newImage.src = imgsArray[newImageIndex];
         
         homediv.appendChild(newImage);
-        
-        newImage.width = "320";
-        newImage.height = "auto";
-        newImage.style.width = "320";
-        newImage.style.height = "auto";
         if (oldImage) {
             newImage.style.position = 'absolute';
             var big_coordinates=getXYpos(oldImage);
