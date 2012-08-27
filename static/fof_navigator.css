@@ -1,7 +1,7 @@
 body {
 	margin: 0;
 	font-family: Helvetica;
-	/*background-image: url(/static/dyfocus_content_background.gif);*/
+	background-image: url(/static/dyfocus_content_background.gif);
 	overflow: hidden;
 	-webkit-text-size-adjust: none;
 }
