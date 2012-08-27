@@ -38,9 +38,9 @@ function homefade() {
         
         homediv.appendChild(newImage);
         
-        newImage.width = "100%";
+        newImage.width = "320";
         newImage.height = "auto";
-        newImage.style.width = "100%";
+        newImage.style.width = "320";
         newImage.style.height = "auto";
         if (oldImage) {
             newImage.style.position = 'absolute';
