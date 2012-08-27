@@ -53,6 +53,11 @@ function homefade() {
             newImage.style.top = bp_y + 'px';
         }
         
+        newImage.width = "320px";
+        newImage.height = "auto";
+        newImage.style.width = "320px";
+        newImage.style.height = "auto";
+        
         if (newImageIndex == (imgsArray.length-1)) {
             newImageIndex = 0;
             
