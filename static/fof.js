@@ -31,11 +31,13 @@ function homefade() {
         newImage.src = imgsArray[newImageIndex];
         newImage.id = "newImg"
         newImage.align = "center"
-        newImage.marginRight = "auto"
-        newImage.marginLeft = "auto"                
+        //newImage.marginRight = "auto"
+        //newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
-        newImage.width = "640"
+        newImage.width = "320";
+	newImage.height = "auto";
+	newImage.style.width = "320";
         
         homediv.appendChild(newImage);
         if (oldImage) {
