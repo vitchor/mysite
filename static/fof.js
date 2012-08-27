@@ -39,7 +39,7 @@ function homefade() {
         newImage.height = "auto";
         newImage.style.width = "320px";
         newImage.style.height = "auto";
-        
+        newImage.style.max-width = "100%"        
 
         
         homediv.appendChild(newImage);
@@ -57,7 +57,7 @@ function homefade() {
         newImage.height = "auto";
         newImage.style.width = "320px";
         newImage.style.height = "auto";
-        
+        newImage.style.max-width = "100%"
         if (newImageIndex == (imgsArray.length-1)) {
             newImageIndex = 0;
             
