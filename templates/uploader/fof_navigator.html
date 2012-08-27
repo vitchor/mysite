@@ -7,9 +7,8 @@
     </script> -->
     
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        
+        <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />        
         <title>dyfocus FOF viewer</title>
         
         <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
@@ -29,7 +28,7 @@
     </head>
     
 	<!--
-    <body bgcolor="#000000" align="center">
+    <body>
         <font face="Arial" size="8" color="#FFFFFF">
 		<hr>
         	<div align="left"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a></div>
@@ -46,7 +45,8 @@
         
     </body>-->
 
-	<body background="{{ STATIC_URL }}dyfocus_content_background.gif">
+
+	<body>
 	<table id="Table 01" width="640" height="960" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td>
@@ -67,6 +67,17 @@
 				<script> homefade();</script></td>
 		</tr>
 	</table>
+	<!-- div not working yet 
+	<body>
+	<div class="wrapper">
+		<div class="header">
+			<div class="prev" onclick="window.location.href('/')"></div>
+			<div class="logo"></div>
+			<div class="next"></div>
+		</div>
+		<div class="content">
+		</div>
+	</div>-->
 	</body>
     
 </html>

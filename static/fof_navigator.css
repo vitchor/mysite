@@ -1,0 +1,49 @@
+body {
+	margin: 0;
+	font-family: Helvetica;
+	background-image: url(/static/dyfocus_content_background.gif);
+	overflow: hidden;
+	-webkit-text-size-adjust: none;
+}
+
+div.wrapper {
+	width:640;
+	border: 0;
+	top: 0;
+	left: 0;
+}
+
+div.header {
+	height: 113;
+}
+
+div.prev {
+	background: url(/static/dyfocus_prev_button.gif);
+	position:absolute;
+	left:0;
+	top:0;
+	height:113;
+	width:104;
+}
+
+div.logo {
+	background: url(/static/dyfocus_logo.gif);
+	position:absolute;
+	left:104;
+	top:0;
+	height:113;
+	width:432;
+	float:center;
+}
+
+div.next {
+	background: url(/static/dyfocus_next.gif);
+	position:absolute;
+	left:536;
+	top:0;
+	height:113;
+	width:104;
+	float:right;
+	
+}
+
