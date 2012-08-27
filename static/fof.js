@@ -1,3 +1,4 @@
+
 var newImage;
 var oldImage;
 
@@ -15,50 +16,53 @@ function homefade() {
         homediv = document.getElementById("homeimg");
 
     } else {
-
+        
+        
         if (newImage) {
-
+            
             if (oldImage) {
                 homediv.removeChild(oldImage);
             }
-
+            
             oldImage = newImage;
         }
-
+        
         newImage = document.createElement('img');
         newImage.src = imgsArray[newImageIndex];
         newImage.id = "newImg"
-        newImage.style.position = 'absolute';
+        newImage.align = "center"
+        newImage.marginRight = "auto"
+        newImage.marginLeft = "auto"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
-        newImage.width = "600"
-
+        newImage.width = "640"
+        
+        homediv.appendChild(newImage);
         if (oldImage) {
+            newImage.style.position = 'absolute';
             var big_coordinates=getXYpos(oldImage);
             var bp_x = big_coordinates['x'];
             var bp_y = big_coordinates['y'];
-
+            
             newImage.style.left = bp_x + 'px';
             newImage.style.top = bp_y + 'px';
         }
-
-        homediv.appendChild(newImage);
-
+        
         if (newImageIndex == (imgsArray.length-1)) {
             newImageIndex = 0;
-
+            
         } else {
             newImageIndex++;
         };
-
-        timer = setInterval("homefadeTrans();", 0.25);    
+        
+        timer = setInterval("homefadeTrans();", 0.25);
     }
 }
 
 function homefadeTrans() {
     if (newImageOpacity >= 100) {
         clearTimeout(timer);
-
+        
         timer = 0;
         newImageOpacity = 0;
         oldImageOpacity = 100;
@@ -94,4 +98,3 @@ function getXYpos(elem) {
 
    return xy;
 }
-

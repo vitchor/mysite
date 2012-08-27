@@ -8,7 +8,7 @@
     
     <head>
         <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=no" />
-	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />        
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />
         <title>dyfocus FOF viewer</title>
         
         <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
@@ -47,37 +47,47 @@
 
 
 	<body>
-	<table id="Table 01" width="640" height="960" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td>
-				<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
-				<img src="{{ STATIC_URL }}dyfocus_prev_button.gif" width="104" height="113" alt=""></a></td>
-			<td>
-				<img src="{{ STATIC_URL }}dyfocus_logo.gif" width="432" height="113" alt=""></td>
-			<td>
-				<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
-				<img src="{{ STATIC_URL }}dyfocus_next.gif" width="104" height="113" alt=""></a></td>
-		</tr>
-		<tr>
-			<td colspan="3">
-				<img src="{{ STATIC_URL }}dyfocus_hr.gif" width="640" height="28" alt=""></td>
-		</tr>
-		<tr>
-			<td colspan="3">
-				<script> homefade();</script></td>
-		</tr>
-	</table>
-	<!-- div not working yet 
-	<body>
-	<div class="wrapper">
-		<div class="header">
-			<div class="prev" onclick="window.location.href('/')"></div>
-			<div class="logo"></div>
-			<div class="next"></div>
-		</div>
-		<div class="content">
-		</div>
-	</div>-->
+	    
+    	<div id="wrapper" align="top">
+    	    
+	    	<table id="Table 01" cellpadding="0" cellspacing="0">
+	    		<tr>
+	    			<td>
+	    				<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+	    				<img src="{{ STATIC_URL }}dyfocus_prev_button.gif" width="104" height="113" alt=""></a></td>
+	    			<td>
+	    				<img src="{{ STATIC_URL }}dyfocus_logo.gif" width="432" height="113" alt=""></td>
+	    			<td>
+	    				<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+	    				<img src="{{ STATIC_URL }}dyfocus_next.gif" width="104" height="113" alt=""></a></td>
+	    		</tr>
+	    		<tr>
+	    			<td colspan="3">
+	    				<img src="{{ STATIC_URL }}dyfocus_hr.gif" width="640" height="28" alt="">
+	    			</td>
+	    		</tr>
+	    		<tr>
+	    			<td colspan="3">
+	    			    <div id="homeimg"/>
+	    			</td>
+	    		</tr>
+	    	</table>
+
+	    </div>
+	
+    	<!-- div not working yet 
+    	<body>
+    	<div class="wrapper">
+    		<div class="header">
+    			<div class="prev" onclick="window.location.href('/')"></div>
+    			<div class="logo"></div>
+    			<div class="next"></div>
+    		</div>
+    		<div class="content">
+    		</div>
+    	</div>-->
+	
+    	<script> homefade();</script>
 	</body>
     
 </html>
