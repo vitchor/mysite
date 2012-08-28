@@ -8,7 +8,7 @@
     
     <head>
         <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
-	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />
+		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_navigator.css" />
         <title>dyfocus FOF viewer</title>
         
         <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
@@ -26,25 +26,6 @@
         </script>
         
     </head>
-    
-	<!--
-    <body>
-        <font face="Arial" size="8" color="#FFFFFF">
-		<hr>
-        	<div align="left"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">PREV</a></div>
-        	<div align="center">dyfocus</div>
-        	<div align="right"><a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">NEXT</a></div>
-      		</hr>  
-        
-        <div id="homeimg"/>
-        
-        <script>
-            //call after page loaded
-            homefade();
-        </script>
-        
-    </body>-->
-
 
 	<body width="320">
 	    
@@ -54,18 +35,14 @@
 	    		<tr>
 	    			<td>
 	    				<a href="/uploader/{{prev_fof_name}}/featured_fof"/>
-	    				<img src="{{ STATIC_URL }}dyfocus_prev_button.gif" width="52" height="56" alt=""></a></td>
+	    				<img src="{{ STATIC_URL }}dyfocus_prev_button.gif" width="16.25%" height="auto" alt=""></a></td>
 	    			<td>
-	    				<img src="{{ STATIC_URL }}dyfocus_logo.gif" width="216" height="56" alt=""></td>
+	    				<img src="{{ STATIC_URL }}dyfocus_logo.gif" width="67.5%" height="auto" alt=""></td>
 	    			<td>
 	    				<a href="/uploader/{{next_fof_name}}/featured_fof">
-	    				<img src="{{ STATIC_URL }}dyfocus_next.gif" width="52" height="56" alt=""></a></td>
+	    				<img src="{{ STATIC_URL }}dyfocus_next.gif" width="16.25%" height="auto" alt=""></a></td>
 	    		</tr>
-	    		<!--<tr>
-	    			<td colspan="3">
-	    				<img src="{{ STATIC_URL }}dyfocus_hr.gif" width="320" height="14" alt="">
-	    			</td>
-	    		</tr>-->
+
 	    		<tr>
 	    			<td colspan="3">
 	    			    <div id="homeimg"/>
@@ -75,17 +52,6 @@
 
 	    </div>
 	
-    	<!-- div not working yet 
-    	<body>
-    	<div class="wrapper">
-    		<div class="header">
-    			<div class="prev" onclick="window.location.href('/')"></div>
-    			<div class="logo"></div>
-    			<div class="next"></div>
-    		</div>
-    		<div class="content">
-    		</div>
-    	</div>-->
 	
     	<script> homefade();</script>
 	</body>
