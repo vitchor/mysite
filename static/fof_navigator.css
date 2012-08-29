@@ -13,25 +13,23 @@ body {
     vertical-align: top;
     /*width:100%;*/
 }
-/*
-#newImg {
-    width = "320px";
-    max-width = "100%";
-    height = "auto";
-}
-*/
-#newImg{
-    max-width:100%%;
-    height:auto !important;
-    width:auto !important;
+
+/* Smartphones (landscape) ----------- */
+@media only screen 
+and (min-width : 321px) {
+/* Styles */
 }
 
-.prevNext{
-	width:100%%;
-	height:auto !important;
-}
-
-#logo{
-	width:100%%;
-	height:auto !important;
+/* Smartphones (portrait) ----------- */
+@media only screen 
+and (max-width : 320px) {
+	#left_button {
+		width: 16.25%;
+	}
+	#logo {
+		width: 67.5%;
+	}
+	#right_button {
+		width:16.25%;
+	}
 }
