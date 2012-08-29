@@ -74,7 +74,7 @@ and (min-width : 641px) {
 */
 /* Smartphones (portrait) ----------- */
 @media only screen 
-and (max-width : 320px) {
+and (max-width : 639px) {
 	#tab_left_button {
 		width: 52px;
 		height: 57px;
