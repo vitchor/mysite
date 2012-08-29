@@ -81,11 +81,19 @@ and (max-width : 320px) {
 	#tab_left_separator {
 		width: 0%;
 	}
+	#img_left_separator {
+		width:0px;
+		height:0px;
+	}
 	#tab_logo {
 		width: 67.5%;
 	}	
 	#tab_right_separator {
 		width: 0%;
+	}
+	#img_right_separator {
+		width:0px;
+		height:0px;
 	}
 	#tab_right_button {
 		width:16.25%;
