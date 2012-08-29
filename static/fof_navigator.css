@@ -17,7 +17,15 @@ body {
 /* Smartphones (landscape) ----------- */
 @media only screen 
 and (min-width : 321px) {
-/* Styles */
+	#left_button {
+		width: 16.25%;
+	}
+	#logo {
+		width: 67.5%;
+	}
+	#right_button {
+		width:16.25%;
+	}
 }
 
 /* Smartphones (portrait) ----------- */
