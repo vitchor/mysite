@@ -24,13 +24,19 @@ body {
 @media only screen 
 and (min-width : 321px) {
 	#left_button {
-		width: 16.25%;
+		width: 8.125%;
+	}
+	#left_separator {
+		width: 25%;
 	}
 	#logo {
-		width: 67.5%;
+		width: 33.75%;
+	}
+	#right_separator {
+		width: 25%;
 	}
 	#right_button {
-		width:16.25%;
+		width:8.125%;
 	}
 }
 
@@ -40,8 +46,14 @@ and (max-width : 320px) {
 	#left_button {
 		width: 16.25%;
 	}
+	#left_separator {
+		width: 0%;
+	}
 	#logo {
 		width: 67.5%;
+	}	
+	#right_separator {
+		width: 0%;
 	}
 	#right_button {
 		width:16.25%;
