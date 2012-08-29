@@ -25,23 +25,23 @@ body {
 and (min-width : 321px) {
 	#left_button {
 		width: 8.125%; /*39 px*/
-		height: 42px;
+		height: auto !important;
 	}
 	#left_separator {
 		width: 25%;
-		height: 42px;
+		height: auto !important;
 	}
 	#logo {
 		width: 33.75%;
-		height:42px;
+		height: auto !important;
 	}
 	#right_separator {
 		width: 25%;
-		height: 42px;
+		height: auto !important;
 	}
 	#right_button {
 		width:8.125%;
-		height: 42px;
+		height: auto !important;
 	}
 }
 
