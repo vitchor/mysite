@@ -24,19 +24,24 @@ body {
 @media only screen 
 and (min-width : 321px) {
 	#left_button {
-		width: 8.125%;
+		width: 8.125%; /*39 px*/
+		height: 42px;
 	}
 	#left_separator {
 		width: 25%;
+		height: 42px;
 	}
 	#logo {
 		width: 33.75%;
+		height:42px;
 	}
 	#right_separator {
 		width: 25%;
+		height: 42px;
 	}
 	#right_button {
 		width:8.125%;
+		height: 42px;
 	}
 }
 
