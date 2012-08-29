@@ -25,3 +25,15 @@ body {
     height:auto !important;
     width:auto !important;
 }
+
+.prevNext{
+	max-width:16.25%%;
+	height:auto !important;
+	width:auto !important;
+}
+
+#logo{
+	max-width:67.5%%;
+	height:auto !important;
+	width:auto !important;
+}
