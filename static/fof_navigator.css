@@ -22,7 +22,7 @@ body {
 
 /* Smartphones (landscape) ----------- */
 @media only screen 
-and (min-width : 321px) {
+and (min-width : 641px) {
 	#tab_left_button {
 		width: 8.125%; /*39 px*/
 		height: auto !important;
@@ -74,7 +74,7 @@ and (min-width : 321px) {
 
 /* Smartphones (portrait) ----------- */
 @media only screen 
-and (max-width : 320px) {
+and (max-width : 640px) {
 	#tab_left_button {
 		width: 52px;
 		height: 57px;
