@@ -14,6 +14,12 @@ body {
     /*width:100%;*/
 }
 
+#newImg{
+    max-width:100%%;
+    height:auto !important;
+    width:auto !important;
+}
+
 /* Smartphones (landscape) ----------- */
 @media only screen 
 and (min-width : 321px) {
