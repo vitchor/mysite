@@ -3,7 +3,6 @@ body {
 	font-family: Helvetica;
 	background-image: url(/static/dyfocus_content_background.gif);
 	overflow: hidden;
-	-webkit-text-size-adjust: none;
 }
 
 #wrapper {
@@ -15,9 +14,9 @@ body {
 }
 
 #newImg{
-    max-width:100%%;
-    height:auto !important;
-    width:auto !important;
+    max-width:100%;
+    height:auto;
+    width:auto;
 }
 
 #main_table{
@@ -37,7 +36,6 @@ body {
 		
 	}
 	
-	}
 	#tab_left_separator {
 		width: 25%;
 		height: 42px;
