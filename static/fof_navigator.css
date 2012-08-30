@@ -44,7 +44,7 @@ body {
 	
 	#tab_logo {
 		width: 33.75%;
-		height: auto !important;
+		height: 42px;
 	}
 	
 	#img_logo {
@@ -63,7 +63,7 @@ body {
 	
 	#tab_right_button {
 		width:8.125%;
-		height: auto !important;
+		height:42px;
 	}
 	
 	#img_right_button {
@@ -74,19 +74,19 @@ body {
 /* Smartphones (portrait) ----------- */
 @media only screen and (max-device-width : 320px) {
 	#tab_left_button {
-		width: 16.25%;
-		height: auto !important;
+		width: 52px;
+		height: 57px;
 	}
 	#tab_left_separator {
-		width: 0%;
+		width: 0;
 	}
 	#img_left_separator {
 		width:0px;
 		height:0px;
 	}
 	#tab_logo {
-		width: 67.5%;
-		height: auto !important;
+		width: 216px;
+		height: 57px;
 	}	
 	#tab_right_separator {
 		width: 0%;
@@ -96,7 +96,7 @@ body {
 		height:0px;
 	}
 	#tab_right_button {
-		width:16.25%;
-		height: auto !important;
+		width:52px;
+		height:57px;
 	}
 }
