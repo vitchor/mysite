@@ -21,8 +21,7 @@ body {
 }
 
 /* Smartphones (landscape) ----------- */
-/*@media only screen 
-and (min-width : 321px) {
+@media only screen and (min-device-width : 321px) {
 	#tab_left_button {
 		width: 8.125%;
 		height: auto !important;
@@ -70,11 +69,10 @@ and (min-width : 321px) {
 	#img_right_button {
 		
 	}
-}*/
+}
 
 /* Smartphones (portrait) ----------- */
-@media only screen 
-and (max-width : 320px) {
+@media only screen and (max-device-width : 320px) {
 	#tab_left_button {
 		width: 16.25%;
 		height: auto !important;
