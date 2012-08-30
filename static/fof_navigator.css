@@ -80,24 +80,22 @@ and (max-width : 640px) {
 		height: 57px;
 	}
 	#tab_left_separator {
-		width: 0px;
-		height: 0px;
+		width: 1px;
 	}
 	#img_left_separator {
-		width:0px;
-		height:0px;
+		width:1px;
+		height:1px;
 	}
 	#tab_logo {
 		width: 216px;
 		height: 57px;
 	}	
 	#tab_right_separator {
-		width: 0px;
-		height: 0px;
+		width: 1px;
 	}
 	#img_right_separator {
-		width:0px;
-		height:0px;
+		width:1px;
+		height:1px;
 	}
 	#tab_right_button {
 		width: 52px;
