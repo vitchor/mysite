@@ -4,16 +4,7 @@ body {
 	background-image: url(/static/dyfocus_content_background.gif);
 	overflow: hidden;
 	padding: 0;
-}
-
-img {
-    margin: 0;
-    padding: 0;
-}
-
-table { 
-  border-spacing:0;
-  border-collapse:collapse;
+    line-height: 0;	
 }
 
 #wrapper {
@@ -40,50 +31,51 @@ table {
 
 #tab_left_button {
 	width: auto;
-	height: 42px;
+	height: 46px;
+
 }
 
 #img_left_button {
 	width: auto;
-	height: 42px;	
+	height: 46px;	
 }
 
 #tab_left_separator {
 	width: 50%;
-	height: 42px;
+	height: 46px;
 }
 
 #img_left_separator {
 	width:100%;
-	height:42px;
+	height:46px;
 }
 
 #tab_logo {
 	width: auto;
-	height: 42px;
+	height: 46px;
 }
 
 #img_logo {
 	width: auto;
-	height: 42px;
+	height: 46px;
 }
 
 #tab_right_separator {
 	width: 50%;
-	height: 42px;
+	height: 46px;
 }
 
 #img_right_separator {
 	width:100%;
-	height:42px;
+	height:46px;
 }
 
 #tab_right_button {
 	width:auto;
-	height:42px;
+	height:46px;
 }
 
 #img_right_button {
 	width: auto;
-	height: 42px;
+	height: 46px;
 }
