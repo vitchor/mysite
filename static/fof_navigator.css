@@ -24,7 +24,7 @@ body {
 @media only screen and (min-device-width : 321px) {
 	#tab_left_button {
 		width: 8.125%;
-		height: auto !important;
+		height: 42px;
 	}
 	
 	#img_left_button {
