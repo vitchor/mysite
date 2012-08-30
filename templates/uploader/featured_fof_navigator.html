@@ -24,22 +24,22 @@
 
 	<body>
 	    
-    	<div id="wrapper" align="left">
+    	<div id="wrapper">
     	    
-	    	<table width="100%" id="Table_01" cellpadding="0" cellspacing="0">
+	    	<table id="main_table" cellpadding="0" cellspacing="0">
 	    		<tr>
 	    			<td id="tab_left_button">
-	    				<a href="/uploader/{{prev_fof_name}}/featured_fof"/>
-	    				<img width="100%" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="<"></a></td>
+	    				<a href="/uploader/{{prev_fof_name}}/featured_fof">
+	    				<img id="img_left_button" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="<"></a></td>
 					<td id="tab_left_separator">
 						<img id="img_left_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
 	    			<td id="tab_logo">
-	    				<img width="100%" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us"></td>
+	    				<img id="img_logo" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us"></td>
 					<td id="tab_right_separator">
 						<img id="img_right_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
 	    			<td id="tab_right_button">
 	    				<a href="/uploader/{{next_fof_name}}/featured_fof">
-	    				<img width="100%" src="{{ STATIC_URL }}dyfocus_next.gif" alt=">"></a></td>
+	    				<img id="img_right_button" src="{{ STATIC_URL }}dyfocus_next.gif" alt=">"></a></td>
 	    		</tr>
 
 	    		<tr>

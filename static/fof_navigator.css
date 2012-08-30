@@ -20,6 +20,10 @@ body {
     width:auto !important;
 }
 
+#main_table{
+	width:100%;
+}
+
 /* Smartphones (landscape) ----------- */
 @media only screen and (min-device-width : 321px) {
 	#tab_left_button {
@@ -77,6 +81,10 @@ body {
 		width: 52px;
 		height: 57px;
 	}
+	
+	#img_left_button {
+		
+	}
 	#tab_left_separator {
 		width: 0;
 	}
@@ -88,6 +96,9 @@ body {
 		width: 216px;
 		height: 57px;
 	}	
+	#img_logo {
+		
+	}
 	#tab_right_separator {
 		width: 0%;
 	}
@@ -98,5 +109,8 @@ body {
 	#tab_right_button {
 		width:52px;
 		height:57px;
+	}
+	#img_right_button {
+		
 	}
 }
