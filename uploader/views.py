@@ -24,57 +24,66 @@ def index(request):
 @csrf_exempt
 def image(request):
     
-    image = Image.open(cStringIO.StringIO(request.FILES['apiupload'].read()))
-    
-    out_image = cStringIO.StringIO()
-    image.save(out_image, 'jpeg')
-    
-    #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
-    
-    #Gets information from post
-    user_device_id = request.POST['device_id']
-    frame_index = request.POST['frame_index']
-    frame_focal_point_x = request.POST['frame_focal_point_x']
-    frame_focal_point_y = request.POST['frame_focal_point_y']
-    fof_name = request.POST['fof_name']
+    #Gets fof info
     fof_size = request.POST['fof_size']
+    user_device_id = request.POST['device_id']
+    fof_name = request.POST['fof_name']
     
+    #Get/Creates user
     try:
         frame_user = User.objects.get(device_id=user_device_id)
     except (KeyError, User.DoesNotExist):
         frame_user = User(name='', device_id=user_device_id, pub_date=timezone.now())
         frame_user.save()
-        
+    
+    #Gets/Creates fof
     try:
         frame_FOF = FOF.objects.get(name=fof_name)
     except (KeyError, FOF.DoesNotExist):
         frame_FOF = frame_user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
     
-    ###TODO###
-    #focal point
-    
-    #Creates the image key with the following format:
-    #frame_name = <device_id>_<fof_name>_<frame_index>.jpeg
-    frame_name = user_device_id
-    frame_name += '_'
-    frame_name += fof_name
-    frame_name += '_'
-    frame_name += frame_index
-    frame_name += '.jpeg'
-        
-    #Creates url:
-    #frame_url = <s3_url>/<frame_name>
-    frame_url = 'http://s3.amazonaws.com/dyfocus/'
-    frame_url += frame_name
-    
-    frame = frame_FOF.frame_set.create(url = frame_url, index = frame_index, focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
-    
+    #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
     b = conn.get_bucket('dyfocus')
-    k = b.new_key(frame_name)
     
-    #Note we're setting contents from the in-memory string provided by cStringIO
-    k.set_contents_from_string(out_image.getvalue())
+    #Creates all frames at once
+    for i in range(int(fof_size)):
+        
+        #Actual index image key
+        key = 'apiupload_' + str(i)
+        
+        image = Image.open(cStringIO.StringIO(request.FILES[key].read()))
+        
+        out_image = cStringIO.StringIO()
+        image.save(out_image, 'jpeg')
+        
+        #Gets information from post
+        frame_focal_point_x_key = 'frame_focal_point_x_' + str(i)
+        frame_focal_point_y_key = 'frame_focal_point_y_' + str(i)
+        
+        frame_focal_point_x = request.POST[frame_focal_point_x_key]
+        frame_focal_point_y = request.POST[frame_focal_point_y_key]
+        
+        #Creates the image key with the following format:
+        #frame_name = <device_id>_<fof_name>_<frame_index>.jpeg
+        frame_name = user_device_id
+        frame_name += '_'
+        frame_name += fof_name
+        frame_name += '_'
+        frame_name += str(i)
+        frame_name += '.jpeg'
+        
+        #Creates url:
+        #frame_url = <s3_url>/<frame_name>
+        frame_url = 'http://s3.amazonaws.com/dyfocus/'
+        frame_url += frame_name
+        
+        frame = frame_FOF.frame_set.create(url = frame_url, index = str(i), focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
+        
+        k = b.new_key(frame_name)
+        
+        #Note we're setting contents from the in-memory string provided by cStringIO
+        k.set_contents_from_string(out_image.getvalue())
     
     return render_to_response('uploader/index.html', {},
                                context_instance=RequestContext(request))
@@ -157,4 +166,23 @@ def user_fof(request, device_id_value, fof_name_value):
     
     return render_to_response('uploader/fof_navigator.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
                                context_instance=RequestContext(request))
-        
+
+def user_fb_info(request):
+
+   device_id_value = request.POST['device_id']
+   user_name = request.POST['name']
+   user_facebook_token = request.POST['facebook_token']
+   user_facebook_id = request.POST['facebook_id']
+
+   try:
+       user = User.objects.get(device_id = user_device_id)    
+   except (KeyError, User.DoesNotExist):
+       user = User(device_id = device_id_value, name = user_name, facebook_token = user_facebook_token, facebook_id = user_facebook_id, pub_date=timezone.now()) 
+       user.save()
+   else:
+       user.name = user_name
+       user.facebook_token = user_facebook_token
+       user.facebook_id = user_facebook_id
+       user.save()
+
+   return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
