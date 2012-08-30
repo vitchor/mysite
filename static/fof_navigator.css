@@ -14,40 +14,10 @@ body {
     /*width:100%;*/
 }
 
-#newImg {
+#newImg{
     max-width:100%%;
     height:auto !important;
     width:auto !important;
-}
-
-/* Smartphones (portrait) ----------- */
-@media only screen and (max-device-width : 320px) {
-	#tab_left_button {
-		width: 52px;
-		height: 57px;
-	}
-	#tab_left_separator {
-		width: 0;
-	}
-	#img_left_separator {
-		width:0px;
-		height:0px;
-	}
-	#tab_logo {
-		width: 216px;
-		height: 57px;
-	}	
-	#tab_right_separator {
-		width: 0%;
-	}
-	#img_right_separator {
-		width:0px;
-		height:0px;
-	}
-	#tab_right_button {
-		width:52px;
-		height:57px;
-	}
 }
 
 /* Smartphones (landscape) ----------- */
@@ -101,4 +71,32 @@ body {
 	}
 }
 
-
+/* Smartphones (portrait) ----------- */
+@media only screen and (max-device-width : 320px) {
+	#tab_left_button {
+		width: 52px;
+		height: 57px;
+	}
+	#tab_left_separator {
+		width: 0;
+	}
+	#img_left_separator {
+		width:0px;
+		height:0px;
+	}
+	#tab_logo {
+		width: 216px;
+		height: 57px;
+	}	
+	#tab_right_separator {
+		width: 0%;
+	}
+	#img_right_separator {
+		width:0px;
+		height:0px;
+	}
+	#tab_right_button {
+		width:52px;
+		height:57px;
+	}
+}
