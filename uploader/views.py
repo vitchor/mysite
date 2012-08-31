@@ -167,21 +167,20 @@ def user_fof(request, device_id_value, fof_name_value):
     return render_to_response('uploader/fof_navigator.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
                                context_instance=RequestContext(request))
 
+@csrf_exempt
 def user_fb_info(request):
-
+    
    device_id_value = request.POST['device_id']
    user_name = request.POST['name']
-   user_facebook_token = request.POST['facebook_token']
    user_facebook_id = request.POST['facebook_id']
 
    try:
-       user = User.objects.get(device_id = user_device_id)    
+       user = User.objects.get(device_id = device_id_value)    
    except (KeyError, User.DoesNotExist):
-       user = User(device_id = device_id_value, name = user_name, facebook_token = user_facebook_token, facebook_id = user_facebook_id, pub_date=timezone.now()) 
+       user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now()) 
        user.save()
    else:
        user.name = user_name
-       user.facebook_token = user_facebook_token
        user.facebook_id = user_facebook_id
        user.save()
 
