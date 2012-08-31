@@ -59,7 +59,7 @@ function homefade() {
             newImageIndex++;
         };
         
-        timer = setInterval("homefadeTrans();", 0.25);
+        timer = setInterval("homefadeTrans();", 1);
     }
 }
 
@@ -71,13 +71,13 @@ function homefadeTrans() {
         newImageOpacity = 0;
         oldImageOpacity = 100;
 
-        setTimeout("homefade();", 700);
+        setTimeout("homefade();", 1000);
 
     } else {
 
         newImage.style.opacity = newImageOpacity/100;
         newImage.style.filter = "alpha(opacity="+newImageOpacity+")";
-        newImageOpacity = newImageOpacity+2.5;
+        newImageOpacity = newImageOpacity+1;
 
         if (oldImage) {
             //oldImage.style.opacity = oldImageOpacity/100;
