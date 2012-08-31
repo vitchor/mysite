@@ -173,15 +173,17 @@ def user_fb_info(request):
    device_id_value = request.POST['device_id']
    user_name = request.POST['name']
    user_facebook_id = request.POST['facebook_id']
+   user_email = request.POST['email']   
 
    try:
        user = User.objects.get(device_id = device_id_value)    
    except (KeyError, User.DoesNotExist):
-       user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now()) 
+       user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
        user.save()
    else:
        user.name = user_name
        user.facebook_id = user_facebook_id
+       user.email = user_email
        user.save()
 
    return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
