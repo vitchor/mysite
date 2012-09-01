@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    
+	<head>
+	    <meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}fof_navigator.css" />
+	    <title>dyfocus FOF viewer</title>
+	</head>
+    
+	<body>
+
+	
+		<div id="wrapper">
+    	    
+	    	<table id="main_table" cellspacing="0" cellpadding="0">
+	    		<tr>
+	    			<td id="tab_left_button">
+	    				<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+	    				<img id="img_left_button" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="<"></a></td>
+					<td id="tab_left_separator">
+						<img id="img_left_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
+	    			<td id="tab_logo">
+	    				<img id="img_logo" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us"></td>
+					<td id="tab_right_separator">
+						<img id="img_right_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
+	    			<td id="tab_right_button">
+	    				<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+	    				<img id="img_right_button" src="{{ STATIC_URL }}dyfocus_next.gif" alt=">"></a></td>
+	    		</tr>
+
+	    		<tr>
+	    			<td colspan="5">
+	    			    Sorry, you and your friends haven't uploaded any photos yet. Take some pictures on the "Shoot" tab bar :)
+	    			</td>
+	    		</tr>
+	    	</table>
+
+	    </div>
+	</body>
+    
+</html>

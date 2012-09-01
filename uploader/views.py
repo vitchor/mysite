@@ -133,39 +133,45 @@ def featured_fof(request, fof_name_value):
                                context_instance=RequestContext(request))
     
 def user_fof(request, device_id_value, fof_name_value):
-    user = get_object_or_404(User, device_id=device_id_value)
+    #user = get_object_or_404(User, device_id=device_id_value)
     
-    fof_list = user.fof_set.all()
-    
-    i = 0
-    
-    if fof_name_value == "0":
-        fof = user.fof_set.all()[0]
-        fof.view_count += 1
-        fof.save()
-        frame_list = fof.frame_set.all().order_by('index')[:5]
+    try: 
+        user = User.objects.get(device_id = device_id_value)
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
         
-    else:    
-        for fof in fof_list:
-            if fof.name == fof_name_value:
-                fof.view_count += 1
-                fof.save()
-                frame_list = fof.frame_set.all().order_by('index')[:5]
-                break
-            i = i + 1
+        fof_list = user.fof_set.all()
+    
+        i = 0
+    
+        if fof_name_value == "0":
+            fof = user.fof_set.all()[0]
+            fof.view_count += 1
+            fof.save()
+            frame_list = fof.frame_set.all().order_by('index')[:5]
+        
+        else:    
+            for fof in fof_list:
+                if fof.name == fof_name_value:
+                    fof.view_count += 1
+                    fof.save()
+                    frame_list = fof.frame_set.all().order_by('index')[:5]
+                    break
+                i = i + 1
             
-    if len(fof_list) - 1 == i:
-        next_fof_name = fof_list[0].name
-    else:
-        next_fof_name = fof_list[i+1].name
+        if len(fof_list) - 1 == i:
+            next_fof_name = fof_list[0].name
+        else:
+            next_fof_name = fof_list[i+1].name
     
-    if i == 0:
-        prev_fof_name = fof_list[len(fof_list) - 1].name
-    else:
-        prev_fof_name = fof_list[i - 1].name
+        if i == 0:
+            prev_fof_name = fof_list[len(fof_list) - 1].name
+        else:
+            prev_fof_name = fof_list[i - 1].name
     
-    return render_to_response('uploader/fof_navigator.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
-                               context_instance=RequestContext(request))
+        return render_to_response('uploader/fof_navigator.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
+                                   context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_info(request):
