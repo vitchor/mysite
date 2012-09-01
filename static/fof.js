@@ -31,19 +31,16 @@ function homefade() {
         newImage.src = imgsArray[newImageIndex];
         
         newImage.id = "newImg"
-        newImage.align = "center"
-        //newImage.marginRight = "auto"
-        //newImage.marginLeft = "auto"                
+        newImage.align = "center"                
         newImage.style.opacity = "0";
         newImage.style.filter = "alpha(opacity=0)";
-        //newImage.style.max-width = "100%%";
-        newImage.style.height = "auto";
-        newImage.style.width = "auto";
+        //newImage.style.height = "auto";
+        //newImage.style.width = "auto";
 
-        
+        newImage.style.position = 'absolute';
         homediv.appendChild(newImage);
         if (oldImage) {
-            newImage.style.position = 'absolute';
+           // newImage.style.position = 'absolute';
             var big_coordinates=getXYpos(oldImage);
             var bp_x = big_coordinates['x'];
             var bp_y = big_coordinates['y'];
