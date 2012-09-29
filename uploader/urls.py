@@ -7,5 +7,6 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<fof_name>\S+)/fof/$', 'fof'),
     url(r'^(?P<fof_name_value>\S+)/featured_fof/$', 'featured_fof'),    
     url(r'^(?P<device_id_value>\S+)/user/(?P<fof_name_value>\S+)/fof_name/$', 'user_fof'),
+    url(r'^(?P<fof_name_value>\S+)/new_fof/$', 'new_fof'),   
     url(r'^fof_not_found/$', 'fof_not_found')    
 )
