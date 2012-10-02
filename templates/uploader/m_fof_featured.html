@@ -1,37 +1,35 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
     
-	<head>
-	    <meta name="viewport" content="width=device-width" />
+    <head>
+        <meta name="viewport" content="width=device-width" />
 		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}fof_navigator.css" />
-	    <title>dyfocus FOF viewer</title>
-    
-	    <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
-    
-	    <script type="text/javascript">
+        <title>dyfocus FOF viewer</title>
         
-	        var imgsArray = new Array();
+        <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
         
-	        {% for frame in frame_list %}
-	            imgsArray[{{ frame.index }}] = "{{ frame.url }}";
-	        {% endfor %}
+        <script type="text/javascript">
+            
+            var imgsArray = new Array();
+            
+            {% for frame in frame_list %}
+                imgsArray[{{ frame.index }}] = "{{ frame.url }}";
+            {% endfor %}
+            
+            window.onload=homefade;
+            
+        </script>
         
-	        window.onload=homefade;
-        
-	    </script>
-    
-	</head>
-    
-	<body>
+    </head>
 
-	
-		<div id="wrapper">
+	<body>
+	    
+    	<div id="wrapper">
     	    
 	    	<table id="main_table" cellspacing="0" cellpadding="0">
 	    		<tr>
 	    			<td id="tab_left_button">
-	    				<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+	    				<a href="/uploader/{{prev_fof_name}}/featured_fof/m/">
 	    				<img id="img_left_button" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="<"></a></td>
 					<td id="tab_left_separator">
 						<img id="img_left_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
@@ -40,7 +38,7 @@
 					<td id="tab_right_separator">
 						<img id="img_right_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
 	    			<td id="tab_right_button">
-	    				<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+	    				<a href="/uploader/{{next_fof_name}}/featured_fof/m/">
 	    				<img id="img_right_button" src="{{ STATIC_URL }}dyfocus_next.gif" alt=">"></a></td>
 	    		</tr>
 
@@ -53,7 +51,8 @@
 
 	    </div>
 	
-    	<script> homefade();</script>
+	
+    	<script type="text/javascript"> homefade();</script>
 	</body>
     
 </html>

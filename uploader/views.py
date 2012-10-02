@@ -129,15 +129,14 @@ def featured_fof(request, fof_name_value):
     else:
         prev_fof_name = featured_fof_list[i - 1].fof.name
 
-    return render_to_response('uploader/featured_fof_navigator.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
-                               context_instance=RequestContext(request))
+    return render_to_response('uploader/fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
 
-def new_fof(request, fof_name_value):
-    
+def m_featured_fof(request, fof_name_value):
+
     featured_fof_list = Featured_FOF.objects.all()
-    
+
     i = 0
-    
+
     if fof_name_value == "0":
         featured_fof = featured_fof_list[0]
         fof = get_object_or_404(FOF, id=featured_fof.fof_id)
@@ -152,7 +151,7 @@ def new_fof(request, fof_name_value):
                 frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
                 break
             i = i + 1
-    
+
     if len(featured_fof_list) - 1 == i:
         next_fof_name = featured_fof_list[0].fof.name
     else:
@@ -163,9 +162,8 @@ def new_fof(request, fof_name_value):
     else:
         prev_fof_name = featured_fof_list[i - 1].fof.name
 
-    return render_to_response('uploader/new_fof_viewer.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
-                               context_instance=RequestContext(request))
-    
+    return render_to_response('uploader/m_fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+                               
 def user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
     
@@ -204,8 +202,47 @@ def user_fof(request, device_id_value, fof_name_value):
         else:
             prev_fof_name = fof_list[i - 1].name
     
-        return render_to_response('uploader/fof_navigator.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name},
-                                   context_instance=RequestContext(request))
+        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+
+def m_user_fof(request, device_id_value, fof_name_value):
+    #user = get_object_or_404(User, device_id=device_id_value)
+
+    try: 
+        user = User.objects.get(device_id = device_id_value)
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
+
+        fof_list = user.fof_set.all()
+
+        i = 0
+
+        if fof_name_value == "0":
+            fof = user.fof_set.all()[0]
+            fof.view_count += 1
+            fof.save()
+            frame_list = fof.frame_set.all().order_by('index')[:5]
+
+        else:    
+            for fof in fof_list:
+                if fof.name == fof_name_value:
+                    fof.view_count += 1
+                    fof.save()
+                    frame_list = fof.frame_set.all().order_by('index')[:5]
+                    break
+                i = i + 1
+
+        if len(fof_list) - 1 == i:
+            next_fof_name = fof_list[0].name
+        else:
+            next_fof_name = fof_list[i+1].name
+
+        if i == 0:
+            prev_fof_name = fof_list[len(fof_list) - 1].name
+        else:
+            prev_fof_name = fof_list[i - 1].name
+
+        return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_info(request):

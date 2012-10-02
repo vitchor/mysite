@@ -12,7 +12,7 @@
 	<script language=javascript>
 		<!--
 		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
-	   		location.replace("/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name/m/");
+	   		location.replace("/uploader/{{ current_fof }}/featured_fof/m/");
 		}
 		-->
 	</script>
@@ -42,7 +42,7 @@
 		<div id="colwrap2">
 			<img src="{{ STATIC_URL }}images/fof_viewer_r3_c1.png" id="fof_viewer_r3_c1" alt="" />
 						<img src="{{ STATIC_URL }}images/fof_viewer_r4_c1.png" id="fof_viewer_r4_c1" alt="" />
-						<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/fof_viewer_r4_c2.png" id="fof_viewer_r4_c2" alt="" /></a>
+						<a href="/uploader/{{prev_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/fof_viewer_r4_c2.png" id="fof_viewer_r4_c2" alt="" /></a>
 						<!--<img src="{{ STATIC_URL }}images/fof_viewer_r4_c3.png" id="fof_viewer_r4_c3" alt="" />-->
 						<div class="clearFloat"></div>
 			<img src="{{ STATIC_URL }}images/fof_viewer_r5_c1.png" id="fof_viewer_r5_c1" alt="" />
@@ -62,7 +62,7 @@
 			<img src="{{ STATIC_URL }}images/fof_viewer_r3_c7.png" id="fof_viewer_r3_c7" alt="" />
 						<div class="clearFloat"></div>
 			<img src="{{ STATIC_URL }}images/fof_viewer_r4_c7.png" id="fof_viewer_r4_c7" alt="" />
-						<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/fof_viewer_r4_c8.png" id="fof_viewer_r4_c8" alt="" /></a>
+						<a href="/uploader/{{next_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/fof_viewer_r4_c8.png" id="fof_viewer_r4_c8" alt="" /></a>
 						<img src="{{ STATIC_URL }}images/fof_viewer_r4_c9.png" id="fof_viewer_r4_c9" alt="" />
 						<div class="clearFloat"></div>
 			<img src="{{ STATIC_URL }}images/fof_viewer_r5_c7.png" id="fof_viewer_r5_c7" alt="" />
