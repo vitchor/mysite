@@ -128,8 +128,13 @@ def featured_fof(request, fof_name_value):
         prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
     else:
         prev_fof_name = featured_fof_list[i - 1].fof.name
+        
+    if featured_fof.fof.user.name:
+        user_name = featured_fof.fof.user.name
+    else:
+        user_name = "Unknown user"
 
-    return render_to_response('uploader/fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+    return render_to_response('uploader/fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_featured_fof(request, fof_name_value):
 
@@ -161,8 +166,13 @@ def m_featured_fof(request, fof_name_value):
         prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
     else:
         prev_fof_name = featured_fof_list[i - 1].fof.name
+        
+    if featured_fof.fof.user.name:
+        user_name = featured_fof.fof.user.name
+    else:
+        user_name = "Unknown user"
 
-    return render_to_response('uploader/m_fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+    return render_to_response('uploader/m_fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
                                
 def user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
@@ -201,8 +211,13 @@ def user_fof(request, device_id_value, fof_name_value):
             prev_fof_name = fof_list[len(fof_list) - 1].name
         else:
             prev_fof_name = fof_list[i - 1].name
+            
+        if featured_fof.fof.user.name:
+            user_name = featured_fof.fof.user.name
+        else:
+            user_name = "Unknown user"
     
-        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
@@ -241,8 +256,13 @@ def m_user_fof(request, device_id_value, fof_name_value):
             prev_fof_name = fof_list[len(fof_list) - 1].name
         else:
             prev_fof_name = fof_list[i - 1].name
+            
+        if featured_fof.fof.user.name:
+            user_name = featured_fof.fof.user.name
+        else:
+            user_name = "Unknown user"
 
-        return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value}, context_instance=RequestContext(request))
+        return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_info(request):
