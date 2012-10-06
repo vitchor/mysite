@@ -212,8 +212,8 @@ def user_fof(request, device_id_value, fof_name_value):
         else:
             prev_fof_name = fof_list[i - 1].name
             
-        if featured_fof.fof.user.name:
-            user_name = featured_fof.fof.user.name
+        if fof.user.name:
+            user_name = fof.user.name
         else:
             user_name = "Unknown user"
     
@@ -257,8 +257,8 @@ def m_user_fof(request, device_id_value, fof_name_value):
         else:
             prev_fof_name = fof_list[i - 1].name
             
-        if featured_fof.fof.user.name:
-            user_name = featured_fof.fof.user.name
+        if fof.user.name:
+            user_name = fof.user.name
         else:
             user_name = "Unknown user"
 
