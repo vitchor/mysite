@@ -24,6 +24,7 @@ class FOF(models.Model):
 
 class Featured_FOF(models.Model):
     fof = models.ForeignKey(FOF)
+    rank = models.IntegerField()
     def __unicode__(self):
         return self.fof.name
 
