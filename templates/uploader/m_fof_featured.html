@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    
-    <head>
-        <meta name="viewport" content="width=device-width" />
-		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}fof_navigator.css" />
-        <title>dyfocus FOF viewer</title>
-        
-        <script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}m_fof_viewer.css" />
+		
+		<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
         
         <script type="text/javascript">
             
@@ -33,40 +32,29 @@
 		  })();
 
 		</script>
-        
-    </head>
-
+	</head>
 	<body>
-	    
-    	<div id="wrapper">
-    	    
-	    	<table id="main_table" cellspacing="0" cellpadding="0">
-	    		<tr>
-	    			<td id="tab_left_button">
-	    				<a href="/uploader/{{prev_fof_name}}/featured_fof/m/">
-	    				<img id="img_left_button" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="<"></a></td>
-					<td id="tab_left_separator">
-						<img id="img_left_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
-	    			<td id="tab_logo">
-	    				<img id="img_logo" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us"></td>
-					<td id="tab_right_separator">
-						<img id="img_right_separator" src="{{ STATIC_URL }}dyfocus_separator.gif" alt="wuut"></td>
-	    			<td id="tab_right_button">
-	    				<a href="/uploader/{{next_fof_name}}/featured_fof/m/">
-	    				<img id="img_right_button" src="{{ STATIC_URL }}dyfocus_next.gif" alt=">"></a></td>
-	    		</tr>
-
-	    		<tr>
-	    			<td colspan="5">
-	    			    <div id="homeimg"> </div>
-	    			</td>
-	    		</tr>
-	    	</table>
-
-	    </div>
-	
-	
-    	<script type="text/javascript"> homefade();</script>
+		<div id="wrapper">
+			<div id="top_bar">
+				<div id="center" class="column">
+					<img id="logo" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us" />
+				</div>
+				<div id="left_button" class="column">
+					<a href="/uploader/{{prev_fof_name}}/featured_fof/m/">
+						<img id="left_arrow" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="" />
+					</a>
+				</div>
+				<div id="right_button" class="column">
+					<a href="/uploader/{{next_fof_name}}/featured_fof/m/">
+						<img id="right_arrow" src="{{ STATIC_URL }}dyfocus_next.gif" alt="" />
+					</a>
+				</div>
+			</div>
+			<div class="clearFloat"></div>
+			<div id="contents">
+				<div id="homeimg"></div>
+		</div>
+		
+		<script type="text/javascript"> homefade();</script>
 	</body>
-    
 </html>
