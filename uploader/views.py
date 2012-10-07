@@ -100,7 +100,7 @@ def fof(request, fof_name):
 
 def featured_fof(request, fof_name_value):
     
-    featured_fof_list = Featured_FOF.objects.all().order_by('rank')
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
     
     i = 0
     
