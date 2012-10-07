@@ -42,34 +42,73 @@
 	  })();
 
 	</script>
+	
 </head>
 
 <body>
-
-<div id="main">
-	<div id="df_background">
-		<img src="{{ STATIC_URL }}images/fof_viewer_r1_c1.png" id="fof_viewer_r1_c1" alt="" />
-				<img src="{{ STATIC_URL }}images/fof_viewer_r1_c5.png" id="fof_viewer_r1_c5" alt="" />
+	<div id="main">
+	
+		<div id="df_background">
+			
+			<img src="{{ STATIC_URL }}images/fof_viewer_r1_c1.png" id="fof_viewer_r1_c1" alt="" />
+			<img src="{{ STATIC_URL }}images/fof_viewer_r1_c5.png" id="fof_viewer_r1_c5" alt="" />
+			
+			<div class="clearFloat"></div>
+			
+			<div id="colwrap2">
+			
+				<div id="left_arrow">
+					<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+						<img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
+					</a>
+				</div>
+			
 				<div class="clearFloat"></div>
-		<div id="colwrap2">
-			<div id="left_arrow"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
-			<div class="clearFloat"></div>
+			
+			</div>
+			
+			<div id="colwrap3">
+			
+				<div id="homeimg">
+					
+					<div id="frontImageDiv">
+						<img id="backImage"/>
+					</div>
+					
+					<div id="backImageDiv">
+						<img id="frontImage"/>
+					</div>
+					
+				</div>
+				
+				<div id="posted_by"> <b>Posted by:</b> {{ user_name }}</div>
+				
+				<div class="clearFloat"></div>
+				
+			</div>
+			
+			<div id="colwrap4">
+				
+				<div id="right_arrow">
+					<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+						<img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
+					</a>
+				</div>
+				
+				<div class="clearFloat"></div>
+			
+			</div>
+			
 		</div>
-		<div id="colwrap3">
-			<div id="homeimg"></div>
-			<div id="posted_by"> <b>Posted by:</b> {{ user_name }}</div>
-			<div class="clearFloat"></div>
-		</div>
-		<div id="colwrap4">
-			<div id="right_arrow"><a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" alt="" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
-			<div class="clearFloat"></div>
-		</div>
-	</div>
-	<div class="clearFloat"></div>
-	<img src="{{ STATIC_URL }}images/fof_viewer_r8_c1.png" id="fof_viewer_r8_c1" alt="" />
+		
 		<div class="clearFloat"></div>
-</div>
+		
+		<img src="{{ STATIC_URL }}images/fof_viewer_r8_c1.png" id="fof_viewer_r8_c1" alt="" />
+		
+		<div class="clearFloat"></div>
+		
+	</div>
 
-<script type="text/javascript"> homefade();</script>
 </body>
 </html>
+
