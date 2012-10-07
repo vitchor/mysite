@@ -12,6 +12,7 @@ var timer = 0;
 var homediv;
 
 function homefade() {
+    /*
     if (!homediv) {
         homediv = document.getElementById("homeimg");
 
@@ -56,7 +57,7 @@ function homefade() {
         };
         
         timer = setInterval("homefadeTrans();", 1);
-    }
+    }*/
 }
 
 function homefadeTrans() {

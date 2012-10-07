@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}m_fof_viewer.css" />
 		
-		<script type="text/javascript" src="{{ STATIC_URL }}fof.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
         
         <script type="text/javascript">
             
@@ -52,9 +52,17 @@
 			</div>
 			<div class="clearFloat"></div>
 			<div id="contents">
-				<div id="homeimg"></div>
+				<div id="homeimg">
+					<div id="backImageDiv">
+						<img id="backImage"/>
+					</div>
+				
+					<div id="frontImageDiv">
+						<img id="frontImage"/>
+					</div>
+				</div>
+
 		</div>
 		
-		<script type="text/javascript"> homefade();</script>
 	</body>
 </html>
