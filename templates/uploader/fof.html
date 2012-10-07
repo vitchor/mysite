@@ -52,7 +52,7 @@
 				<img src="{{ STATIC_URL }}images/fof_viewer_r1_c5.png" id="fof_viewer_r1_c5" alt="" />
 				<div class="clearFloat"></div>
 		<div id="colwrap2">
-			<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/left-arrow-light.png" id="fof_viewer_r4_c2" alt="" onmouseover="this.src='{{ STATIC_URL }}images/left-arrow-dark.png'" onmouseout="this.src='{{ STATIC_URL }}images/left-arrow-light.png'" /></a>
+			<div id="left_arrow"><a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
 			<div class="clearFloat"></div>
 		</div>
 		<div id="colwrap3">
@@ -61,7 +61,7 @@
 			<div class="clearFloat"></div>
 		</div>
 		<div id="colwrap4">
-			<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/right-arrow-light" id="fof_viewer_r4_c8" alt="" onmouseover="this.src='{{ STATIC_URL }}images/right-arrow-dark.png'" onmouseout="this.src='{{ STATIC_URL }}images/right-arrow-light.png'" /></a>
+			<div id="right_arrow"><a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/"><img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" alt="" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
 			<div class="clearFloat"></div>
 		</div>
 	</div>

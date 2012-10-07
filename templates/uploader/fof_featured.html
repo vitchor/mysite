@@ -53,16 +53,16 @@
 				<img src="{{ STATIC_URL }}images/fof_viewer_r1_c5.png" id="fof_viewer_r1_c5" alt="" />
 				<div class="clearFloat"></div>
 		<div id="colwrap2">
-			<a href="/uploader/{{prev_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/left-arrow-light.png" id="fof_viewer_r4_c2" onmouseover="this.src='{{ STATIC_URL }}images/left-arrow-dark.png'" onmouseout="this.src='{{ STATIC_URL }}images/left-arrow-light.png'" /></a>
+			<div id="left_arrow"><a href="/uploader/{{prev_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
 			<div class="clearFloat"></div>
 		</div>
 		<div id="colwrap3">
 			<div id="homeimg"></div>
 			<div id="posted_by"> <b>Posted by:</b> {{ user_name }}</div>
-			<div class="clearFloat"></div>
+						<div class="clearFloat"></div>
 		</div>
 		<div id="colwrap4">
-			<a href="/uploader/{{next_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/right-arrow-light.png" id="fof_viewer_r4_c8" alt="" onmouseover="this.src='{{ STATIC_URL }}images/right-arrow-dark.png'" onmouseout="this.src='{{ STATIC_URL }}images/right-arrow-light.png'"  /></a>
+			<div id="right_arrow"><a href="/uploader/{{next_fof_name}}/featured_fof"><img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" /></a></div>
 			<div class="clearFloat"></div>
 		</div>
 	</div>
