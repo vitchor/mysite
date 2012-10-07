@@ -138,7 +138,7 @@ def featured_fof(request, fof_name_value):
 
 def m_featured_fof(request, fof_name_value):
 
-    featured_fof_list = Featured_FOF.objects.all()
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
     i = 0
 
@@ -183,12 +183,12 @@ def user_fof(request, device_id_value, fof_name_value):
         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     else:
         
-        fof_list = user.fof_set.all()
+        fof_list = user.fof_set.all().order_by('-pub_date')
     
         i = 0
     
         if fof_name_value == "0":
-            fof = user.fof_set.all()[0]
+            fof = user.fof_set.all().order_by('-pub_date')[0]
             fof.view_count += 1
             fof.save()
             frame_list = fof.frame_set.all().order_by('index')[:5]
@@ -228,12 +228,12 @@ def m_user_fof(request, device_id_value, fof_name_value):
         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     else:
 
-        fof_list = user.fof_set.all()
+        fof_list = user.fof_set.all().order_by('-pub_date')
 
         i = 0
 
         if fof_name_value == "0":
-            fof = user.fof_set.all()[0]
+            fof = user.fof_set.all().order_by('-pub_date')[0]
             fof.view_count += 1
             fof.save()
             frame_list = fof.frame_set.all().order_by('index')[:5]
