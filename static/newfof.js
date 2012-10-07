@@ -7,42 +7,47 @@ var backImageIndex = 0;
 var newImageOpacity = 0.00;
 
 var timer = 0;
+var threadRunning = false;
 
 function homefade() {
     
-    if(imgsArray.length > 1) {
+    if (!threadRunning) {
+        threadRunning = true;
         
-        if (!(frontImage && backImage)) {
-            frontImage = document.getElementById('frontImage');
-            backImage = document.getElementById('backImage');
-        }
+        if (imgsArray.length > 1) {
         
-        backImage.src = imgsArray[backImageIndex];
-        
-        frontImage.style.opacity = "0";
-        backImage.style.opacity = "1";
-        
-        frontImage.src = imgsArray[frontImageIndex];
-        
-        if (frontImageIndex == (imgsArray.length - 1)) {
-            frontImageIndex = 0;
-            backImageIndex = imgsArray.length - 1;
-        
-        } else {    
-            frontImageIndex++;
-            
-            if (backImageIndex == (imgsArray.length - 1)) {
-                backImageIndex = 0; 
-            } else {
-                backImageIndex++;
+            if (!(frontImage && backImage)) {
+                frontImage = document.getElementById('frontImage');
+                backImage = document.getElementById('backImage');
             }
-            
-        }
         
-        timer = setInterval("homefadeTrans();", 10);
-    } else {
-        frontImage = document.getElementById('frontImage');
-        frontImage.src = imgsArray[0];
+            backImage.src = imgsArray[backImageIndex];
+        
+            frontImage.style.opacity = "0";
+            backImage.style.opacity = "1";
+        
+            frontImage.src = imgsArray[frontImageIndex];
+        
+            if (frontImageIndex == (imgsArray.length - 1)) {
+                frontImageIndex = 0;
+                backImageIndex = imgsArray.length - 1;
+        
+            } else {    
+                frontImageIndex++;
+            
+                if (backImageIndex == (imgsArray.length - 1)) {
+                    backImageIndex = 0; 
+                } else {
+                    backImageIndex++;
+                }
+            
+            }
+        
+            timer = setInterval("homefadeTrans();", 10);
+        } else {
+            frontImage = document.getElementById('frontImage');
+            frontImage.src = imgsArray[0];
+        }
     }
 }
 
@@ -52,7 +57,7 @@ function homefadeTrans() {
         
         timer = 0;
         newImageOpacity = 0;
-        
+        threadRunning = false;
         setTimeout("homefade();", 1000);
         
     } else {
