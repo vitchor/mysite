@@ -11,9 +11,10 @@
             
             var imgsArray = new Array();
             
-            {% for frame in frame_list %}
-                imgsArray[{{ frame.index }}] = "{{ frame.url }}";
-            {% endfor %}
+	        {% for frame in frame_list %}
+	            imgsArray[{{ frame.index }}] = new Image();
+				imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
+	        {% endfor %}
             
             window.onload=homefade;
             
