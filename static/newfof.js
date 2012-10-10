@@ -58,7 +58,7 @@ function homefadeTrans() {
         timer = 0;
         newImageOpacity = 0;
         threadRunning = false;
-        setTimeout("homefade();", 1000);
+        setTimeout("homefade();", 2000);
         
     } else {
 
