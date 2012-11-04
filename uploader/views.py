@@ -13,6 +13,8 @@ import _imaging
 import random
 import string
 from django.utils import timezone
+from django.utils import simplejson as json
+from django.http import HttpResponse
 
 from uploader.models import User, FOF, Frame, Featured_FOF
 
@@ -284,3 +286,129 @@ def user_fb_info(request):
        user.save()
 
    return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
+   
+def json_fof(request, device_id_value, fof_name_value):
+    
+    response_data = {}
+    
+    try: 
+        user = User.objects.get(device_id = device_id_value)
+    except (KeyError, User.DoesNotExist):
+        response_data['result'] = 'error'
+        response_data['message'] = 'User does not exist'
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    else:
+        
+        fof_list = user.fof_set.all().order_by('-pub_date')
+    
+        i = 0
+    
+        if fof_name_value == "0":
+            fof = user.fof_set.all().order_by('-pub_date')[0]
+            fof.view_count += 1
+            fof.save()
+            frame_list = fof.frame_set.all().order_by('index')[:5]
+        
+        else:    
+            for fof in fof_list:
+                if fof.name == fof_name_value:
+                    fof.view_count += 1
+                    fof.save()
+                    frame_list = fof.frame_set.all().order_by('index')[:5]
+                    break
+                i = i + 1
+            
+        if len(fof_list) - 1 <= i:
+            next_fof_name = fof_list[0].name
+        else:
+            next_fof_name = fof_list[i+1].name
+    
+        if i == 0:
+            prev_fof_name = fof_list[len(fof_list) - 1].name
+        else:
+            prev_fof_name = fof_list[i - 1].name
+            
+        if fof.user.name:
+            user_name = fof.user.name
+        else:
+            user_name = "Unknown user"
+        
+        response_data['frame_list'] = ''
+        
+        for frame in frame_list:
+            if response_data['frame_list'] == '':
+                response_data['frame_list'] = str(frame)
+            else:
+                response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
+        
+        response_data['device_id_value'] = device_id_value
+        response_data['next_fof_name'] = next_fof_name
+        response_data['prev_fof_name'] = prev_fof_name
+        response_data['current_fof'] = fof_name_value
+        response_data['user_name'] = user_name
+        response_data['result'] = 'ok'
+        response_data['message'] = 'ok'
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+def json_fof_featured(request, fof_name_value):
+
+    response_data = {}
+
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+    i = 0
+
+    if fof_name_value == "0":
+        featured_fof = featured_fof_list[0]
+        fof = get_object_or_404(FOF, id=featured_fof.fof_id)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    else:
+        for featured_fof in featured_fof_list:
+            if featured_fof.fof.name == fof_name_value:
+                featured_fof.fof.view_count += 1
+                featured_fof.fof.save()
+                frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+                break
+            i = i + 1
+
+    try:
+        frame_list
+    except:
+        response_data['result'] = 'error'
+        response_data['message'] = 'Invalid FOF name'
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+    if len(featured_fof_list) - 1 == i:
+        next_fof_name = featured_fof_list[0].fof.name
+    else:
+        next_fof_name = featured_fof_list[i+1].fof.name
+
+    if i == 0:
+        prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
+    else:
+        prev_fof_name = featured_fof_list[i - 1].fof.name
+        
+    if featured_fof.fof.user.name:
+        user_name = featured_fof.fof.user.name
+    else:
+        user_name = "Unknown user"
+
+    response_data['frame_list'] = ''
+
+    for frame in frame_list:
+        if response_data['frame_list'] == '':
+            response_data['frame_list'] = str(frame)
+        else:
+            response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
+
+    response_data['next_fof_name'] = next_fof_name
+    response_data['prev_fof_name'] = prev_fof_name
+    response_data['current_fof'] = fof_name_value
+    response_data['user_name'] = user_name
+    response_data['result'] = 'ok'
+    response_data['message'] = 'ok'
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
