@@ -15,19 +15,7 @@ function homefade() {
         threadRunning = true;
         
         if (imgsArray.length > 1) {
-        
-            if (!(frontImage && backImage)) {
-                frontImage = document.getElementById('frontImage');
-                backImage = document.getElementById('backImage');
-            }
-        
-            backImage.src = imgsArray[backImageIndex].src;
-        
-            frontImage.style.opacity = "0";
-            backImage.style.opacity = "1";
-        
-            frontImage.src = imgsArray[frontImageIndex].src;
-        
+            
             if (frontImageIndex == (imgsArray.length - 1)) {
                 frontImageIndex = 0;
                 backImageIndex = imgsArray.length - 1;
@@ -42,11 +30,39 @@ function homefade() {
                 }
             
             }
-        
+            
+            if (!backImageDiv || !frontImageDiv) {
+                var backImageDiv = document.getElementById('backImageDiv');
+                var frontImageDiv = document.getElementById('frontImageDiv');        
+            }
+            
+            imgsArray[backImageIndex].id = "backImage";
+            imgsArray[frontImageIndex].id = "frontImage";
+            
+            imgsArray[backImageIndex].style.opacity= "1";
+            
+            //Adds the back Image object:
+            if (backImageDiv.hasChildNodes()) {
+                 backImageDiv.removeChild(backImageDiv.lastChild);
+             }      
+            backImageDiv.appendChild(imgsArray[backImageIndex]);
+            
+            //Hides the front image:
+            imgsArray[frontImageIndex].style.opacity= "0";
+            
+            //Adds front image object:
+            if (frontImageDiv.hasChildNodes()) {
+                frontImageDiv.removeChild(frontImageDiv.lastChild);
+            }
+            frontImageDiv.appendChild(imgsArray[frontImageIndex]);
+            
             timer = setInterval("homefadeTrans();", 10);
+            
         } else {
-            frontImage = document.getElementById('frontImage');
-            frontImage.src = imgsArray[0].src;
+            var backImageDiv = document.getElementById('backImageDiv');
+            imgsArray[0].id = "backImage";
+            imgsArray[0].style.opacity = "1";
+            backImageDiv.appendChild(imgsArray[0]);
         }
     }
 }
@@ -61,9 +77,8 @@ function homefadeTrans() {
         setTimeout("homefade();", 2000);
         
     } else {
-
-        frontImage.style.opacity = newImageOpacity/100.0;
-        frontImage.style.filter = "alpha(opacity="+newImageOpacity+")";
+        imgsArray[frontImageIndex].style.opacity = newImageOpacity/100.0;
+        imgsArray[frontImageIndex].style.filter = "alpha(opacity="+newImageOpacity+")";
         newImageOpacity = newImageOpacity + 1;
         
     }
