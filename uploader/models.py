@@ -4,7 +4,7 @@ from django.db import models
 
 class User(models.Model):
     name = models.CharField(max_length=50, null=True)
-    device_id = models.CharField(max_length=200)
+    device_id = models.CharField(max_length=200, null=True)
     password = models.CharField(max_length=200, null=True)
     email = models.CharField(max_length=200, null=True)
     facebook_token = models.CharField(max_length=100, null=True)
@@ -16,6 +16,10 @@ class User(models.Model):
 class Friends(models.Model):
     friend_1 = models.ForeignKey(User, related_name='user_friend_1')
     friend_2 = models.ForeignKey(User, related_name='user_friend_2')
+    
+class Device(models.Model):
+    user = models.ForeignKey(User)
+    device_id = models.CharField(max_length=200)
     
 class FOF(models.Model):
     user = models.ForeignKey(User)
