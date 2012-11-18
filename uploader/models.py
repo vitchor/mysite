@@ -13,6 +13,10 @@ class User(models.Model):
     def __unicode__(self):
         return self.device_id
 
+class Friends(models.Model):
+    friend_1 = models.ForeignKey(User, related_name='user_friend_1')
+    friend_2 = models.ForeignKey(User, related_name='user_friend_2')
+    
 class FOF(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=200)
