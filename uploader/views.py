@@ -364,7 +364,6 @@ def user_fb_friends(request):
    
     # Populate the friends table with the new information
     for friend in friends_json['friends']:
-        print >>sys.stderr, friend
         try: 
             # Is there any user with the same facebook_id as the requesting user friend is?
             user_friend = User.objects.get(facebook_id = friend['facebook_id'])
@@ -393,10 +392,8 @@ def user_fb_friends(request):
                 
                 if response_data['friends_list'] == '':
                     response_data['friends_list'] = user_friend_object.facebook_id
-                    j = 0
                 else:
                     response_data['friends_list'] = response_data['friends_list'] + ',' + user_friend_object.facebook_id
-                    j = 0
                 
             except (KeyError, User.DoesNotExist):
                 # Nothing to do here
