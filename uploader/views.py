@@ -104,6 +104,39 @@ def fof(request, fof_name):
     return render_to_response('uploader/fof.html', {'frame_list':frame_list},
                                context_instance=RequestContext(request))
 
+def fof_not_found(request, fof_name):
+    fof = get_object_or_404(FOF, name=fof_name)
+    
+    frame_list = fof.frame_set.all().order_by('index')[:5]
+    
+    return render_to_response('uploader/fof.html', {'frame_list':frame_list},
+                               context_instance=RequestContext(request))
+
+def embedded_fof(request, fof_name_value):     
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+    
+    i = 0
+    
+    ## initializes the fof "featured_fof" and the "frame_list"
+    if fof_name_value == "0":
+        featured_fof = featured_fof_list[0]
+        fof = get_object_or_404(FOF, id=featured_fof.fof_id)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    else:
+		fof = get_object_or_404(FOF, name=fof_name_value)
+		fof.view_count += 1
+		fof.save()
+		frame_list = fof.frame_set.all().order_by('index')[:5]	
+
+		
+    if fof.user.name:
+        user_name = fof.user.name
+    else:
+        user_name = "Unknown user"
+
+    return render_to_response('uploader/fof_embedded.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def featured_fof(request, fof_name_value):
     
@@ -126,11 +159,13 @@ def featured_fof(request, fof_name_value):
                 break
             i = i + 1
     
+    ## defines next FOF    
     if len(featured_fof_list) - 1 == i:
         next_fof_name = featured_fof_list[0].fof.name
     else:
         next_fof_name = featured_fof_list[i+1].fof.name
 
+	## defines preview fof name. If "fof_name_value == 0" i will also be zero
     if i == 0:
         prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
     else:
@@ -391,69 +426,69 @@ def user_fb_friends(request):
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
-    def json_fof(request, device_id_value, fof_name_value):
+def json_fof(request, device_id_value, fof_name_value):
 
-        response_data = {}
+	response_data = {}
 
-        try: 
-            user = User.objects.get(device_id = device_id_value)
-        except (KeyError, User.DoesNotExist):
-            response_data['result'] = 'error'
-            response_data['message'] = 'User does not exist'
-            return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-        else:
+	try: 
+		user = User.objects.get(device_id = device_id_value)
+	except (KeyError, User.DoesNotExist):
+		response_data['result'] = 'error'
+		response_data['message'] = 'User does not exist'
+		return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+	else:
 
-            fof_list = user.fof_set.all().order_by('-pub_date')
+		fof_list = user.fof_set.all().order_by('-pub_date')
 
-            i = 0
+		i = 0
 
-            if fof_name_value == "0":
-                fof = user.fof_set.all().order_by('-pub_date')[0]
-                fof.view_count += 1
-                fof.save()
-                frame_list = fof.frame_set.all().order_by('index')[:5]
+		if fof_name_value == "0":
+			fof = user.fof_set.all().order_by('-pub_date')[0]
+			fof.view_count += 1
+			fof.save()
+			frame_list = fof.frame_set.all().order_by('index')[:5]
 
-            else:    
-                for fof in fof_list:
-                    if fof.name == fof_name_value:
-                        fof.view_count += 1
-                        fof.save()
-                        frame_list = fof.frame_set.all().order_by('index')[:5]
-                        break
-                    i = i + 1
+		else:    
+			for fof in fof_list:
+				if fof.name == fof_name_value:
+					fof.view_count += 1
+					fof.save()
+					frame_list = fof.frame_set.all().order_by('index')[:5]
+					break
+				i = i + 1
 
-            if len(fof_list) - 1 <= i:
-                next_fof_name = fof_list[0].name
-            else:
-                next_fof_name = fof_list[i+1].name
+		if len(fof_list) - 1 <= i:
+			next_fof_name = fof_list[0].name
+		else:
+			next_fof_name = fof_list[i+1].name
 
-            if i == 0:
-                prev_fof_name = fof_list[len(fof_list) - 1].name
-            else:
-                prev_fof_name = fof_list[i - 1].name
+		if i == 0:
+			prev_fof_name = fof_list[len(fof_list) - 1].name
+		else:
+			prev_fof_name = fof_list[i - 1].name
 
-            if fof.user.name:
-                user_name = fof.user.name
-            else:
-                user_name = "Unknown user"
+		if fof.user.name:
+			user_name = fof.user.name
+		else:
+			user_name = "Unknown user"
 
-            response_data['frame_list'] = ''
+		response_data['frame_list'] = ''
 
-            for frame in frame_list:
-                if response_data['frame_list'] == '':
-                    response_data['frame_list'] = str(frame)
-                else:
-                    response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
+		for frame in frame_list:
+			if response_data['frame_list'] == '':
+				response_data['frame_list'] = str(frame)
+			else:
+				response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
 
-            response_data['device_id_value'] = device_id_value
-            response_data['next_fof_name'] = next_fof_name
-            response_data['prev_fof_name'] = prev_fof_name
-            response_data['current_fof'] = fof_name_value
-            response_data['user_name'] = user_name
-            response_data['result'] = 'ok'
-            response_data['message'] = 'ok'
+		response_data['device_id_value'] = device_id_value
+		response_data['next_fof_name'] = next_fof_name
+		response_data['prev_fof_name'] = prev_fof_name
+		response_data['current_fof'] = fof_name_value
+		response_data['user_name'] = user_name
+		response_data['result'] = 'ok'
+		response_data['message'] = 'ok'
 
-        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+	return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 def json_fof_featured(request, fof_name_value):
 

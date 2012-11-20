@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>dyfoc.us - share your moments!</title>
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_viewer.css" media="all" />
+	<!--[if IE]>
+	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
+	<![endif]-->
+	<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
+    
+	<script language=javascript>
+		<!--
+		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+	   		location.replace("/uploader/{{ current_fof }}/featured_fof/m/");
+		}
+		-->
+	</script>
+
+    <script type="text/javascript">
+        
+        var imgsArray = new Array();
+        
+        {% for frame in frame_list %}
+            imgsArray[{{ frame.index }}] = new Image();
+			imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
+        {% endfor %}
+        
+        window.onload=embeddedfade;
+        
+    </script>
+
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-35287341-1']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
+	
+</head>
+
+<body>
+
+<div id="colwrap_embedded">
+		
+	<div id="backImageEmbed">
+		
+	</div>
+
+	<div id="frontImageEmbed">
+
+	</div>
+		
+</div>
+<!--<div id="embedded"> <b>Posted by:</b> {{ user_name }}</div>
+
+	<div id="homeimg">
+		
+		<div id="backImageDiv">
+			
+		</div>
+		
+		<div id="frontImageDiv">
+		
+		</div>
+		
+	</div>
+	
+	<div id="posted_by"> <b>Posted by:</b> {{ user_name }}</div>-->
+			
+</div>
+
+
+	<script type="text/javascript"> embeddedfade();</script>
+</body>
+</html>
