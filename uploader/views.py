@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.utils import simplejson as json
 from django.http import HttpResponse
 
-from uploader.models import User, FOF, Frame, Featured_FOF, Friends
+from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Device
 
 def index(request):
     return render_to_response('uploader/index.html', {},
@@ -31,12 +31,17 @@ def image(request):
     user_device_id = request.POST['device_id']
     fof_name = request.POST['fof_name']
     
-    #Get/Creates user
+    #Let's checkout if this device is registered already:
     try:
-        frame_user = User.objects.get(device_id=user_device_id)
-    except (KeyError, User.DoesNotExist):
+        device = Device.objects.get(device_id=user_device_id)
+        # Device exists, so does the user. Let's get the correct user:
+        frame_user = get_object_or_404(User, id = device.user_id)
+        
+    except (KeyError, Device.DoesNotExist):
+        # Device, and user, doesn't exist. Let's create them:
         frame_user = User(name='', device_id=user_device_id, pub_date=timezone.now())
         frame_user.save()
+        user.device_set.create(device_id = user.device_id)
     
     #Gets/Creates fof
     try:
@@ -99,6 +104,39 @@ def fof(request, fof_name):
     return render_to_response('uploader/fof.html', {'frame_list':frame_list},
                                context_instance=RequestContext(request))
 
+def fof_not_found(request, fof_name):
+    fof = get_object_or_404(FOF, name=fof_name)
+    
+    frame_list = fof.frame_set.all().order_by('index')[:5]
+    
+    return render_to_response('uploader/fof.html', {'frame_list':frame_list},
+                               context_instance=RequestContext(request))
+
+def embedded_fof(request, fof_name_value):     
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+    
+    i = 0
+    
+    ## initializes the fof "featured_fof" and the "frame_list"
+    if fof_name_value == "0":
+        featured_fof = featured_fof_list[0]
+        fof = get_object_or_404(FOF, id=featured_fof.fof_id)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    else:
+		fof = get_object_or_404(FOF, name=fof_name_value)
+		fof.view_count += 1
+		fof.save()
+		frame_list = fof.frame_set.all().order_by('index')[:5]	
+
+		
+    if fof.user.name:
+        user_name = fof.user.name
+    else:
+        user_name = "Unknown user"
+
+    return render_to_response('uploader/fof_embedded.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def featured_fof(request, fof_name_value):
     
@@ -121,11 +159,13 @@ def featured_fof(request, fof_name_value):
                 break
             i = i + 1
     
+    ## defines next FOF    
     if len(featured_fof_list) - 1 == i:
         next_fof_name = featured_fof_list[0].fof.name
     else:
         next_fof_name = featured_fof_list[i+1].fof.name
 
+	## defines preview fof name. If "fof_name_value == 0" i will also be zero
     if i == 0:
         prev_fof_name = featured_fof_list[len(featured_fof_list) - 1].fof.name
     else:
@@ -180,8 +220,10 @@ def user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
     
     try: 
-        user = User.objects.get(device_id = device_id_value)
-    except (KeyError, User.DoesNotExist):
+        device = Device.objects.get(device_id = device_id_value)
+        user = get_object_or_404(User, id=device.user_id)
+        
+    except (KeyError, Device.DoesNotExist):
         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     else:
         
@@ -225,8 +267,10 @@ def m_user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
 
     try: 
-        user = User.objects.get(device_id = device_id_value)
-    except (KeyError, User.DoesNotExist):
+        device = Device.objects.get(device_id = device_id_value)
+        user = get_object_or_404(User, id=device.user_id)
+
+    except (KeyError, Device.DoesNotExist):
         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     else:
 
@@ -268,88 +312,69 @@ def m_user_fof(request, device_id_value, fof_name_value):
 
 @csrf_exempt
 def user_fb_info(request):
+    device_id_value = request.POST['device_id']
+    user_name = request.POST['name']
+    user_facebook_id = request.POST['facebook_id']
+    user_email = request.POST['email']
     
-   device_id_value = request.POST['device_id']
-   user_name = request.POST['name']
-   user_facebook_id = request.POST['facebook_id']
-   user_email = request.POST['email']   
-
-   try:
-       user = User.objects.get(device_id = device_id_value)
-   except (KeyError, User.DoesNotExist):
-       user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
-       user.save()
-   else:
-       user.name = user_name
-       user.facebook_id = user_facebook_id
-       user.email = user_email
-       user.save()
-
-   return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
-   
-def json_fof(request, device_id_value, fof_name_value):
-    
-    response_data = {}
-    
-    try: 
-        user = User.objects.get(device_id = device_id_value)
-    except (KeyError, User.DoesNotExist):
-        response_data['result'] = 'error'
-        response_data['message'] = 'User does not exist'
-        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-    else:
+    try:
         
-        fof_list = user.fof_set.all().order_by('-pub_date')
-    
-        i = 0
-    
-        if fof_name_value == "0":
-            fof = user.fof_set.all().order_by('-pub_date')[0]
-            fof.view_count += 1
-            fof.save()
-            frame_list = fof.frame_set.all().order_by('index')[:5]
-        
-        else:    
-            for fof in fof_list:
-                if fof.name == fof_name_value:
-                    fof.view_count += 1
-                    fof.save()
-                    frame_list = fof.frame_set.all().order_by('index')[:5]
-                    break
-                i = i + 1
+        device = Device.objects.get(device_id = device_id_value)
+        #Device already exists, but maybe this is not the first device from this user. Let's check it out:
+        try:
+            user = User.objects.get(facebook_id = user_facebook_id)
             
-        if len(fof_list) - 1 <= i:
-            next_fof_name = fof_list[0].name
-        else:
-            next_fof_name = fof_list[i+1].name
-    
-        if i == 0:
-            prev_fof_name = fof_list[len(fof_list) - 1].name
-        else:
-            prev_fof_name = fof_list[i - 1].name
+            # The user, with FB info, also exists. They should be the same. Are they?
+            device_user = get_object_or_404(User, id=device.user_id)
             
-        if fof.user.name:
-            user_name = fof.user.name
-        else:
-            user_name = "Unknown user"
-        
-        response_data['frame_list'] = ''
-        
-        for frame in frame_list:
-            if response_data['frame_list'] == '':
-                response_data['frame_list'] = str(frame)
+            if user.id == device_user:
+                # No problems here, the user from the device is the same from the facebook info.
+                j = 0
             else:
-                response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
+                #FUCK! We have two different users, one with the correct FB info and another with the correct device.
+                #The image method was called twice, with different device_ids, before the fb_info method.
+                #We need to add this device to the correct user (with FB info) and destroy the other user (without FB info):
+                #First, lets point this device to the correct user:
+                device.user_id = user.id
+                device.save()
+                #Second, lets transfer his fofs and friends to the new user and invalidate the old user:
+                
+                fof_list = device_user.fof_set.all()
+                for fof in fof_list:
+                    fof.user_id = user.id
+                    fof.save()
+                
+                
+                for friend in Friends.objects.all():
+                    if friend.friend_1_id == device_user.id:
+                        friend.friend_1_id = user.id
+                        friend.save()
+                        
+                    if friend.friend_2_id == device_user.id:
+                        friend.friend_2_id = user.id
+                        friend.save()
+                
+                device_user.facebook_id = 'null'
+                device_user.device_id = 'null'
+                device_user.save()
+                
+        except (KeyError, User.DoesNotExist):
+            # The device exists but there's no user with his FB information. Let's add the FB info to the user that owns this device
+            device_user = get_object_or_404(User, id=device.user_id)
+            device_user.facebook_id = user_facebook_id
+            device_user.name = user_name
+            device_user.email = user_email
+            device_user.save()
+            
+    except (KeyError, Device.DoesNotExist):
+        # The device doesn't exist. That means we need to create everything from scratch:
+        # Let's create the user:
+        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
+        user.save()
+        #Let's create the device:
+        user_device = user.device_set.create(device_id = user.device_id)
         
-        response_data['device_id_value'] = device_id_value
-        response_data['next_fof_name'] = next_fof_name
-        response_data['prev_fof_name'] = prev_fof_name
-        response_data['current_fof'] = fof_name_value
-        response_data['user_name'] = user_name
-        response_data['result'] = 'ok'
-        response_data['message'] = 'ok'
-    
-    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_friends(request):
@@ -400,7 +425,71 @@ def user_fb_friends(request):
                 j = 0
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-    
+
+def json_fof(request, device_id_value, fof_name_value):
+
+	response_data = {}
+
+	try: 
+		user = User.objects.get(device_id = device_id_value)
+	except (KeyError, User.DoesNotExist):
+		response_data['result'] = 'error'
+		response_data['message'] = 'User does not exist'
+		return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+	else:
+
+		fof_list = user.fof_set.all().order_by('-pub_date')
+
+		i = 0
+
+		if fof_name_value == "0":
+			fof = user.fof_set.all().order_by('-pub_date')[0]
+			fof.view_count += 1
+			fof.save()
+			frame_list = fof.frame_set.all().order_by('index')[:5]
+
+		else:    
+			for fof in fof_list:
+				if fof.name == fof_name_value:
+					fof.view_count += 1
+					fof.save()
+					frame_list = fof.frame_set.all().order_by('index')[:5]
+					break
+				i = i + 1
+
+		if len(fof_list) - 1 <= i:
+			next_fof_name = fof_list[0].name
+		else:
+			next_fof_name = fof_list[i+1].name
+
+		if i == 0:
+			prev_fof_name = fof_list[len(fof_list) - 1].name
+		else:
+			prev_fof_name = fof_list[i - 1].name
+
+		if fof.user.name:
+			user_name = fof.user.name
+		else:
+			user_name = "Unknown user"
+
+		response_data['frame_list'] = ''
+
+		for frame in frame_list:
+			if response_data['frame_list'] == '':
+				response_data['frame_list'] = str(frame)
+			else:
+				response_data['frame_list'] = response_data['frame_list'] + ',' + str(frame)
+
+		response_data['device_id_value'] = device_id_value
+		response_data['next_fof_name'] = next_fof_name
+		response_data['prev_fof_name'] = prev_fof_name
+		response_data['current_fof'] = fof_name_value
+		response_data['user_name'] = user_name
+		response_data['result'] = 'ok'
+		response_data['message'] = 'ok'
+
+	return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 def json_fof_featured(request, fof_name_value):
 
     response_data = {}
