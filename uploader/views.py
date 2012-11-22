@@ -462,3 +462,37 @@ def json_fof_featured(request, fof_name_value):
     response_data['message'] = 'ok'
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+def fof_not_found(request, fof_name):
+    fof = get_object_or_404(FOF, name=fof_name)
+
+    frame_list = fof.frame_set.all().order_by('index')[:5]
+
+    return render_to_response('uploader/fof.html', {'frame_list':frame_list},
+                               context_instance=RequestContext(request))
+
+def embedded_fof(request, fof_name_value):     
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+    i = 0
+
+    ## initializes the fof "featured_fof" and the "frame_list"
+    if fof_name_value == "0":
+        featured_fof = featured_fof_list[0]
+        fof = get_object_or_404(FOF, id=featured_fof.fof_id)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    else:
+        fof = get_object_or_404(FOF, name=fof_name_value)
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+        
+    if fof.user.name:
+        user_name = fof.user.name
+    else:
+        user_name = "Unknown user"
+
+    return render_to_response('uploader/fof_embedded.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+
