@@ -383,17 +383,14 @@ def user_fb_friends(request):
     
     # Returns the list of the requesting user friends
     response_data = {}
-    response_data['friends_list'] = ''
+    response_data['friends_list'] = []
     
     for friend in Friends.objects.all():
         if friend.friend_1_id == user.id:
             try:
                 user_friend_object = User.objects.get(id = friend.friend_2_id)
                 
-                if response_data['friends_list'] == '':
-                    response_data['friends_list'] = user_friend_object.facebook_id
-                else:
-                    response_data['friends_list'] = response_data['friends_list'] + ',' + user_friend_object.facebook_id
+                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
                 
             except (KeyError, User.DoesNotExist):
                 # Nothing to do here
