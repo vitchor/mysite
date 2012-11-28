@@ -28,14 +28,17 @@ def image(request):
     
     #Gets fof info
     fof_size = request.POST['fof_size']
-    user_device_id = request.POST['device_id']
     fof_name = request.POST['fof_name']
-    
+    user_device_id = request.POST['device_id']
+    user_facebook_id = request.POST['facebook_id']
+    user_facebook_name = request.POST['facebook_name']
+    user_facebook_email = request.POST['facebook_email']
+        
     #Get/Creates user
     try:
-        frame_user = User.objects.get(device_id=user_device_id)
+        frame_user = User.objects.get(facebook_id=user_facebook_id)
     except (KeyError, User.DoesNotExist):
-        frame_user = User(name='', device_id=user_device_id, pub_date=timezone.now())
+        frame_user = User(name=user_facebook_name, facebook_id=user_facebook_id, email=user_facebook_name,  device_id=user_device_id, pub_date=timezone.now())
         frame_user.save()
     
     #Gets/Creates fof
@@ -176,13 +179,17 @@ def m_featured_fof(request, fof_name_value):
 
     return render_to_response('uploader/m_fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
                                
-def user_fof(request, device_id_value, fof_name_value):
+def user_fof(request, facebook_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
     
     try: 
-        user = User.objects.get(device_id = device_id_value)
+        user = User.objects.get(facebook_id = facebook_id_value)
     except (KeyError, User.DoesNotExist):
-        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+        try:
+            user = User.objects.get(device_id = facebook_id_value)
+        except (KeyError, User.DoesNotExist):
+            return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    
     else:
         
         fof_list = user.fof_set.all().order_by('-pub_date')
@@ -219,7 +226,7 @@ def user_fof(request, device_id_value, fof_name_value):
         else:
             user_name = "Unknown user"
     
-        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
