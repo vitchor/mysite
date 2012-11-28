@@ -273,7 +273,7 @@ def m_user_fof(request, facebook_id_value, fof_name_value):
         else:
             user_name = "Unknown user"
 
-        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_info(request):
