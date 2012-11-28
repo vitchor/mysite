@@ -189,43 +189,43 @@ def user_fof(request, facebook_id_value, fof_name_value):
             user = User.objects.get(device_id = facebook_id_value)
         except (KeyError, User.DoesNotExist):
             return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    
+        
+    fof_list = user.fof_set.all().order_by('-pub_date')
+
+    i = 0
+
+    if fof_name_value == "0":
+        fof = user.fof_set.all().order_by('-pub_date')[0]
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    
+    else:    
+        for fof in fof_list:
+            if fof.name == fof_name_value:
+                fof.view_count += 1
+                fof.save()
+                frame_list = fof.frame_set.all().order_by('index')[:5]
+                break
+            i = i + 1
+        
+    if len(fof_list) - 1 == i:
+        next_fof_name = fof_list[0].name
     else:
+        next_fof_name = fof_list[i+1].name
+
+    if i == 0:
+        prev_fof_name = fof_list[len(fof_list) - 1].name
+    else:
+        prev_fof_name = fof_list[i - 1].name
         
-        fof_list = user.fof_set.all().order_by('-pub_date')
-    
-        i = 0
-    
-        if fof_name_value == "0":
-            fof = user.fof_set.all().order_by('-pub_date')[0]
-            fof.view_count += 1
-            fof.save()
-            frame_list = fof.frame_set.all().order_by('index')[:5]
-        
-        else:    
-            for fof in fof_list:
-                if fof.name == fof_name_value:
-                    fof.view_count += 1
-                    fof.save()
-                    frame_list = fof.frame_set.all().order_by('index')[:5]
-                    break
-                i = i + 1
-            
-        if len(fof_list) - 1 == i:
-            next_fof_name = fof_list[0].name
-        else:
-            next_fof_name = fof_list[i+1].name
-    
-        if i == 0:
-            prev_fof_name = fof_list[len(fof_list) - 1].name
-        else:
-            prev_fof_name = fof_list[i - 1].name
-            
-        if fof.user.name:
-            user_name = fof.user.name
-        else:
-            user_name = "Unknown user"
-    
-        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+    if fof.user.name:
+        user_name = fof.user.name
+    else:
+        user_name = "Unknown user"
+
+    return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_user_fof(request, facebook_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
@@ -237,43 +237,42 @@ def m_user_fof(request, facebook_id_value, fof_name_value):
             user = User.objects.get(device_id = facebook_id_value)
         except (KeyError, User.DoesNotExist):
             return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+
+    fof_list = user.fof_set.all().order_by('-pub_date')
+
+    i = 0
+
+    if fof_name_value == "0":
+        fof = user.fof_set.all().order_by('-pub_date')[0]
+        fof.view_count += 1
+        fof.save()
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+
+    else:    
+        for fof in fof_list:
+            if fof.name == fof_name_value:
+                fof.view_count += 1
+                fof.save()
+                frame_list = fof.frame_set.all().order_by('index')[:5]
+                break
+            i = i + 1
+
+    if len(fof_list) - 1 == i:
+        next_fof_name = fof_list[0].name
     else:
+        next_fof_name = fof_list[i+1].name
 
-        fof_list = user.fof_set.all().order_by('-pub_date')
+    if i == 0:
+        prev_fof_name = fof_list[len(fof_list) - 1].name
+    else:
+        prev_fof_name = fof_list[i - 1].name
+        
+    if fof.user.name:
+        user_name = fof.user.name
+    else:
+        user_name = "Unknown user"
 
-        i = 0
-
-        if fof_name_value == "0":
-            fof = user.fof_set.all().order_by('-pub_date')[0]
-            fof.view_count += 1
-            fof.save()
-            frame_list = fof.frame_set.all().order_by('index')[:5]
-
-        else:    
-            for fof in fof_list:
-                if fof.name == fof_name_value:
-                    fof.view_count += 1
-                    fof.save()
-                    frame_list = fof.frame_set.all().order_by('index')[:5]
-                    break
-                i = i + 1
-
-        if len(fof_list) - 1 == i:
-            next_fof_name = fof_list[0].name
-        else:
-            next_fof_name = fof_list[i+1].name
-
-        if i == 0:
-            prev_fof_name = fof_list[len(fof_list) - 1].name
-        else:
-            prev_fof_name = fof_list[i - 1].name
-            
-        if fof.user.name:
-            user_name = fof.user.name
-        else:
-            user_name = "Unknown user"
-
-        return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+    return render_to_response('uploader/m_fof.html', {'frame_list':frame_list, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 @csrf_exempt
 def user_fb_info(request):
