@@ -33,7 +33,11 @@ def image(request):
     user_facebook_id = request.POST['facebook_id']
     user_facebook_name = request.POST['facebook_name']
     user_facebook_email = request.POST['facebook_email']
-        
+    
+    if user_facebook_id is None:
+        return render_to_response('uploader/index.html', {},
+                                   context_instance=RequestContext(request))
+                                   
     #Get/Creates user
     try:
         frame_user = User.objects.get(facebook_id=user_facebook_id)
