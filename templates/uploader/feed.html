@@ -6,26 +6,28 @@
 	<!--[if IE]>
 	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
 	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}fof_viewer.css" media="all" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_viewer.css" media="all" />
 	<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!--  BOOTSTRAP  -->
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> <!--ADDS JQUERY-->
 	<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> <!--ADDS JQUERY-->
     
-	<script type="text/javascript">
+    <script type="text/javascript">
 		/*  CHANGE THE PAGE IN CASE OF IPHONE	*/
 		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
-	   		location.replace("/uploader/{{ current_fof }}/featured_fof/m/");
+	   		location.replace("/uploader/{{ facebook_id_value }}/m_feed/{{ index }}/");
 		}
-	
-        /*  FRAME FADDING:	*/
-        var imgsArray = new Array();   
+
+		/*  FRAME FADDING:	*/
+        var imgsArray = new Array();
+        
         {% for frame in frame_list %}
             imgsArray[{{ frame.index }}] = new Image();
 			imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
         {% endfor %}
+        
         window.onload=homefade;
         
-    	/*  GOOGLE ANALYTICS:	*/
+		/*  GOOGLE ANALYTICS:	*/
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-35287341-1']);
 		_gaq.push(['_trackPageview']);
@@ -35,10 +37,12 @@
 			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		})();
+
 	</script>
-</head>
 	
-<body> 
+</head>
+
+<body>
 	<div id="fb-root"></div>
 	<script type="text/javascript">
 		/*  FACEBOOK CONNECTION (USED FOR LIKE BUTTON?):  */
@@ -50,16 +54,7 @@
 			e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
 			document.getElementById('fb-root').appendChild(e);
 		}());
-		
-		/*  FACEBOOK CONNECTION (USED FOR LIKE BUTTON?):  
-		(function(d, s, id) {
-			var js, fjs = d.getElementsByTagName(s)[0];
-			if (d.getElementById(id)) return;
-			js = d.createElement(s); js.id = id;
-			js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=416260668426967";
-			fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
-*/
+
 		/*  ATTRIBUTES OF THE SHARE BUTTON:	*/
 		$(document).ready(function(){
 			$('#share_button').click(function(e){
@@ -80,10 +75,10 @@
 
 	<!--  BOOTSTRAP DECLARATION -->
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
-    
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>	
 	
 	<div id="main">
+	
 		<div id="df_background">
 			
 			<!-- Cabeçário: -->
@@ -99,8 +94,9 @@
 			<div class="clearFloat"></div>
 			
 			<div id="colwrap2">
+			
 				<div id="left_arrow">
-					<a href="/uploader/{{prev_fof_name}}/featured_fof">
+					<a href="/uploader/{{facebook_id_value}}/feed/{{prev_fof_index}}/">
 						<img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
 					</a>
 				</div>
@@ -109,7 +105,7 @@
 			
 			</div>
 			
-			<div id="colwrap3">			
+			<div id="colwrap3">
 			
 				<div id="homeimg">
 					
@@ -118,19 +114,19 @@
 					</div>
 					
 					<div id="frontImageDiv">
-					
+						
 					</div>
 					
 				</div>
-					
+				
 				<!-- START OF share, like, send and embed buttons -->		
 				<div id="buttons">
 					<img src = "{{ STATIC_URL }}images/share_facebook.png" class="share" id = "share_button" type='button_count'>
-					<div class="fb-like" data-href="https://dyfoc.us/uploader/{{current_fof}}/featured_fof/" data-send="true" data-layout="button_count" data-width="500" data-show-faces="false" data-font="arial"></div>
+					<div class="fb-like" data-href="https://dyfoc.us/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" data-font="arial"></div>
 				</div>
 				
 				<div class="accordion" id="accordion2">
-					<div class="accordion-heading" style="text-align:left; padding-left: 2px;">
+					<div class="accordion-heading" style="text-align:left; margin-left: 2px;">
 					  <a class = "btn btn-mini" data-toggle="collapse" data-parent="#accordion2" href="#collapse">
 						Embed
 					  </a>
@@ -144,8 +140,10 @@
 					  </div>
 					</div>
 				</div>
-				<!-- END OF share, like, send and embed buttons -->					
-				<div id="posted_by"> <b>Posted by</b> {{ user_name }} <b> on </b> {{ fof_date }}</div> 
+				<!-- END OF share, like, send and embed buttons -->	
+				
+				<div id="posted_by"> <b>Posted by</b> {{ user_name }} <b> on </b> {{ fof_date }}</div>
+				
 				<div class="clearFloat"></div>
 				
 			</div>
@@ -153,7 +151,7 @@
 			<div id="colwrap4">
 				
 				<div id="right_arrow">
-					<a href="/uploader/{{next_fof_name}}/featured_fof">
+					<a href="/uploader/{{facebook_id_value}}/feed/{{next_fof_index}}/">
 						<img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
 					</a>
 				</div>
@@ -171,7 +169,7 @@
 		<div class="clearFloat"></div>
 		
 	</div>
-
 	<script type="text/javascript"> homefade();</script>
 </body>
 </html>
+

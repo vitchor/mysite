@@ -12,6 +12,8 @@ import Image
 import _imaging
 import random
 import string
+from itertools import chain
+from django.db.models import Q
 from django.utils import timezone
 from django.utils import simplejson as json
 from django.http import HttpResponse
@@ -505,3 +507,122 @@ def embedded_fof(request, fof_name_value):
 
     return render_to_response('uploader/fof_embedded.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
+def feed(request, facebook_id_value, index):
+    index = int(index)
+    
+    # Attempts to find the user by its facebook ID:
+    try: 
+        user = User.objects.get(facebook_id = facebook_id_value)
+        
+        # Gets a list of friends from this user (assuming the data is not duplicated)
+        friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
+
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
+        i = 0
+        fof_list = ''
+        # Gets a list of FOFs from each friend
+        for friend in friends_list:
+            # if friend_1 is user, friend_2 is the friend id
+            if friend.friend_1_id == user.id:
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:5]
+            # if friend_2 is user, friend_1 is the friend id
+            else:
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:5]
+            
+            # Populates a general list of FOFs from all friends
+            # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+            # this is the pulo from the gato!
+            fof_list = sorted(chain(fof_list, friend_fof_list), key=lambda instance: instance.pub_date, reverse=True)
+            
+            i = i + 1
+        
+        # Determines which is the FOF that needs to be shown
+        current_fof = fof_list[index]
+        
+        # Finds the correspondent FOF in the database
+        fof = FOF.objects.get(name = current_fof)
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+        
+        # Checks if list reached its end (ring loop)
+        if len(fof_list) - 1 == index:
+            next_fof_index = 0
+        else:
+            next_fof_index = index + 1
+    
+        # Checks if list is in the first element (ring loop)
+        if index == 0:
+            prev_fof_index = len(fof_list) - 1
+        else:
+            prev_fof_index = index - 1
+        
+        if fof.user.name:
+            user_name = fof.user.name
+        else:
+            user_name = "Unknown user"
+            
+        fof_date = fof.pub_date
+        return render_to_response('uploader/feed.html', {'frame_list':frame_list, 'facebook_id_value':facebook_id_value, 'next_fof_index':next_fof_index, 'prev_fof_index':prev_fof_index, 'user_name':user_name, 'fof_date':fof_date}, context_instance=RequestContext(request))
+ 
+ 
+def m_feed(request, facebook_id_value, index):
+    index = int(index)
+
+    # Attempts to find the user by its facebook ID:
+    try: 
+        user = User.objects.get(facebook_id = facebook_id_value)
+
+        # Gets a list of friends from this user (assuming the data is not duplicated)
+        friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
+
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
+        i = 0
+        fof_list = ''
+        # Gets a list of FOFs from each friend
+        for friend in friends_list:
+            # if friend_1 is user, friend_2 is the friend id
+            if friend.friend_1_id == user.id:
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:5]
+            # if friend_2 is user, friend_1 is the friend id
+            else:
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:5]
+
+            # Populates a general list of FOFs from all friends
+            # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+            # this is the pulo from the gato!
+            fof_list = sorted(chain(fof_list, friend_fof_list), key=lambda instance: instance.pub_date, reverse=True)
+
+            i = i + 1
+
+        # Determines which is the FOF that needs to be shown
+        current_fof = fof_list[index]
+
+        # Finds the correspondent FOF in the database
+        fof = FOF.objects.get(name = current_fof)
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+
+        # Checks if list reached its end (ring loop)
+        if len(fof_list) - 1 == index:
+            next_fof_index = 0
+        else:
+            next_fof_index = index + 1
+
+        # Checks if list is in the first element (ring loop)
+        if index == 0:
+            prev_fof_index = len(fof_list) - 1
+        else:
+            prev_fof_index = index - 1
+
+        if fof.user.name:
+            user_name = fof.user.name
+        else:
+            user_name = "Unknown user"
+
+        fof_date = fof.pub_date
+        return render_to_response('uploader/m_feed.html', {'frame_list':frame_list, 'facebook_id_value':facebook_id_value, 'next_fof_index':next_fof_index, 'prev_fof_index':prev_fof_index, 'user_name':user_name, 'fof_date':fof_date}, context_instance=RequestContext(request))
+
+
+    

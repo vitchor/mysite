@@ -14,4 +14,6 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<device_id_value>\S+)/(?P<fof_name_value>\S+)/j/?$', 'json_fof'),
     url(r'^(?P<fof_name_value>\S+)/j_featured/?$', 'json_fof_featured'),
     url(r'^(?P<fof_name_value>\S+)/embedded_fof/$', 'embedded_fof'),
+    url(r'^(?P<facebook_id_value>\S+)/feed/(?P<index>\S+)/$', 'feed'),
+    url(r'^(?P<facebook_id_value>\S+)/m_feed/(?P<index>\S+)/$', 'm_feed'),
 )
