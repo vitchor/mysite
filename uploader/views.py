@@ -374,7 +374,7 @@ def user_fb_friends(request):
     # Parse the JSON
     friends_json = json.loads(request.POST['json'])
     
-    user = get_object_or_404(User, device_id=friends_json['user_device_id'])
+    user = get_object_or_404(User, facebook_id=friends_json['user_facebook_id'])
    
     # Populate the friends table with the new information
     for friend in friends_json['friends']:
