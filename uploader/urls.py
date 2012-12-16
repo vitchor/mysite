@@ -3,6 +3,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('uploader.views',
     url(r'^$', 'index'),
     url(r'^image/$', 'image'),
+    url(r'^user_info/$', 'user_info'),
     url(r'^user_fb_info/$', 'user_fb_info'),
     url(r'^user_fb_friends/$', 'user_fb_friends'),
     url(r'^(?P<fof_name>\S+)/fof/$', 'fof'),

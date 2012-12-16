@@ -286,7 +286,7 @@ def user_fb_info(request):
    device_id_value = request.POST['device_id']
    user_name = request.POST['name']
    user_facebook_id = request.POST['facebook_id']
-   user_email = request.POST['email']   
+   user_email = request.POST['email']
 
    try:
        user = User.objects.get(device_id = device_id_value)
@@ -301,6 +301,63 @@ def user_fb_info(request):
 
    return render_to_response('uploader/index.html', {}, context_instance=RequestContext(request))
    
+   
+@csrf_exempt
+def user_info(request):
+    
+    json_request = json.loads(request.POST['json'])
+    
+    device_id_value = json_request['device_id']
+    user_name = json_request['name']
+    user_facebook_id = json_request['facebook_id']
+    user_email = json_request['email']
+    
+    # Lets find this user or create a new one if necessary
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+    except (KeyError, User.DoesNotExist):
+        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
+        user.save()
+           
+           
+    # Lets populate the friends table with the new information
+    for friend in json_request['friends']:
+        try: 
+            # Is there any user with the same facebook_id as the requesting user friend is?
+            user_friend = User.objects.get(facebook_id = friend['facebook_id'])
+
+            # Yes! They are friends! Let's add a new row to the friends model!...
+            # ...First lets checkout if that friend row doesn't exists already:
+            try:
+                Friends.objects.get(friend_1_id = user.id, friend_2_id = user_friend.id)
+            except (KeyError, Friends.DoesNotExist):
+                # It doesn't exists, lets create it:
+                friend_relation = Friends(friend_1_id = user.id, friend_2_id = user_friend.id)
+                friend_relation.save()
+
+        except (KeyError, User.DoesNotExist):
+            # Nothing to do here
+            j = 0
+           
+    
+    # Now lets returns the list of the requesting user dyfocus friends
+    response_data = {}
+    response_data['friends_list'] = []
+
+    for friend in Friends.objects.all():
+        if friend.friend_1_id == user.id:
+            try:
+                user_friend_object = User.objects.get(id = friend.friend_2_id)
+
+                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
+
+            except (KeyError, User.DoesNotExist):
+                # Nothing to do here
+                j = 0
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+    
 def json_fof(request, device_id_value, fof_name_value):
     
     response_data = {}
@@ -369,10 +426,12 @@ def json_fof(request, device_id_value, fof_name_value):
 def user_fb_friends(request):
     
     # TEST:
-    # $ curl -d json='{"user_device_id": "28c8ef21c63e7fa857b4e10a10953783cee15c04","friends": [{"facebook_id": "640592329"},{"facebook_id": "100000754383534"},{"facebook_id": "100000723578122"}]}' http://localhost:8000/uploader/user_fb_friends/
+    # $ curl -d json='{"user_facebook_id": "100000370417687", "user_device_id": "28c8ef21c63e7fa857b4e10a10953783cee15c04", "friends": [{"facebook_id": "640592329"},{"facebook_id": "100000754383534"},{"facebook_id": "100000723578122"}]}' http://localhost:8000/uploader/user_fb_friends/
     
     # Parse the JSON
     friends_json = json.loads(request.POST['json'])
+    
+    print friends_json['user_facebook_id']
     
     user = get_object_or_404(User, facebook_id=friends_json['user_facebook_id'])
    
