@@ -585,17 +585,24 @@ def feed(request, facebook_id_value, index):
         for friend in friends_list:
             # if friend_1 is user, friend_2 is the friend id
             if friend.friend_1_id == user.id:
-                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:5]
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]
             # if friend_2 is user, friend_1 is the friend id
             else:
-                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:5]
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
             
             # Populates a general list of FOFs from all friends
-            # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
-            # this is the pulo from the gato!
-            fof_list = sorted(chain(fof_list, friend_fof_list), key=lambda instance: instance.pub_date, reverse=True)
+            fof_list = chain(fof_list, friend_fof_list)
             
             i = i + 1
+        
+        # Adds user's FOFs to the list
+        user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+        fof_list = chain(fof_list, user_fof_list)
+        
+        # Sorts list using the publish date
+        # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+        # this is the pulo from the gato!
+        fof_list = sorted(fof_list, key=lambda instance: instance.pub_date, reverse=True)
         
         # Determines which is the FOF that needs to be shown
         current_fof = fof_list[index]
@@ -650,12 +657,19 @@ def m_feed(request, facebook_id_value, index):
                 friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:5]
 
             # Populates a general list of FOFs from all friends
-            # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
-            # this is the pulo from the gato!
-            fof_list = sorted(chain(fof_list, friend_fof_list), key=lambda instance: instance.pub_date, reverse=True)
+            fof_list = chain(fof_list, friend_fof_list)
 
             i = i + 1
 
+        # Adds user's FOFs to the list
+        user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+        fof_list = chain(fof_list, user_fof_list)
+        
+        # Sorts list using the publish date
+        # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+        # this is the pulo from the gato!
+        fof_list = sorted(fof_list, key=lambda instance: instance.pub_date, reverse=True)
+        
         # Determines which is the FOF that needs to be shown
         current_fof = fof_list[index]
 
