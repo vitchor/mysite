@@ -651,10 +651,10 @@ def m_feed(request, facebook_id_value, index):
         for friend in friends_list:
             # if friend_1 is user, friend_2 is the friend id
             if friend.friend_1_id == user.id:
-                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:5]
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]
             # if friend_2 is user, friend_1 is the friend id
             else:
-                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:5]
+                friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
 
             # Populates a general list of FOFs from all friends
             fof_list = chain(fof_list, friend_fof_list)
