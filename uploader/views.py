@@ -111,6 +111,7 @@ def featured_fof(request, fof_name_value):
         fof = get_object_or_404(FOF, id=featured_fof.fof_id)
         fof.view_count += 1
         fof.save()
+        fof_name_value = fof.name;
         frame_list = fof.frame_set.all().order_by('index')[:5]
     else:
         for featured_fof in featured_fof_list:
@@ -175,7 +176,7 @@ def m_featured_fof(request, fof_name_value):
         user_name = "Unknown user"
 
     return render_to_response('uploader/m_fof_featured.html', {'frame_list':frame_list, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
-                               
+         
 def user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
     
@@ -219,7 +220,26 @@ def user_fof(request, device_id_value, fof_name_value):
         else:
             user_name = "Unknown user"
     
-        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof.html', {'frame_list':frame_list, 'device_id_value':device_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))                               
+
+def share_fof(request, fof_name_value):
+
+    try: 
+        fof = FOF.objects.get(name = fof_name_value)
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
+		if fof.name == fof_name_value:
+			fof.view_count += 1
+			fof.save()
+			frame_list = fof.frame_set.all().order_by('index')[:5]
+		
+		if fof.user.name:
+			user_name = fof.user.name
+		else:
+			user_name = "Unknown user"
+			
+		return render_to_response('uploader/share_fof.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_user_fof(request, device_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
@@ -469,6 +489,9 @@ def fof_not_found(request, fof_name):
                                context_instance=RequestContext(request))
 
 def embedded_fof(request, fof_name_value):     
+    return embedded_fof_height(request, fof_name_value, "0")
+
+def embedded_fof_height(request, fof_name_value, fof_height_value):     
     featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
     i = 0
@@ -491,5 +514,4 @@ def embedded_fof(request, fof_name_value):
     else:
         user_name = "Unknown user"
 
-    return render_to_response('uploader/fof_embedded.html', {'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
-
+    return render_to_response('uploader/fof_embedded.html', {'fof_height_value':fof_height_value, 'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))

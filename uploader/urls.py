@@ -14,4 +14,6 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<device_id_value>\S+)/(?P<fof_name_value>\S+)/j/?$', 'json_fof'),
     url(r'^(?P<fof_name_value>\S+)/j_featured/?$', 'json_fof_featured'),
     url(r'^(?P<fof_name_value>\S+)/embedded_fof/$', 'embedded_fof'),
+    url(r'^(?P<fof_name_value>\S+)/embedded_fof/(?P<fof_height_value>\S+)/height/$', 'embedded_fof_height'),
+    url(r'^(?P<fof_name_value>\S+)/share_fof/$', 'share_fof'),
 )

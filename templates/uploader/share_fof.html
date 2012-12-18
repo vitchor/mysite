@@ -10,7 +10,8 @@
 	<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!--  BOOTSTRAP  -->
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> <!--ADDS JQUERY-->
 	<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
-    
+
+	
     <script type="text/javascript">
 		/*  CHANGE THE PAGE IN CASE OF IPHONE	*/
 		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
@@ -29,7 +30,7 @@
         $(window).bind("load", function() {
 			resize('textAreaEmbedLink', 'fofWidth', 'fofHeight', {{current_fof}});
 		});
-        
+      
 		/*  GOOGLE ANALYTICS:	*/
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-35287341-1']);
@@ -66,6 +67,7 @@
 				{
 					method: 'feed',
 					name: "{{ user_name }}'s FOF",
+					//CHANGE THE SHARE LINK
 					link: window.location.href,
 					picture: imgsArray[0].src,
 					caption: window.location.href,
@@ -81,7 +83,6 @@
     <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>	
 	
 	<div id="main">
-	
 		<div id="df_background">
 			
 			<!-- Cabeçário: -->
@@ -96,37 +97,18 @@
 			
 			<div class="clearFloat"></div>
 			
-			<div id="colwrap2">
-			
-				<div id="left_arrow">
-					<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
-						<img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
-					</a>
-				</div>
-			
-				<div class="clearFloat"></div>
-			
-			</div>
-			
-			<div id="colwrap3">
+			<div id="colwrap3_share">
 			
 				<div id="homeimg">
-					
-					<div id="backImageDiv">
-						
-					</div>
-					
-					<div id="frontImageDiv">
-						
-					</div>
-					
+					<div id="backImageDiv" ></div>					
+					<div id="frontImageDiv"></div>
 				</div>
-								<script type="text/javascript"> homefade();</script>
+				<script type="text/javascript"> homefade();</script>
 					
 				<!-- START OF share, like, send and embed buttons 		-->
 				<div id="all_buttons">
 					<div id="fb_buttons">
-						<div class="share" > <img src = "{{ STATIC_URL }}images/share_facebook.png" class="img-rounded" id="share_button" type='button_count'></div>
+						<div class="share" > <img src = "{{ STATIC_URL }}images/share_facebook.png" id="share_button" type='button_count'></div>
 						<div class="fb-like" data-href="https://dyfoc.us/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" data-font="arial"></div>	
 					</div>
 					
@@ -156,23 +138,13 @@
 					</div>
 				</div>
 				<!-- END OF share, like, send and embed buttons -->	
+				
 				<div id="posted_by"> <b>Posted by:</b> {{ user_name }}</div>
 				
 				<div class="clearFloat"></div>
 				
 			</div>
-			
-			<div id="colwrap4">
-				
-				<div id="right_arrow">
-					<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
-						<img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
-					</a>
-				</div>
-				
-				<div class="clearFloat"></div>
-			
-			</div>
+						
 			
 		</div>
 		
@@ -183,7 +155,7 @@
 		<div class="clearFloat"></div>
 		
 	</div>
-	<script type="text/javascript"> homefade();</script>
+
 </body>
 </html>
 

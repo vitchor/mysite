@@ -20,10 +20,19 @@
     <script type="text/javascript">
         
         var imgsArray = new Array();
+        var fofHeight = "{{ fof_height_value }}";
         
         {% for frame in frame_list %}
             imgsArray[{{ frame.index }}] = new Image();
 			imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
+			
+			{% if fof_height_value != "0" %}
+				imgsArray[{{ frame.index }}].style.height = "{{ fof_height_value }}px";
+			{% else %}
+  				imgsArray[{{ frame.index }}].style.height = "576px";
+			{% endif %}
+			imgsArray[{{ frame.index }}].style.width = "auto"
+
         {% endfor %}
         
         window.onload=embeddedfade;
@@ -48,20 +57,17 @@
 
 <body>
 
-<div id="colwrap_embedded">
+<div>
 		
-	<div id="backImageEmbed">
+	<div id="backImageEmbedDiv">
 		
 	</div>
 
-	<div id="frontImageEmbed">
+	<div id="frontImageEmbedDiv">
 
 	</div>
 		
 </div>
-
-</div>
-
 
 <script type="text/javascript"> embeddedfade();</script>
 </body>
