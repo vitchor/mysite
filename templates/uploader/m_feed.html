@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}m_fof_viewer.css" />
+		
+		<script type="text/javascript" src="{{ STATIC_URL }}newfof.js"></script>
+        
+        <script type="text/javascript">
+            
+            var imgsArray = new Array();
+            
+	        {% for frame in frame_list %}
+	            imgsArray[{{ frame.index }}] = new Image();
+				imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
+	        {% endfor %}
+            
+            window.onload=homefade;
+            
+        </script>
+
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-35287341-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+
+		</script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="top_bar">
+				<div id="center" class="column">
+					<img id="logo" src="{{ STATIC_URL }}dyfocus_logo.gif" alt="dyfoc.us" />
+				</div>
+				<div id="left_button" class="column">
+					<a href="/uploader/{{ facebook_id_value }}/m_feed/{{ prev_fof_index }}/">
+						<img id="left_arrow" src="{{ STATIC_URL }}dyfocus_prev_button.gif" alt="" />
+					</a>
+				</div>
+				<div id="right_button" class="column">
+					<a href="/uploader/{{ facebook_id_value }}/m_feed/{{ next_fof_index }}/">
+						<img id="right_arrow" src="{{ STATIC_URL }}dyfocus_next.gif" alt="" />
+					</a>
+				</div>
+			</div>
+			<div class="clearFloat"></div>
+			<div id="contents">
+				<div id="homeimg">
+					<div id="backImageDiv">
+					
+					</div>
+				
+					<div id="frontImageDiv">
+					
+					</div>
+				</div>
+				<div id="posted_by"> <b>Posted by</b> {{ user_name }} <b> <p>on </b> {{ fof_date }}</div>
+
+		</div>
+		<script type="text/javascript"> homefade();</script>
+	</body>
+</html>

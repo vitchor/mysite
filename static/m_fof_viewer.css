@@ -103,6 +103,11 @@ body {
 	position: absolute;
 }
 
+#posted_by {
+    text-align:center;
+    margin-top: 450px;
+}
+
 /*** IE6 Fix ***/
 * html #left {
   left: 42px;           /* RC width */

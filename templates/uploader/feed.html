@@ -14,7 +14,7 @@
     <script type="text/javascript">
 		/*  CHANGE THE PAGE IN CASE OF IPHONE	*/
 		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
-	   		location.replace("/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name/m/");
+	   		location.replace("/uploader/{{ facebook_id_value }}/m_feed/{{ index }}/");
 		}
 
 		/*  FRAME FADDING:	*/
@@ -25,10 +25,7 @@
 			imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
         {% endfor %}
         
-        window.onload = tooltips();
-        $(window).bind("load", function() {
-			resize('textAreaEmbedLink', 'fofWidth', 'fofHeight', {{current_fof}});
-		});
+        window.onload=homefade;
         
 		/*  GOOGLE ANALYTICS:	*/
 		var _gaq = _gaq || [];
@@ -99,7 +96,7 @@
 			<div id="colwrap2">
 			
 				<div id="left_arrow">
-					<a href="/uploader/{{device_id_value}}/user/{{prev_fof_name}}/fof_name/">
+					<a href="/uploader/{{facebook_id_value}}/feed/{{prev_fof_index}}/">
 						<img src="{{ STATIC_URL }}images/left-arrow-dark.png" id="fof_viewer_r4_c2" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
 					</a>
 				</div>
@@ -121,38 +118,26 @@
 					</div>
 					
 				</div>
-								<script type="text/javascript"> homefade();</script>
-					
-				<!-- START OF share, like, send and embed buttons 		-->
-				<div id="all_buttons">
-					<div id="fb_buttons">
-						<div class="share" > <img src = "{{ STATIC_URL }}images/share_facebook.png" class="img-rounded" id="share_button" type='button_count'></div>
-						<div class="fb-like" data-href="https://dyfoc.us/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" data-font="arial"></div>	
+				
+				<!-- START OF share, like, send and embed buttons -->		
+				<div id="buttons">
+					<img src = "{{ STATIC_URL }}images/share_facebook.png" class="share" id = "share_button" type='button_count'>
+					<div class="fb-like" data-href="https://dyfoc.us/uploader/{{ device_id_value }}/user/{{ current_fof }}/fof_name" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false" data-font="arial"></div>
+				</div>
+				
+				<div class="accordion" id="accordion2">
+					<div class="accordion-heading" style="text-align:left; margin-left: 2px;">
+					  <a class = "btn btn-mini" data-toggle="collapse" data-parent="#accordion2" href="#collapse">
+						Embed
+					  </a>
 					</div>
-					
-					<div class="accordion" id="accordion2">
-						<div class="accordion-heading">
-							<a class = "btn btn-small btn-link" data-toggle="collapse" data-parent="#accordion2" href="#collapse" style="margin-top: -2px; margin-left: -5px;" >
-								Embed
-							</a>
-						</div>								
-					</div>
-				</div>		
-					
-				<!-- CELL THAT WILL BE COLLAPSED AFTER CLICKING THE embed LINK: -->		
-				<div id="collapse" class="accordion-body collapse">
-					<div class="accordion-inner">
-						<form class="well form-inline">
-							<h4><i>Copy and paste the following code into your website:</i></h4>
-							<textarea id="textAreaEmbedLink" style="width:500px" name="embedded_link" rows="3"></textarea>			
-							<h4>
-								Change size:							  
-								<input title="Height" id="fofHeight" style="width: 50px;" type="text" class="span3" placeholder="Height"></input>
-								 x 
-								<input title="Width" id="fofWidth" style="width: 50px;" type="text" class="span3 disabled" placeholder="Width" disabled>
-								<button type="button" class="btn btn-inverse" onclick="resize('textAreaEmbedLink', 'fofWidth', 'fofHeight', {{current_fof}})">Resize</button>
-							</h4>											
-						</form>				
+					<div id="collapse" class="accordion-body collapse">
+					  <div class="accordion-inner">
+						<h4>
+							<i>Copy and paste the following code into your website:</i></h4>
+							<textarea style="width:500px" name="embedded_link" rows="3"> <iframe src="http://dyfoc.us/uploader/{{current_fof}}/embedded_fof/" width="432px" height="576px" frameborder="no" scrolling="no" marginwidth="0" marginheight="0" vspace="0" hspace="0"></iframe> </textarea>
+						<!--<input type="text" size="45" value=<script type="text/javascript">document.write(window.location.href);</script>>-->
+					  </div>
 					</div>
 				</div>
 				<!-- END OF share, like, send and embed buttons -->	
@@ -166,7 +151,7 @@
 			<div id="colwrap4">
 				
 				<div id="right_arrow">
-					<a href="/uploader/{{device_id_value}}/user/{{next_fof_name}}/fof_name/">
+					<a href="/uploader/{{facebook_id_value}}/feed/{{next_fof_index}}/">
 						<img src="{{ STATIC_URL }}images/right-arrow-dark.png" id="fof_viewer_r4_c8" style="opacity:0.0;" onmouseover="this.style.opacity = 1" onmouseout="this.style.opacity = 0" alt="" />
 					</a>
 				</div>
