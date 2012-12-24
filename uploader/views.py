@@ -105,8 +105,7 @@ def fof(request, fof_name):
     
     frame_list = fof.frame_set.all().order_by('index')[:5]
     
-    return render_to_response('uploader/fof.html', {'frame_list':frame_list},
-                               context_instance=RequestContext(request))
+    return render_to_response('uploader/fof.html', {'frame_list':frame_list}, context_instance=RequestContext(request))
 
 
 def featured_fof(request, fof_name_value):
@@ -145,8 +144,8 @@ def featured_fof(request, fof_name_value):
         user_name = featured_fof.fof.user.name
     else:
         user_name = "Unknown user"
-
-    return render_to_response('uploader/fof_featured.html', {'frame_list':frame_list, 'fof_date':fof.pub_date,'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+	
+    return render_to_response('uploader/fof_viwer.html', {'type':"featured_fof",'hide_arrows': 0, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/featured_fof/m/",'frame_list':frame_list, 'fof_date':featured_fof.fof.pub_date,'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_featured_fof(request, fof_name_value):
 
@@ -231,7 +230,7 @@ def user_fof(request, facebook_id_value, fof_name_value):
     else:
         user_name = "Unknown user"
 	
-    return render_to_response('uploader/fof.html', {'frame_list':frame_list,'fof_date':fof.pub_date, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+    return render_to_response('uploader/fof_viwer.html', {'type':"user_fof",'hide_arrows': 0 ,'mobile_link':"/uploader/"+facebook_id_value+"/user/"+fof_name_value+"/fof_name/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def share_fof(request, fof_name_value):
 
@@ -250,7 +249,7 @@ def share_fof(request, fof_name_value):
 		else:
 			user_name = "Unknown user"
 			
-		return render_to_response('uploader/share_fof.html', {'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+		return render_to_response('uploader/fof_viwer.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_user_fof(request, facebook_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)

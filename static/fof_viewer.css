@@ -12,7 +12,7 @@
 	font-family:Verdana,Helvetica, Arial;	font-size:12px;
 	text-align: center;
 	vertical-align: middle;
-}#all_buttons {    width: 100%;    text-align: right;    padding-bottom: 4px;}
+}#all_buttons {    width: 100%;    text-align: right;    padding-bottom: 4px;    padding-left: 13px;}
 
 .accordion-heading{ 
 	text-align:left;

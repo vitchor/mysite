@@ -68,6 +68,57 @@ function homefade() {
     }
 }
 
+function headScript(mobileAddress, current_fof, hide_arrows) {
+/*  CHANGE THE PAGE IN CASE OF IPHONE	*/
+	if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))) {
+   		location.replace(mobileAddress);
+	}
+	window.onload = afterLoading(hide_arrows);
+	$(window).bind("load", function() {
+		resize('textAreaEmbedLink', 'fofWidth', 'fofHeight', current_fof);
+	});
+	
+	/*  GOOGLE ANALYTICS:*/	
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-35287341-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+}
+
+function bodyScript(){
+	/*  FACEBOOK CONNECTION (USED FOR LIKE BUTTON?):  */
+	window.fbAsyncInit = function(user_name) {
+		FB.init({appId: '417476174956036', status: true, cookie: true, xfbml: true});
+	};
+	(function() {
+		var e = document.createElement('script'); e.async = true;
+		e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+		document.getElementById('fb-root').appendChild(e);
+	}());
+
+	/*  ATTRIBUTES OF THE SHARE BUTTON:	*/
+	$(document).ready(function(){
+		$('#share_button').click(function(e){
+			e.preventDefault();	
+			FB.ui(
+			{
+				method: 'feed',
+				name: "{{ user_name }}'s FOF",
+				link: "https://dyfoc.us/uploader/{{current_fof}}/share_fof/",
+				picture: imgsArray[0].src,
+				caption: window.location.href,
+				description: 'This FOF was taken by {{ user_name }}',
+				message: ''
+			});		
+		});
+	});
+}
+
 // Fades the pictures frontImage and backImage so when one of the pics reaches 100%, it calls the homefade function
 function homefadeTrans() {
     if (newImageOpacity >= 100.0) {
@@ -83,10 +134,10 @@ function homefadeTrans() {
         imgsArray[frontImageIndex].style.filter = "alpha(opacity="+newImageOpacity+")";
         newImageOpacity = newImageOpacity + 1;
     }
-  
+
 }
 
-function tooltips(){
+function afterLoading(hide_arrows){
 	if(!window.jQuery)	{
 		alert('jQuery not loaded');
 	}
@@ -95,14 +146,32 @@ function tooltips(){
 		$(document).ready(function(){
 			$('#fofWidth').tooltip({'placement':'bottom', 'trigger' : 'hover'});
 			$('#fofHeight').tooltip({'placement':'bottom', 'trigger' : 'hover'});
+			
+			if(hide_arrows == 1){
+				hideArrows();
+			}
+			if(type == "featured_fof"){
+				document.getElementById("left_arrow_link").href = "/uploader/"+prev_fof+"/featured_fof";
+				document.getElementById("right_arrow_link").href = "/uploader/"+next_fof+"/featured_fof";
+			}else if (type == "user_fof"){
+				document.getElementById("left_arrow_link").href = "/uploader/"+device_id+"/user/"+prev_fof+"/fof_name/";
+				document.getElementById("right_arrow_link").href = "/uploader/"+device_id+"/user/"+next_fof+"/fof_name/";
+			}
+			
 		});
 	}		
+}
+
+function hideArrows(){
+	document.getElementById("colwrap4").style.display = 'none';
+	document.getElementById("colwrap2").style.display = 'none';
+	document.getElementById("colwrap3").id = 'colwrap3_share';
 }
 
 function resize(embed_link, fofWidth, fofHeight, currentFof) {
 	var height = document.getElementById(fofHeight).value;
 	
-	if (height == ""){// how to check if the attribute is null?
+	if (height == ""){
 		height = "576";
 		document.getElementById(fofHeight).value = "576";
 	}
