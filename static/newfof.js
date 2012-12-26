@@ -156,6 +156,9 @@ function afterLoading(hide_arrows){
 			}else if (type == "user_fof"){
 				document.getElementById("left_arrow_link").href = "/uploader/"+device_id+"/user/"+prev_fof+"/fof_name/";
 				document.getElementById("right_arrow_link").href = "/uploader/"+device_id+"/user/"+next_fof+"/fof_name/";
+			} else if(type == "feed_fof"){
+				document.getElementById("left_arrow_link").href = "/uploader/"+device_id+"/feed/"+prev_fof+"/";
+				document.getElementById("right_arrow_link").href = "/uploader/"+device_id+"/feed/"+next_fof+"/"
 			}
 			
 		});
