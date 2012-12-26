@@ -269,7 +269,7 @@ def m_share_fof(request, fof_name_value):
 		else:
 			user_name = "Unknown user"
 			
-		return render_to_response('uploader/m_fof_share.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+		return render_to_response('uploader/m_fof_share.html', {'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 
 def m_user_fof(request, facebook_id_value, fof_name_value):
