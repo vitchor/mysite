@@ -251,6 +251,27 @@ def share_fof(request, fof_name_value):
 			
 		return render_to_response('uploader/fof_viwer.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
+
+def m_share_fof(request, fof_name_value):
+
+    try: 
+        fof = FOF.objects.get(name = fof_name_value)
+    except (KeyError, User.DoesNotExist):
+        return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    else:
+		if fof.name == fof_name_value:
+			fof.view_count += 1
+			fof.save()
+			frame_list = fof.frame_set.all().order_by('index')[:5]
+		
+		if fof.user.name:
+			user_name = fof.user.name
+		else:
+			user_name = "Unknown user"
+			
+		return render_to_response('uploader/m_fof_share.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+
+
 def m_user_fof(request, facebook_id_value, fof_name_value):
     #user = get_object_or_404(User, device_id=device_id_value)
 

@@ -17,6 +17,7 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<fof_name_value>\S+)/embedded_fof/$', 'embedded_fof'),
     url(r'^(?P<fof_name_value>\S+)/embedded_fof/(?P<fof_height_value>\S+)/height/$', 'embedded_fof_height'),
     url(r'^(?P<fof_name_value>\S+)/share_fof/$', 'share_fof'),
+    url(r'^(?P<fof_name_value>\S+)/share_fof/m/$', 'm_share_fof'),
     url(r'^(?P<facebook_id_value>\S+)/feed/(?P<index>\S+)/$', 'feed'),
     url(r'^(?P<facebook_id_value>\S+)/m_feed/(?P<index>\S+)/$', 'm_feed'),
 )
