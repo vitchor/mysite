@@ -740,3 +740,80 @@ def m_feed(request, facebook_id_value, index):
         fof_date = fof.pub_date
         return render_to_response('uploader/m_feed.html', {'frame_list':frame_list, 'facebook_id_value':facebook_id_value, 'next_fof_index':next_fof_index, 'prev_fof_index':prev_fof_index, 'user_name':user_name, 'fof_date':fof_date}, context_instance=RequestContext(request))
 
+@csrf_exempt
+def login(request):
+
+    json_request = json.loads(request.POST['json'])
+
+    device_id_value = json_request['device_id']
+    user_name = json_request['name']
+    user_facebook_id = json_request['facebook_id']
+    user_email = json_request['email']
+
+    # Lets find this user or create a new one if necessary
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+    except (KeyError, User.DoesNotExist):
+        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
+        user.save()
+
+
+    # Lets populate the friends table with the new information
+    for friend in json_request['friends']:
+        try: 
+            # Is there any user with the same facebook_id as the requesting user friend is?
+            user_friend = User.objects.get(facebook_id = friend['facebook_id'])
+
+            # Yes! They are friends! Let's add a new row to the friends model!...
+            # ...First lets checkout if that friend row doesn't exists already:
+            try:
+                Friends.objects.get(friend_1_id = user.id, friend_2_id = user_friend.id)
+            except (KeyError, Friends.DoesNotExist):
+                # It doesn't exists, lets create it:
+                friend_relation = Friends(friend_1_id = user.id, friend_2_id = user_friend.id)
+                friend_relation.save()
+
+        except (KeyError, User.DoesNotExist):
+            # Nothing to do here
+            j = 0
+
+
+    # Now lets returns the list of the requesting user dyfocus friends
+    response_data = {}
+    response_data['friends_list'] = []
+
+    for friend in Friends.objects.all():
+        if friend.friend_1_id == user.id:
+            try:
+                user_friend_object = User.objects.get(id = friend.friend_2_id)
+
+                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
+
+            except (KeyError, User.DoesNotExist):
+                # Nothing to do here
+                j = 0
+
+
+	featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+
+	for featured_fof in featured_fof_list:
+
+		frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+
+		frames = []
+		for frame in frame_list:
+			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+		user = featured_fof.user.__class__
+
+		fof = {}
+		fof["user_name"] = user.name
+		fof["user_facebook_id"] = user.facebook_id
+		fof["frames"] = frames
+
+		featured_fof_list.append(fof)
+
+	response_data['featured_fof_list'] = featured_fof_list
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
