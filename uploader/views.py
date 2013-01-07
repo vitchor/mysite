@@ -796,7 +796,8 @@ def login(request):
 
 	featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
-
+	featured_fof_array = [];
+	
 	for featured_fof in featured_fof_list:
 
 		frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
@@ -805,15 +806,15 @@ def login(request):
 		for frame in frame_list:
 			frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		user = featured_fof.user.__class__
+		user = featured_fof.fof.user
 
 		fof = {}
 		fof["user_name"] = user.name
 		fof["user_facebook_id"] = user.facebook_id
 		fof["frames"] = frames
 
-		featured_fof_list.append(fof)
+		featured_fof_array.append(fof)
 
-	response_data['featured_fof_list'] = featured_fof_list
+	response_data['featured_fof_list'] = featured_fof_array
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
