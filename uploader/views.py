@@ -17,6 +17,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils import simplejson as json
 from django.http import HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends
 
@@ -806,13 +807,29 @@ def login(request):
 		for frame in frame_list:
 			frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		user = featured_fof.fof.user
+		fof_object = featured_fof.fof
+		
+		pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+		
+		user = fof_object.user
 
+		likes = fof_object.like_set.all()
+		
+		comments = fof_object.comment_set.all()
+		
 		fof = {}
 		fof["user_name"] = user.name
 		fof["user_facebook_id"] = user.facebook_id
 		fof["frames"] = frames
+		fof["pub_date"] = pub_date
+		
+		if comments == []:
+			fof["comments"] = comments
+		else:
+			fof["comments"] = "0"
 
+		fof["likes"] = len(likes)		
+		
 		featured_fof_array.append(fof)
 
 	response_data['featured_fof_list'] = featured_fof_array
