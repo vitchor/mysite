@@ -44,3 +44,13 @@ class Frame(models.Model):
     focal_point_y = models.IntegerField()
     def __unicode__(self):
         return self.url
+
+class Like(models.Model):
+	user = models.ForeignKey(User)
+	fof = models.ForeignKey(FOF)
+	
+class Comment(models.Model):
+	user = models.ForeignKey(User)
+	fof = models.ForeignKey(FOF)
+	comment = models.CharField(max_length=200)
+	
