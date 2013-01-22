@@ -784,7 +784,9 @@ def login(request):
     response_data['friends_list'] = []
 
     for friend in Friends.objects.all():
+
         if friend.friend_1_id == user.id:
+
             try:
                 user_friend_object = User.objects.get(id = friend.friend_2_id)
 
@@ -794,44 +796,43 @@ def login(request):
                 # Nothing to do here
                 j = 0
 
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
-	featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+    featured_fof_array = [];
 
-	featured_fof_array = [];
-	
-	for featured_fof in featured_fof_list:
+    for featured_fof in featured_fof_list:
 
-		frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+        frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
 
-		frames = []
-		for frame in frame_list:
-			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		fof_object = featured_fof.fof
-		
-		pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
-		
-		user = fof_object.user
+            fof_object = featured_fof.fof
 
-		likes = fof_object.like_set.all()
-		
-		comments = fof_object.comment_set.all()
-		
-		fof = {}
-		fof["user_name"] = user.name
-		fof["user_facebook_id"] = user.facebook_id
-		fof["frames"] = frames
-		fof["pub_date"] = pub_date
-		
-		if comments == []:
-			fof["comments"] = comments
-		else:
-			fof["comments"] = "0"
+            pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
 
-		fof["likes"] = len(likes)		
-		
-		featured_fof_array.append(fof)
+            user = fof_object.user
 
-	response_data['featured_fof_list'] = featured_fof_array
+            likes = fof_object.like_set.all()
+
+            comments = fof_object.comment_set.all()
+
+            fof = {}
+            fof["user_name"] = user.name
+            fof["user_facebook_id"] = user.facebook_id
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+
+            if comments == []:
+                fof["comments"] = comments
+            else:
+                fof["comments"] = "0"
+
+            fof["likes"] = len(likes)		
+
+            featured_fof_array.append(fof)
+
+    response_data['featured_fof_list'] = featured_fof_array
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
