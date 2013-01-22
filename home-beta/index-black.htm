@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>dyfoc.us</title>
+	<link rel="stylesheet" type="text/css" href="./dyfocus-black.css" media="all" />
+	<!--[if IE]>
+	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
+	<![endif]-->
+	<script type="text/javascript">
+    function changeBgImage (image, id) {
+        var element = document.getElementById(id);
+        element.style.backgroundImage = "url("+image+")";
+    }
+    function changeImgSource (image, id) {
+        var element = document.getElementById(id);
+        element.src = image;
+    }
+    </script>
+</head>
+
+<body>
+    <div id="main">
+        <div id="header" onMouseOver="changeBgImage('./images/header-fill.png', 'header'); changeImgSource('./images/header.png', 'header-image')" onMouseOut="changeBgImage('./images/header-fill-black.png', 'header'); changeImgSource('./images/header-black.png', 'header-image')">
+            <img id="header-image" src="./images/header-black.png" onmouseover="this.src = './images/header.png'" onmouseout="this.src = './images/header-black.png'"/>
+        </div>
+        <div id="contents">
+            <div id="iphones">
+                <img src="./images/iphones.png"/>
+                <div id="iphone-screen-vertical-overlay">
+                    <iframe src='http://dyfoc.us/uploader/462837.106732/embedded_fof/259/height/' width='173' height='259' frameborder='no' scrolling='no' marginwidth='0' marginheight='0' hspace='0'></iframe>
+                </div>
+                <div id="iphone-screen-horizontal-overlay">
+                    <iframe src='http://dyfoc.us/uploader/145679.939939/embedded_fof/195/height/' width='259' height='173' frameborder='no' scrolling='no' marginwidth='0' marginheight='0' hspace='0'></iframe>
+                </div>
+            </div>
+            <div id="note">
+                A brand-new way of sharing <p /> your moments with the people <p /> you like!
+                <div id="appstore-icon">
+                    <img src="./images/appstore-icon.png" />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
