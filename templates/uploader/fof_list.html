@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>dyfoc.us - share your moments!</title>
+	<!--[if IE]>
+	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
+	<![endif]-->
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}fof_list.css" media="all" />
+	<link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> <!--  BOOTSTRAP  -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script> <!--ADDS JQUERY-->
+    <script type="text/javascript" src="{{ STATIC_URL }}fof_list.js"></script>
+    
+	<script type="text/javascript"> 
+		var fof_names = new Array();
+		var fof_pub_dates = new Array();
+		var fof_users = new Array();
+		var fof_device_ids = new Array();
+		var fof_views = new Array();
+		
+ 		var type = "{{ type }}";
+		var static_url = "{{ STATIC_URL }}";
+		var i = 0;
+		
+		var fof_frames = new Array();
+		{% for fof in fof_list %}
+			fof_names[i] = "{{fof.name}}";
+			fof_pub_dates[i] = "{{ fof.pub_date }}";
+			fof_users[i] = "{{ fof.user.name }}";
+			fof_device_ids[i] = "{{ fof.user.device_id }}";
+			fof_views[i] = "{{ fof.view_count }}";
+			
+			frames[i] = new Array();
+			{% for frame in fof.frame_set.all %}
+				frames[i][{{ frame.index }}] = new Image();
+				frames[i][{{ frame.index }}].src = "{{ frame.url }}";
+			{% endfor %}
+			i += 1;
+        {% endfor %}
+        
+        headScript("{{mobile_link}}");
+	</script>
+</head>
+<body>
+		<!--  BOOTSTRAP DECLARATION -->
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+		<div id="fb-root"></div>
+
+		<div id="main">
+
+			<div id="df_background">
+
+				<!-- Cabeçário: -->
+				<a href="https://www.facebook.com/dyfocus"> <img src="{{ STATIC_URL }}images/fof_viewer_r1_c1.png" id="fof_viewer_r1_c1" alt="" /> </a>
+				<div id="container">
+					<div id="fof_viewer_r1_c5"><img src="{{ STATIC_URL }}images/fof_viewer_r1_c5.png" alt="" />
+					</div>
+					<!-- PAGE LIKE BUTTON: -->
+					<div id="page_like" class="fb-like" data-href="http://www.facebook.com/dyfocus" data-send="false" data-layout="button_count" data-width="120" data-show-faces="false" data-font="arial"></div>
+				</div>
+			</div>
+
+			<img src="{{ STATIC_URL }}images/fof_viewer_r8_c1.png" id="fof_viewer_r8_c1" alt="" />
+			
+		</div>
+	</body>
+</html>
