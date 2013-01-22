@@ -798,7 +798,7 @@ def login(request):
 	featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
 	featured_fof_array = [];
-	
+
 	for featured_fof in featured_fof_list:
 
 		frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
@@ -808,28 +808,28 @@ def login(request):
 			frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
 		fof_object = featured_fof.fof
-		
+
 		pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
-		
+
 		fof_user = fof_object.user
 
 		likes = fof_object.like_set.all()
-		
+
 		comments = fof_object.comment_set.all()
-		
+
 		fof = {}
 		fof["user_name"] = fof_user.name
 		fof["user_facebook_id"] = fof_user.facebook_id
 		fof["frames"] = frames
 		fof["pub_date"] = pub_date
-		
+
 		if comments == []:
 			fof["comments"] = comments
 		else:
 			fof["comments"] = "0"
 
 		fof["likes"] = len(likes)		
-		
+
 		featured_fof_array.append(fof)
 
 	response_data['featured_fof_list'] = featured_fof_array
@@ -837,7 +837,7 @@ def login(request):
 	# creating the user fof array
 	user_fof_array = []
 	user_fof_list = user.fof_set.all().order_by('-pub_date')
-	
+
 	for user_fof in user_fof_list:
 
 		frame_list = user_fof.frame_set.all().order_by('index')[:5]
@@ -845,26 +845,26 @@ def login(request):
 		frames = []
 		for frame in frame_list:
 			frames.append({"frame_url":frame.url,"frame_index":frame.index})
-		
+
 		pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
 
 		likes = user_fof.like_set.all()
-		
+
 		comments = user_fof.comment_set.all()
-		
+
 		fof = {}
 		fof["user_name"] = user.name
 		fof["user_facebook_id"] = user.facebook_id
 		fof["frames"] = frames
 		fof["pub_date"] = pub_date
-		
+
 		if comments == []:
 			fof["comments"] = comments
 		else:
 			fof["comments"] = "0"
 
 		fof["likes"] = len(likes)		
-		
+
 		user_fof_array.append(fof)
 
 	response_data['user_fof_list'] = user_fof_array
