@@ -146,7 +146,7 @@ def featured_fof(request, fof_name_value):
     else:
         user_name = "Unknown user"
 	
-    return render_to_response('uploader/fof_viwer.html', {'type':"featured_fof",'hide_arrows': 0, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/featured_fof/m/",'frame_list':frame_list, 'fof_date':featured_fof.fof.pub_date,'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+    return render_to_response('uploader/fof_viewer.html', {'type':"featured_fof",'hide_arrows': 0, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/featured_fof/m/",'frame_list':frame_list, 'fof_date':featured_fof.fof.pub_date,'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def m_featured_fof(request, fof_name_value):
 
@@ -231,7 +231,7 @@ def user_fof(request, facebook_id_value, fof_name_value):
     else:
         user_name = "Unknown user"
 	
-    return render_to_response('uploader/fof_viwer.html', {'type':"user_fof",'hide_arrows': 0 ,'mobile_link':"/uploader/"+facebook_id_value+"/user/"+fof_name_value+"/fof_name/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+    return render_to_response('uploader/fof_viewer.html', {'type':"user_fof",'hide_arrows': 0 ,'mobile_link':"/uploader/"+facebook_id_value+"/user/"+fof_name_value+"/fof_name/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'device_id_value':facebook_id_value, 'facebook_id_value':facebook_id_value, 'next_fof_name':next_fof_name, 'prev_fof_name':prev_fof_name, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def share_fof(request, fof_name_value):
 
@@ -250,7 +250,7 @@ def share_fof(request, fof_name_value):
 		else:
 			user_name = "Unknown user"
 			
-		return render_to_response('uploader/fof_viwer.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
+		return render_to_response('uploader/fof_viewer.html', {'type':"share_fof",'hide_arrows': 1, 'device_id_value':0, 'mobile_link':"/uploader/"+fof_name_value+"/share_fof/m/",'frame_list':frame_list,'fof_date':fof.pub_date, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 
 def m_share_fof(request, fof_name_value):
@@ -673,7 +673,7 @@ def feed(request, facebook_id_value, index):
             user_name = "Unknown user"
             
         fof_date = fof.pub_date
-        return render_to_response('uploader/fof_viwer.html', {'type':"feed_fof",'hide_arrows': 0, 'device_id_value':facebook_id_value, 'mobile_link':"/uploader/"+facebook_id_value+"/m_feed/"+str(index)+"/",'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof_viewer.html', {'type':"feed_fof",'hide_arrows': 0, 'device_id_value':facebook_id_value, 'mobile_link':"/uploader/"+facebook_id_value+"/m_feed/"+str(index)+"/",'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
  
  
 def m_feed(request, facebook_id_value, index):
