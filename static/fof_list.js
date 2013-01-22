@@ -138,7 +138,9 @@ function appendFof(fof_index){
 function after_loading(){
 	$(window).bind("load", function() {
 		bodyScript();
-		appendFof(0);
+		for(var index = 0; index < i; index++){
+			appendFof(index);    
+		}
 	});
 }
 
