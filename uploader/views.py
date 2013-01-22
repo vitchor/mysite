@@ -741,6 +741,19 @@ def m_feed(request, facebook_id_value, index):
         fof_date = fof.pub_date
         return render_to_response('uploader/m_feed.html', {'frame_list':frame_list, 'facebook_id_value':facebook_id_value, 'next_fof_index':next_fof_index, 'prev_fof_index':prev_fof_index, 'user_name':user_name, 'fof_date':fof_date}, context_instance=RequestContext(request))
 
+def list_featured(request):
+
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+    all_fofs = []
+    list_len = len(featured_fof_list)
+    list_index = 0
+    while list_index < list_len:
+        all_fofs.append(featured_fof_list[list_index].fof)
+        list_index += 1
+    i = 0
+    return render_to_response('uploader/fof_list.html', {'fof_list':all_fofs,'type':"my_fof", 'mobile_link':"/uploader/"+str(0)+"/featured_fof/m/"}, context_instance=RequestContext(request))
+            
 @csrf_exempt
 def login(request):
 
