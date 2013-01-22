@@ -28,12 +28,14 @@
 		
         var type = "{{ type }}";
         var device_id = "{{ device_id_value }}";
+		var user_name = "{{user_name}}";
+		var current_fof = "{{current_fof}}";
 	</script>
 </head>
 <body> 
 	<div id="fb-root"></div>
 	<script type="text/javascript">
-		bodyScript("{{ user_name }}");
+		bodyScript();
 	</script>
 
 	<!--  BOOTSTRAP DECLARATION -->

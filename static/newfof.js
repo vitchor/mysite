@@ -92,7 +92,7 @@ function headScript(mobileAddress, current_fof, hide_arrows) {
 
 function bodyScript(){
 	/*  FACEBOOK CONNECTION (USED FOR LIKE BUTTON?):  */
-	window.fbAsyncInit = function(user_name) {
+	window.fbAsyncInit = function() {
 		FB.init({appId: '417476174956036', status: true, cookie: true, xfbml: true});
 	};
 	(function() {
@@ -108,11 +108,11 @@ function bodyScript(){
 			FB.ui(
 			{
 				method: 'feed',
-				name: "{{ user_name }}'s FOF",
-				link: "https://dyfoc.us/uploader/{{current_fof}}/share_fof/",
+				name: user_name + "'s FOF",
+				link: "https://dyfoc.us/uploader/"+current_fof+"/share_fof/",
 				picture: imgsArray[0].src,
 				caption: window.location.href,
-				description: 'This FOF was taken by {{ user_name }}',
+				description: 'This FOF was taken by ' + user_name,
 				message: ''
 			});		
 		});
