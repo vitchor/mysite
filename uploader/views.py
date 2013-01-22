@@ -829,9 +829,9 @@ def login(request):
             else:
                 fof["comments"] = "0"
 
-            fof["likes"] = len(likes)		
+            fof["likes"] = len(likes)
 
-            featured_fof_array.append(fof)
+        featured_fof_array.append(fof)
 
     response_data['featured_fof_list'] = featured_fof_array
 
