@@ -810,138 +810,138 @@ def login(request):
                 j = 0
 
 
-	featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
-	featured_fof_array = [];
+    featured_fof_array = [];
 
-	for featured_fof in featured_fof_list:
+    for featured_fof in featured_fof_list:
 
-		frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+        frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
 
-		frames = []
-		for frame in frame_list:
-			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		fof_object = featured_fof.fof
+        fof_object = featured_fof.fof
 
-		pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+        pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
 
-		fof_user = fof_object.user
+        fof_user = fof_object.user
 
-		likes = fof_object.like_set.all()
+        likes = fof_object.like_set.all()
 
-		comments = fof_object.comment_set.all()
+        comments = fof_object.comment_set.all()
 
-		fof = {}
-		fof["user_name"] = fof_user.name
-		fof["user_facebook_id"] = fof_user.facebook_id
-		fof["frames"] = frames
-		fof["pub_date"] = pub_date
+        fof = {}
+        fof["user_name"] = fof_user.name
+        fof["user_facebook_id"] = fof_user.facebook_id
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
 
-		if comments == []:
-			fof["comments"] = comments
-		else:
-			fof["comments"] = "0"
+        if comments == []:
+            fof["comments"] = comments
+        else:
+            fof["comments"] = "0"
 
-		fof["likes"] = len(likes)		
+        fof["likes"] = len(likes)
 
-		featured_fof_array.append(fof)
+        featured_fof_array.append(fof)
 
-	response_data['featured_fof_list'] = featured_fof_array
+        response_data['featured_fof_list'] = featured_fof_array
 
-	# creating the user fof array
-	user_fof_array = []
-	user_fof_list = user.fof_set.all().order_by('-pub_date')
+    # creating the user fof array
+    user_fof_array = []
+    user_fof_list = user.fof_set.all().order_by('-pub_date')
 
-	for user_fof in user_fof_list:
+    for user_fof in user_fof_list:
 
-		frame_list = user_fof.frame_set.all().order_by('index')[:5]
+        frame_list = user_fof.frame_set.all().order_by('index')[:5]
 
-		frames = []
-		for frame in frame_list:
-			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+        pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
 
-		likes = user_fof.like_set.all()
+        likes = user_fof.like_set.all()
 
-		comments = user_fof.comment_set.all()
+        comments = user_fof.comment_set.all()
 
-		fof = {}
-		fof["user_name"] = user.name
-		fof["user_facebook_id"] = user.facebook_id
-		fof["frames"] = frames
-		fof["pub_date"] = pub_date
+        fof = {}
+        fof["user_name"] = user.name
+        fof["user_facebook_id"] = user.facebook_id
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
 
-		if comments == []:
-			fof["comments"] = comments
-		else:
-			fof["comments"] = "0"
+        if comments == []:
+            fof["comments"] = comments
+        else:
+            fof["comments"] = "0"
 
-		fof["likes"] = len(likes)		
+        fof["likes"] = len(likes)
 
-		user_fof_array.append(fof)
+        user_fof_array.append(fof)
 
-	response_data['user_fof_list'] = user_fof_array
+    response_data['user_fof_list'] = user_fof_array
     # Lets create the feed fof list
 
     # Gets a list of friends from this user (assuming the data is not duplicated)
-	friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
+    friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
 
-	i = 0
-	feed_fof_list = ''
-	# Gets a list of FOFs from each friend
-	for friend in friends_list:
-		# if friend_1 is user, friend_2 is the friend id
-		if friend.friend_1_id == user.id:
-			friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]
-			# if friend_2 is user, friend_1 is the friend id
-		else:
-			friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
+    i = 0
+    feed_fof_list = ''
+    #Gets a list of FOFs from each friend
+    for friend in friends_list:
+        #if friend_1 is user, friend_2 is the friend id
+        if friend.friend_1_id == user.id:
+            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]
+            #if friend_2 is user, friend_1 is the friend id
+        else:
+            friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
 
-		# Populates a general list of FOFs from all friends
-		feed_fof_list = chain(feed_fof_list, friend_fof_list)
-		i = i + 1
-	# Adds user's FOFs to the list
-	user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
-	feed_fof_list = chain(feed_fof_list, user_fof_list)
+        #Populates a general list of FOFs from all friends
+        feed_fof_list = chain(feed_fof_list, friend_fof_list)
+        i = i + 1
+    # Adds user's FOFs to the list
+    user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+    feed_fof_list = chain(feed_fof_list, user_fof_list)
 
-	# Sorts list using the publish date
+    #Sorts list using the publish date
 	# NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
 	# this is the pulo from the gato!
-	feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
-	feed_fof_array = []
+    feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
+    feed_fof_array = []
 
-	for feed_fof in feed_fof_list:
+    for feed_fof in feed_fof_list:
 
-		frame_list = feed_fof.frame_set.all().order_by('index')[:5]
+        frame_list = feed_fof.frame_set.all().order_by('index')[:5]
 
-		frames = []
-		for frame in frame_list:
-			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-		likes = feed_fof.like_set.all()
+        likes = feed_fof.like_set.all()
 
-		comments = feed_fof.comment_set.all()
+        comments = feed_fof.comment_set.all()
 
-		pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+        pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
 
-		fof = {}
-		fof["user_name"] = feed_fof.user.name
-		fof["user_facebook_id"] = feed_fof.user.facebook_id
-		fof["frames"] = frames
-		fof["pub_date"] = pub_date
+        fof = {}
+        fof["user_name"] = feed_fof.user.name
+        fof["user_facebook_id"] = feed_fof.user.facebook_id
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
 
-		if comments == []:
-			fof["comments"] = comments
-		else:
-			fof["comments"] = "0"
+        if comments == []:
+            fof["comments"] = comments
+        else:
+            fof["comments"] = "0"
 
-		fof["likes"] = len(likes)		
+        fof["likes"] = len(likes)		
 
-		feed_fof_array.append(fof)
+        feed_fof_array.append(fof)
 
-	response_data['feed_fof_list'] = feed_fof_array
+    response_data['feed_fof_list'] = feed_fof_array
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
