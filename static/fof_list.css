@@ -1,0 +1,20 @@
+@charset "utf-8";body {	background-color: #eeeeee;	font-size: 62.5%;	margin: 0;	padding: 0;}body * {	font-size: 100%;}h1, h2, h3, h4, h5, h6 {	font-weight: normal;}p {	margin-bottom: 1.1em;	margin-top: 0;}hr {	width:100%;	height:2px;	background-color:#C9C2BD;	border:1px dotted green;}Read more: How to Put a Bar or Separators on a Website | eHow.com http://www.ehow.com/how_5108520_put-bar-separators-website.html#ixzz2HDlO0tjF#main p.lastNode {	margin-bottom: 0;}a:link img, a:visited img {	border: none;}#main {	margin: 0 auto;	width: 960px;}#df_background {	margin-left: 0px;	margin-top: 0px;	display: inline;	float: left;	margin-bottom: 0;	background-color: #fff;	width: 960px;	padding-top: 0px;	height: 740px;}html > body #df_background {	height: auto;	min-height: 740px;}#fof_viewer_r1_c1 {	margin-left: 0px;	margin-top: 0px;	display: inline;	float: left;	height: 40px;	margin-bottom: 0;	width: 160px;}#fof_viewer_r1_c5 {	margin-left: 0px;	margin-top: 0px;	display: inline;	float: left;	height: 40px;	margin-bottom: 0;	width: 800px;}#container {    position: relative;
+    width: 100%;}#page_like {    width: 100%;    height: 100%;    position: absolute;    top: 10px;    right: 10px;    z-index: 10;    text-align: right;    height: 30px;}
+
+.fb-like{
+	overflow: hidden;	float:right; 	padding: 1px;	padding-bottom: 3px;   	padding-top: 0px;
+}
+.all_buttons {    width: 100%;    text-align: right;    margin-top: 1px;    padding-bottom: 4px;    padding-left: 13px;}
+
+.fb_buttons {    width: 50%;    height: 100%;    text-align: right;    padding-bottom: 4px;    padding-right: 0px;    float: left;}
+.accordion-body{ 	width:100%;}.btn_share{
+	width: auto;
+	height: 20px;
+}
+.share{
+	width: 305px;	float: left;		
+}.embed_counter{	width: 50%;	float:right;	margin-left: 0px;}.accordion{	float:left;	padding: 0px;	text-align: right;	margin-top: -2px;	width: 14%;}.fof_views{	float:right;	text-align: left;	margin-left: 1px;	margin-top: 1px;	width: 85%;}
+#fof_viewer_r4_c2 {	margin-left: 0px;	margin-top: 0px;	display: inline;	float: left;	height: 155px;	margin-bottom: 0;	width: 33px;}.colwrap_fof {	float: left;	margin-top: 40px;	width: 768px;
+	padding-left: 95px;	text-align: center;	position:relative;}.posted_by {    margin-left: 0px;    margin-top: 0px;    text-align: center;    display: inline;    float: left;    height: 40px;    margin-bottom: 0;    width: 768px;    font-family:Verdana,Helvetica, Arial;    font-size:12px;}.frontImage, .backImage {	height: 576px;	width: auto;	position: relative;	margin-right:auto;	margin-left:auto;}
+
+.homeimg {    margin-top: 0px;    text-align: center;    width: 100%;    height: 576px;    position: relative;}img{	max-height: 576px;	width: auto;}.frontDiv, .backDiv {	float: left;	/*margin-left: 0px;*/	margin-top: 0px;	width: 768px;	height: 576px;	text-align: center;	position: absolute;}
