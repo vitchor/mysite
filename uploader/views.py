@@ -883,5 +883,94 @@ def login(request):
 		user_fof_array.append(fof)
 
 	response_data['user_fof_list'] = user_fof_array
+    # Lets create the feed fof list
 
+    # Gets a list of friends from this user (assuming the data is not duplicated)
+	friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
+
+	i = 0
+	feed_fof_list = ''
+	# Gets a list of FOFs from each friend
+	for friend in friends_list:
+		# if friend_1 is user, friend_2 is the friend id
+		if friend.friend_1_id == user.id:
+			friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]
+			# if friend_2 is user, friend_1 is the friend id
+		else:
+			friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
+
+		# Populates a general list of FOFs from all friends
+		feed_fof_list = chain(feed_fof_list, friend_fof_list)
+		i = i + 1
+	# Adds user's FOFs to the list
+	user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+	feed_fof_list = chain(feed_fof_list, user_fof_list)
+
+	# Sorts list using the publish date
+	# NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+	# this is the pulo from the gato!
+	feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
+	feed_fof_array = []
+
+	for feed_fof in feed_fof_list:
+
+		frame_list = feed_fof.frame_set.all().order_by('index')[:5]
+
+		frames = []
+		for frame in frame_list:
+			frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+		likes = feed_fof.like_set.all()
+
+		comments = feed_fof.comment_set.all()
+
+		pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+
+		fof = {}
+		fof["user_name"] = feed_fof.user.name
+		fof["user_facebook_id"] = feed_fof.user.facebook_id
+		fof["frames"] = frames
+		fof["pub_date"] = pub_date
+
+		if comments == []:
+			fof["comments"] = comments
+		else:
+			fof["comments"] = "0"
+
+		fof["likes"] = len(likes)		
+
+		feed_fof_array.append(fof)
+
+	response_data['feed_fof_list'] = feed_fof_array
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+@csrf_exempt
+def user_web_info(request):
+    if request.is_ajax():
+        if request.method == 'GET':
+            message = "This is an XHR GET request"
+        elif request.method == 'POST':
+            message = "Your email is "+request.POST['email']
+            # Here we can access the POST data
+            print request.POST
+            user_name = request.POST['name']
+            user_facebook_id = request.POST['facebook_id']
+            user_email = request.POST['email']
+            
+            try:
+                user = User.objects.get(facebook_id = user_facebook_id)
+            except (KeyError, User.DoesNotExist):
+                user = User(name = user_name, device_id = '', facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email)
+                result = "User not found - Creating one"
+                print result
+                user.save()
+            else:
+                user.name = user_name
+                user.facebook_id = user_facebook_id
+                user.email = user_email
+                result = "User found - Updating info"
+                user.save()
+                print result
+    else:
+        message = "No XHR"
+    return HttpResponse()
