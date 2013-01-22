@@ -618,7 +618,7 @@ def feed(request, facebook_id_value, index):
         user = User.objects.get(facebook_id = facebook_id_value)
         
         # Gets a list of friends from this user (assuming the data is not duplicated)
-        friends_list = Friends.objects.filter(Q(friend_1_id = user.id) | Q(friend_2_id = user.id))
+        friends_list = Friends.objects.filter(friend_1_id = user.id)
 
     except (KeyError, User.DoesNotExist):
         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
@@ -650,6 +650,8 @@ def feed(request, facebook_id_value, index):
         
         # Determines which is the FOF that needs to be shown
         current_fof = fof_list[index]
+
+	
         
         # Finds the correspondent FOF in the database
         fof = FOF.objects.get(name = current_fof)
