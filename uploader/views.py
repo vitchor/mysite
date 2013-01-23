@@ -808,7 +808,7 @@ def login(request):
         try:
             #Populates a friends list
             user_friend_object = User.objects.get(id = friend.friend_2_id)
-            ['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
+            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
             
             #Populates a general list of FOFs from all friends
             friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
