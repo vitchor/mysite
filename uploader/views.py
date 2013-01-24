@@ -868,16 +868,16 @@ def likes_and_comments(request):
         like_array = []
         comment_array = []
         
-        like_response = {}
-        comment_response = {}
         
         for like in likes:
+            like_response = {}
             like_response["user_facebook_id"] = like.user.facebook_id
             like_response["fof_id"] = fof.id
             
             like_array.append(like_response)
         
         for comment in comments:
+            comment_response = {}
             comment_response["user_facebook_id"] = comment.user.facebook_id
             comment_response["fof_id"] = fof.id
             comment_response["comment"] = comment.comment
