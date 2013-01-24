@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
@@ -19,7 +20,7 @@ from django.utils import simplejson as json
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 
-from uploader.models import User, FOF, Frame, Featured_FOF, Friends
+from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment
 
 def index(request):
     return render_to_response('uploader/index.html', {},
@@ -756,6 +757,90 @@ def list_featured(request):
     i = 0
     return render_to_response('uploader/fof_list.html', {'fof_list':all_fofs,'type':"my_fof", 'mobile_link':"/uploader/"+str(0)+"/featured_fof/m/"}, context_instance=RequestContext(request))
             
+
+@csrf_exempt
+def comment(request):
+    """ 
+    curl -d json='{
+        "facebook_id": "100000370417687",
+        "fof_id": "96964.057167",
+        "comment_message": "QUE LEGAAAL! "
+    }' http://localhost:8000/uploader/comment/
+    """
+
+    response_data = {}
+
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['facebook_id']
+    comment_message = json_request['comment_message']
+    fof_id = json_request['fof_id']
+
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+
+        try:
+            fof = FOF.objects.get(id=fof_id)
+            
+            comment = Comment()
+            comment.user_id = user.id
+            comment.fof_id = fof.id
+            comment.comment = comment_message
+            comment.save()
+            response_data["result"] = "ok"
+
+        except (KeyError, FOF.DoesNotExist):
+            # Nothing to do here
+            response_data["error"] = "FOF doesn't exist"
+
+    except (KeyError, User.DoesNotExist):
+        # Nothing to do here
+        response_data["error"] = "User doesn't exist"
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+@csrf_exempt
+def like(request):    
+    """ 
+    curl -d json='{
+        "facebook_id": "100000370417687",
+        "fof_id": "50"
+    }' http://localhost:8000/uploader/like/ 
+    """
+
+    response_data = {}
+        
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['facebook_id']
+    fof_id = json_request['fof_id']
+    
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+        
+        try:
+            fof = FOF.objects.get(id=fof_id)
+            
+            try:
+                Like.objects.get(user_id = user.id, fof_id = fof.id)
+                response_data["error"] = "like already exists"
+                            
+            except (KeyError, Like.DoesNotExist):
+                # Nothing to do here
+                like = Like()
+                like.user_id = user.id
+                like.fof_id = fof.id
+                like.save()
+                response_data["result"] = "ok"
+            
+        except (KeyError, FOF.DoesNotExist):
+            # Nothing to do here
+            response_data["error"] = "FOF doesn't exist"
+    
+    except (KeyError, User.DoesNotExist):
+        # Nothing to do here
+        response_data["error"] = "User doesn't exist"
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 @csrf_exempt
 def login(request):
 
@@ -772,7 +857,6 @@ def login(request):
     except (KeyError, User.DoesNotExist):
         user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
         user.save()
-
 
 
     # Lets populate the friends table with the new information
@@ -825,6 +909,8 @@ def login(request):
 
     for featured_fof in featured_fof_list:
 
+        fof = {}
+
         frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
 
         frames = []
@@ -840,10 +926,17 @@ def login(request):
         likes = fof_object.like_set.all()
 
         comments = fof_object.comment_set.all()
+        
+        try :
+            Like.objects.get(fof_id = fof_object.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"            
 
-        fof = {}
+       
         fof["user_name"] = fof_user.name
         fof["user_facebook_id"] = fof_user.facebook_id
+        fof["id"] = fof_object.id
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
@@ -890,8 +983,15 @@ def login(request):
 
         comments = feed_fof.comment_set.all()
         
+        try :
+            Like.objects.get(fof_id = feed_fof.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"
+            
         fof["user_name"] = feed_fof.user.name
         fof["user_facebook_id"] = feed_fof.user.facebook_id
+        fof["id"] = feed_fof.id
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
