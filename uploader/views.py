@@ -842,6 +842,48 @@ def like(request):
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
+def likes_and_comments(request):
+    response_data = {}
+    
+    json_request = json.loads(request.POST['json'])
+    
+    fof_id = json_request['fof_id']
+    
+    try:
+        fof = FOF.objects.get(id=fof_id)
+        
+    except (KeyError, FOF.DoesNotExist):
+        # Ciao Ciao
+        response_data["error"] = "FOF does not exist"
+    
+    else:
+        likes = fof.like_set.all()
+        comments = fof.comment_set.all()
+        
+        like_array = []
+        comment_array = []
+        
+        for like in likes:
+            like_response["user_facebook_id"] = like.user
+            like_response["fof_id"] = fof.id
+            
+            like_array.append(like_response)
+        
+        for comment in comments:
+            comment_response["user_facebook_id"] = comment.user
+            comment_response["fof_id"] = comment.fof
+            comment_response["comment"] = comment.comment
+            
+            comment_array.append(comment_response)
+            
+        response_data["like_list"] = like_array
+        response_data["comment_list"] = comment_array
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+        
+
+@csrf_exempt
 def login(request):
 
     json_request = json.loads(request.POST['json'])
