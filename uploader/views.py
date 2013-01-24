@@ -843,6 +843,11 @@ def like(request):
 
 @csrf_exempt
 def likes_and_comments(request):
+    '''
+    curl -d json='{
+        "fof_id": "50"
+    }' http://dyfoc.us/uploader/like/
+    '''
     response_data = {}
     
     json_request = json.loads(request.POST['json'])
@@ -864,14 +869,14 @@ def likes_and_comments(request):
         comment_array = []
         
         for like in likes:
-            like_response["user_facebook_id"] = like.user
+            like_response["user_facebook_id"] = like.user.facebook_id
             like_response["fof_id"] = fof.id
             
             like_array.append(like_response)
         
         for comment in comments:
-            comment_response["user_facebook_id"] = comment.user
-            comment_response["fof_id"] = comment.fof
+            comment_response["user_facebook_id"] = comment.user.facebook_id
+            comment_response["fof_id"] = fof.id
             comment_response["comment"] = comment.comment
             
             comment_array.append(comment_response)
