@@ -14,7 +14,7 @@ $(document).ready(function(){
 window.fbAsyncInit = function() {
 // init the FB JS SDK
 FB.init({
-  appId      : '417476174956036', // App ID from the App Dashboard
+  appId      : '416260668426967', // App ID from the App Dashboard
   channelUrl : '/static/home/channel.html', // Channel File for x-domain communication
   status     : true, // check the login status upon init?
   cookie     : true, // set sessions cookies to allow your server to access the session?
@@ -29,8 +29,18 @@ FB.getLoginStatus(function(response) {
     FB.api('/me?fields=name,id,email', function(response) {
         // Remove the next comment to automatically redirect to user feed:
         //location.replace('http://dyfoc.us/uploader/'+response.id+'/feed/0/');
-        $('#login').text('Welcome, '+response.name+'. View Profile >');
-        $('#login').attr('href','http://dyfoc.us/uploader/'+response.id+'/feed/0/');
+        $('#login').text('');
+        $('#welcome').text('Welcome, ');
+        $('#username').text(response.name+' (');
+        $('#logout').text('logout');
+        $('#logout').click(function(){
+           FB.logout(function(response){
+               top.location.href = "http://marcelosalloum.pagekite.me/";
+           });
+        });
+        $('#point').text('). ');
+        $('#view-feed').text('View feed >');
+        $('#view-feed').attr('href','http://dyfoc.us/uploader/'+response.id+'/feed/0/');
         $.post('/uploader/user_web_info/', {
             name: response.name,
             facebook_id: response.id,
@@ -45,10 +55,12 @@ FB.getLoginStatus(function(response) {
   } else if (response.status === 'not_authorized') {
     // not_authorized
     //login();
+    $('#username').text('');
     $('#login').text('Connect with Facebook');
   } else {
     // not_logged_in
     //login();
+    $('#username').text('');
     $('#login').text('Log in or Sign Up');
   }
  });
@@ -70,7 +82,7 @@ function logMeIn() {
   var paramsLocation=window.location.toString().indexOf('?');
   var params="";
   if (paramsLocation>=0) params=window.location.toString().slice(paramsLocation);
-  top.location = 'https://graph.facebook.com/oauth/authorize?client_id=417476174956036&scope=email&redirect_uri=http://dyfoc.us'+params;
+  top.location = 'https://graph.facebook.com/oauth/authorize?client_id=416260668426967&scope=email&redirect_uri=http://marcelosalloum.pagekite.me'+params;
 }
 
 // Load the SDK's source Asynchronously
