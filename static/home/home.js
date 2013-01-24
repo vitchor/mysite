@@ -14,7 +14,7 @@ $(document).ready(function(){
 window.fbAsyncInit = function() {
 // init the FB JS SDK
 FB.init({
-  appId      : '416260668426967', // App ID from the App Dashboard
+  appId      : '417476174956036', // App ID from the App Dashboard
   channelUrl : '/static/home/channel.html', // Channel File for x-domain communication
   status     : true, // check the login status upon init?
   cookie     : true, // set sessions cookies to allow your server to access the session?
@@ -35,7 +35,7 @@ FB.getLoginStatus(function(response) {
         $('#logout').text('logout');
         $('#logout').click(function(){
            FB.logout(function(response){
-               top.location.href = "http://marcelosalloum.pagekite.me/";
+               top.location.href = "http://dyfoc.us/";
            });
         });
         $('#point').text('). ');
@@ -82,7 +82,7 @@ function logMeIn() {
   var paramsLocation=window.location.toString().indexOf('?');
   var params="";
   if (paramsLocation>=0) params=window.location.toString().slice(paramsLocation);
-  top.location = 'https://graph.facebook.com/oauth/authorize?client_id=416260668426967&scope=email&redirect_uri=http://marcelosalloum.pagekite.me'+params;
+  top.location = 'https://graph.facebook.com/oauth/authorize?client_id=417476174956036&scope=email&redirect_uri=http://dyfoc.us'+params;
 }
 
 // Load the SDK's source Asynchronously
