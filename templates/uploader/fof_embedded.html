@@ -16,14 +16,14 @@
         
         {% for frame in frame_list %}
             imgsArray[{{ frame.index }}] = new Image();
-			imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
-			
-			{% if fof_height_value != "0" %}
-				imgsArray[{{ frame.index }}].style.height = "{{ fof_height_value }}px";
-			{% else %}
-  				imgsArray[{{ frame.index }}].style.height = "576px";
-			{% endif %}
-			imgsArray[{{ frame.index }}].style.width = "auto"
+            imgsArray[{{ frame.index }}].src = "{{ frame.url }}";
+            
+            {% if fof_height_value != "0" %}
+                imgsArray[{{ frame.index }}].style.height = "{{ fof_height_value }}px";
+            {% else %}
+                imgsArray[{{ frame.index }}].style.height = "576px";
+            {% endif %}
+            imgsArray[{{ frame.index }}].style.width = "auto"
 
         {% endfor %}
         
