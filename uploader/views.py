@@ -845,8 +845,8 @@ def like(request):
 def likes_and_comments(request):
     '''
     curl -d json='{
-        "fof_id": "50"
-    }' http://dyfoc.us/uploader/like/
+        "fof_id": "22"
+    }' http://dyfoc.us/uploader/likes_and_comments/
     '''
     response_data = {}
     
@@ -867,6 +867,9 @@ def likes_and_comments(request):
         
         like_array = []
         comment_array = []
+        
+        like_response = {}
+        comment_response = {}
         
         for like in likes:
             like_response["user_facebook_id"] = like.user.facebook_id
