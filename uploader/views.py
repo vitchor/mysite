@@ -800,6 +800,7 @@ def comment(request):
             comment.user_id = user.id
             comment.fof_id = fof.id
             comment.comment = comment_message
+            comment.pub_date = timezone.now()
             comment.save()
             response_data["result"] = "ok"
 
@@ -843,6 +844,7 @@ def like(request):
                 like = Like()
                 like.user_id = user.id
                 like.fof_id = fof.id
+                like.pub_date = timezone.now()
                 like.save()
                 response_data["result"] = "ok"
             
