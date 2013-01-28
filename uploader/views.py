@@ -1098,3 +1098,218 @@ def user_web_info(request):
     else:
         message = "No XHR"
     return HttpResponse()
+
+@csrf_exempt
+def json_feed(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_feed/
+    '''
+    
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['user_facebook_id']
+
+    response_data = {}
+
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+
+    else:
+        user_friends = Friends.objects.filter(Q(friend_1_id = user.id))
+
+        feed_fof_list = ''
+
+        for friend in user_friends:
+
+            #Populates a general list of FOFs from all friends
+            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
+            feed_fof_list = chain(feed_fof_list, friend_fof_list)
+
+        # Adds personal FOFs to the feed list
+        user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+        feed_fof_list = chain(feed_fof_list, user_fof_list)
+
+        # Sorts the list
+        feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
+        feed_fof_array = []
+
+        for feed_fof in feed_fof_list:
+
+            fof = {}
+
+            # Add this fof to the user_fof_array
+            frame_list = feed_fof.frame_set.all().order_by('index')[:5]
+
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+            pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+
+            likes = feed_fof.like_set.all()
+
+            comments = feed_fof.comment_set.all()
+
+            try :
+                Like.objects.get(fof_id = feed_fof.id, user_id = user.id)
+                fof["liked"] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof["liked"] = "0"
+
+            fof["user_name"] = feed_fof.user.name
+            fof["user_facebook_id"] = feed_fof.user.facebook_id
+            fof["id"] = feed_fof.id
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+
+            if comments == []:
+                fof["comments"] = comments
+            else:
+                fof["comments"] = "0"
+
+            fof["likes"] = len(likes)
+
+            feed_fof_array.append(fof)
+
+            #if feed_fof.user == user:
+            #    user_fof_array.append(fof)
+
+
+        response_data['feed_fof_list'] = feed_fof_array
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+@csrf_exempt
+def json_featured_fof(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_featured_fof/
+    '''
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['user_facebook_id']
+    response_data = {}
+    
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+    
+    else:
+        featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+        featured_fof_array = [];
+
+        for featured_fof in featured_fof_list:
+
+            fof = {}
+
+            frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+            fof_object = featured_fof.fof
+
+            pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+
+            fof_user = fof_object.user
+
+            likes = fof_object.like_set.all()
+
+            comments = fof_object.comment_set.all()
+        
+            try :
+                Like.objects.get(fof_id = fof_object.id, user_id = user.id)
+                fof["liked"] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof["liked"] = "0"            
+
+       
+            fof["user_name"] = fof_user.name
+            fof["user_facebook_id"] = fof_user.facebook_id
+            fof["id"] = fof_object.id
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+
+            if comments == []:
+                fof["comments"] = comments
+            else:
+                fof["comments"] = "0"
+
+            fof["likes"] = len(likes)
+
+            featured_fof_array.append(fof)
+
+            response_data['featured_fof_list'] = featured_fof_array
+       
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+@csrf_exempt
+def json_user_fof(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_user_fof/
+    '''
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['user_facebook_id']
+    response_data = {}
+    
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+    
+    else:
+    
+        user_fof_array = []
+        user_fof_list = user.fof_set.all().order_by('-pub_date')
+    
+        for user_fof in user_fof_list:
+            fof = {}
+
+            # Add this fof to the user_fof_array
+            frame_list = user_fof.frame_set.all().order_by('index')[:5]
+
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+            pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+
+            likes = user_fof.like_set.all()
+
+            comments = user_fof.comment_set.all()
+
+            try :
+                Like.objects.get(fof_id = user_fof.id, user_id = user.id)
+                fof["liked"] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof["liked"] = "0"
+
+            fof["user_name"] = user_fof.user.name
+            fof["user_facebook_id"] = user_fof.user.facebook_id
+            fof["id"] = user_fof.id
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+
+            if comments == []:
+                fof["comments"] = comments
+            else:
+                fof["comments"] = "0"
+
+            fof["likes"] = len(likes)
+
+            user_fof_array.append(fof)
+            
+        response_data['user_fof_list'] = user_fof_array
+
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
