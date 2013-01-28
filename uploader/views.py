@@ -1179,7 +1179,7 @@ def json_feed(request):
             #    user_fof_array.append(fof)
 
 
-        response_data['feed_fof_list'] = feed_fof_array
+        response_data['fof_list'] = feed_fof_array
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
@@ -1247,7 +1247,7 @@ def json_featured_fof(request):
 
             featured_fof_array.append(fof)
 
-            response_data['featured_fof_list'] = featured_fof_array
+            response_data['fof_list'] = featured_fof_array
        
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
@@ -1310,6 +1310,6 @@ def json_user_fof(request):
 
             user_fof_array.append(fof)
             
-        response_data['user_fof_list'] = user_fof_array
+        response_data['fof_list'] = user_fof_array
 
         return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
