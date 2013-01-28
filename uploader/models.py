@@ -46,11 +46,13 @@ class Frame(models.Model):
         return self.url
 
 class Like(models.Model):
-	user = models.ForeignKey(User)
-	fof = models.ForeignKey(FOF)
-	
+    user = models.ForeignKey(User)
+    fof = models.ForeignKey(FOF)
+    pub_date = models.DateTimeField('date published')
+
 class Comment(models.Model):
-	user = models.ForeignKey(User)
-	fof = models.ForeignKey(FOF)
-	comment = models.CharField(max_length=200)
-	
+    user = models.ForeignKey(User)
+    fof = models.ForeignKey(FOF)
+    comment = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('date published')
+    
