@@ -861,7 +861,7 @@ def likes_and_comments(request):
     '''
     curl -d json='{
         "fof_id": "22"
-    }' http://dyfoc.us/uploader/likes_and_comments/
+    }' http://localhost:8080/uploader/likes_and_comments/
     '''
     response_data = {}
     
@@ -884,10 +884,12 @@ def likes_and_comments(request):
         response_data["comment_list"] = []
         
         for like in likes:
-            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date":fof.pub_date})
+            pub_date =  json.dumps(like.pub_date, cls=DjangoJSONEncoder)
+            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
         
         for comment in comments:
-            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":fof.pub_date,"comment":comment})
+            pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
+            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment})
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
         
