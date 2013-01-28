@@ -57,7 +57,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = "/Users/"
+STATIC_ROOT = "/home/ubuntu/mysite/static/"
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -65,8 +65,8 @@ STATIC_URL = "/static/"
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-	"/Users/alexandre/Documents/Projects/DynaFocus/mysite/static",
-	"/Users/alexandre/Documents/Projects/DynaFocus/mysite/home-beta",
+	"/home/ubuntu/mysite/static",
+	"/home/ubuntu/mysite/images",
 )
 
 # List of finder classes that know how to find static files in
@@ -74,7 +74,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -106,7 +106,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/Users/alexandre/Documents/Projects/DynaFocus/mysite/templates',
+    '/home/ubuntu/mysite/templates',
 )
 
 INSTALLED_APPS = (
