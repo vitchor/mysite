@@ -150,6 +150,10 @@ function afterLoading(hide_arrows){
 			if(hide_arrows == 1){
 				hideArrows();
 			}
+			$('#dyfocus_logo').attr('href','http://dyfoc.us');
+			$('#fof_viewer_r1_c1').click(function(){
+			    top.location.href = "http://dyfoc.us/";
+			});
 			if(type == "featured_fof"){
 				document.getElementById("left_arrow_link").href = "/uploader/"+prev_fof+"/featured_fof";
 				document.getElementById("right_arrow_link").href = "/uploader/"+next_fof+"/featured_fof";
