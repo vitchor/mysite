@@ -880,7 +880,7 @@ def likes_and_comments(request):
             #like_response = {}
             #like_response["user_facebook_id"] = like.user.facebook_id
             #like_response["fof_id"] = fof.id
-            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"name":like.user.name,"fof_id":fof.id})
+            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id})
             
             #print like.user.facebook_id
             #print fof.id
@@ -894,7 +894,7 @@ def likes_and_comments(request):
             #comment_response["comment"] = comment.comment
             
             #comment_array.append(comment_response)
-            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"name":comment.user.name,"fof_id":fof.id,"comment":comment})
+            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"comment":comment})
         
         
         #for like in like_array:
