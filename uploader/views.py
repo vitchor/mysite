@@ -884,7 +884,7 @@ def likes_and_comments(request):
         response_data["comment_list"] = []
         
         for like in likes:
-            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date",})
+            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date",fof.pub_date})
         
         for comment in comments:
             response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date",fof.pub_date,"comment":comment})
