@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+# NOTE: to send something as a log to the server, you must use the code:
+# request.META['wsgi.errors].write("TEXT YOU WANT TO STORE")
+# it can afterwards be visualized on /var/log/apache2/error.log
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
@@ -865,30 +870,40 @@ def likes_and_comments(request):
         likes = fof.like_set.all()
         comments = fof.comment_set.all()
         
-        like_array = []
-        comment_array = []
+        #like_array = []
+        #comment_array = []
         
+        response_data["like_list"] = []
+        response_data["comment_list"] = []
         
         for like in likes:
-            like_response = {}
-            like_response["user_facebook_id"] = like.user.facebook_id
-            like_response["fof_id"] = fof.id
+            #like_response = {}
+            #like_response["user_facebook_id"] = like.user.facebook_id
+            #like_response["fof_id"] = fof.id
+            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"fof_id":fof.id})
             
-            like_array.append(like_response)
+            #print like.user.facebook_id
+            #print fof.id
+            
+            #like_array.append(like_response)
         
         for comment in comments:
-            comment_response = {}
-            comment_response["user_facebook_id"] = comment.user.facebook_id
-            comment_response["fof_id"] = fof.id
-            comment_response["comment"] = comment.comment
+            #comment_response = {}
+            #comment_response["user_facebook_id"] = comment.user.facebook_id
+            #comment_response["fof_id"] = fof.id
+            #comment_response["comment"] = comment.comment
             
-            comment_array.append(comment_response)
+            #comment_array.append(comment_response)
+            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"fof_id":fof.id,"comment":comment})
             
-        response_data["like_list"] = like_array
-        response_data["comment_list"] = comment_array
+        #response_data["like_list"] = like_array
+        #response_data["comment_list"] = comment_array
+        
+        #for like in like_array:
+            #print like["user_facebook_id"]
+            #print like["fof_id"]
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-
         
 
 @csrf_exempt
