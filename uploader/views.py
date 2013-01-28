@@ -891,7 +891,7 @@ def likes_and_comments(request):
         
         for comment in comments:
             pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
-            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment})
+            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
         
