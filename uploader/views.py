@@ -863,7 +863,7 @@ def likes_and_comments(request):
     '''
     curl -d json='{
         "fof_id": "22"
-    }' http://localhost:8080/uploader/likes_and_comments/
+    }' http://localhost:8000/uploader/likes_and_comments/
     '''
     response_data = {}
     
@@ -886,11 +886,26 @@ def likes_and_comments(request):
         response_data["comment_list"] = []
         
         for like in likes:
-            pub_date =  json.dumps(like.pub_date, cls=DjangoJSONEncoder)
+            
+            raw_pub_date =  json.dumps(timezone.now(), cls=DjangoJSONEncoder)
+            print raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+            
+            if like.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(like.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+            
             response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
         
         for comment in comments:
-            pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
+            
+            if comment.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+                
             response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
@@ -974,7 +989,11 @@ def login(request):
 
         fof_object = featured_fof.fof
 
-        pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+        if fof_object.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
 
         fof_user = fof_object.user
 
@@ -1027,8 +1046,12 @@ def login(request):
         frames = []
         for frame in frame_list:
             frames.append({"frame_url":frame.url,"frame_index":frame.index})
-
-        pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+        
+        if feed_fof.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
 
         likes = feed_fof.like_set.all()
 
@@ -1140,7 +1163,11 @@ def json_feed(request):
             for frame in frame_list:
                 frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-            pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+            if feed_fof.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
 
             likes = feed_fof.like_set.all()
 
@@ -1205,7 +1232,12 @@ def json_featured_fof(request):
 
             fof_object = featured_fof.fof
 
-            pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+            if fof_object.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+                
 
             fof_user = fof_object.user
 
@@ -1267,7 +1299,12 @@ def json_user_fof(request):
             for frame in frame_list:
                 frames.append({"frame_url":frame.url,"frame_index":frame.index})
 
-            pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+
+            if user_fof.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
 
             likes = user_fof.like_set.all()
 
