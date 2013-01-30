@@ -995,11 +995,7 @@ def login(request):
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
-        if comments == []:
-            fof["comments"] = comments
-        else:
-            fof["comments"] = "0"
-
+        fof["comments"] = len(comments)
         fof["likes"] = len(likes)
 
         featured_fof_array.append(fof)
@@ -1050,11 +1046,7 @@ def login(request):
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
-        if comments == []:
-            fof["comments"] = comments
-        else:
-            fof["comments"] = "0"
-
+        fof["comments"] = len(comments)
         fof["likes"] = len(likes)
         
         feed_fof_array.append(fof)
@@ -1166,11 +1158,7 @@ def json_feed(request):
             fof["frames"] = frames
             fof["pub_date"] = pub_date
 
-            if comments == []:
-                fof["comments"] = comments
-            else:
-                fof["comments"] = "0"
-
+            fof["comments"] = len(comments)
             fof["likes"] = len(likes)
 
             feed_fof_array.append(fof)
@@ -1238,11 +1226,7 @@ def json_featured_fof(request):
             fof["frames"] = frames
             fof["pub_date"] = pub_date
 
-            if comments == []:
-                fof["comments"] = comments
-            else:
-                fof["comments"] = "0"
-
+            fof["comments"] = len(comments)
             fof["likes"] = len(likes)
 
             featured_fof_array.append(fof)
@@ -1301,11 +1285,7 @@ def json_user_fof(request):
             fof["frames"] = frames
             fof["pub_date"] = pub_date
 
-            if comments == []:
-                fof["comments"] = comments
-            else:
-                fof["comments"] = "0"
-
+            fof["comments"] = len(comments)
             fof["likes"] = len(likes)
 
             user_fof_array.append(fof)
