@@ -1182,6 +1182,7 @@ def json_feed(request):
                 fof["liked"] = "0"
 
             fof["user_name"] = feed_fof.user.name
+            fof["fof_name"] = feed_fof.name
             fof["user_facebook_id"] = feed_fof.user.facebook_id
             fof["id"] = feed_fof.id
             fof["frames"] = frames
@@ -1257,6 +1258,7 @@ def json_featured_fof(request):
             fof["user_name"] = fof_user.name
             fof["user_facebook_id"] = fof_user.facebook_id
             fof["id"] = fof_object.id
+            fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
 
@@ -1321,6 +1323,7 @@ def json_user_fof(request):
             fof["user_name"] = user_fof.user.name
             fof["user_facebook_id"] = user_fof.user.facebook_id
             fof["id"] = user_fof.id
+            fof["fof_name"] = user_fof.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
 
