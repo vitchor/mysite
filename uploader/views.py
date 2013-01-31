@@ -1011,6 +1011,7 @@ def login(request):
         fof["user_name"] = fof_user.name
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
+        fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
@@ -1066,6 +1067,7 @@ def login(request):
         fof["user_name"] = feed_fof.user.name
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
+        fof["fof_name"] = feed_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
