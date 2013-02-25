@@ -619,7 +619,7 @@ def embedded_fof_height(request, fof_name_value, fof_height_value):
 def power_user_feed(request, index):
     index = int(index)
     
-    fof_list = FOF.objects.all()
+    fof_list = FOF.objects.all().order_by('-pub_date')
     
     try:
         # Determines which is the FOF that needs to be shown
@@ -652,7 +652,7 @@ def power_user_feed(request, index):
             user_name = "Unknown user"
         
         fof_date = fof.pub_date
-        return render_to_response('uploader/fof_viewer.html', {'type':"feed_fof",'hide_arrows': 0, 'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof_viewer.html', {'type':"power_feed_fof",'hide_arrows': 0, 'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
 
 def feed(request, facebook_id_value, index):
     index = int(index)

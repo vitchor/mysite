@@ -163,7 +163,10 @@ function afterLoading(hide_arrows){
 			} else if(type == "feed_fof"){
 				document.getElementById("left_arrow_link").href = "/uploader/"+device_id+"/feed/"+prev_fof+"/";
 				document.getElementById("right_arrow_link").href = "/uploader/"+device_id+"/feed/"+next_fof+"/"
-			}
+			} else if(type == "power_feed_fof"){
+    			document.getElementById("left_arrow_link").href = "/uploader/powerfeed/"+prev_fof+"/";
+    			document.getElementById("right_arrow_link").href = "/uploader/powerfeed/"+next_fof+"/"
+    		}
 			
 		});
 	}		
