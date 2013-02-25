@@ -616,13 +616,51 @@ def embedded_fof_height(request, fof_name_value, fof_height_value):
     return render_to_response('uploader/fof_embedded.html', {'fof_height_value':fof_height_value, 'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
 
-def feed(request, facebook_id_value, index):
+def power_user_feed(request, index):
     index = int(index)
     
+    fof_list = FOF.objects.all()
+    
+    try:
+        # Determines which is the FOF that needs to be shown
+        current_fof = fof_list[index]
+    
+    except (IndexError):
+        # Current user hasn't got any friends. Let's redirect him/her to the featured_fofs page!           
+        return HttpResponseRedirect('/uploader/0/featured_fof/') 
+                   
+    else:
+        # Finds the correspondent FOF in the database
+        fof = FOF.objects.get(name = current_fof)
+        frame_list = fof.frame_set.all().order_by('index')[:5]
+    
+        # Checks if list reached its end (ring loop)
+        if len(fof_list) - 1 == index:
+            next_fof_index = 0
+        else:
+            next_fof_index = index + 1
+
+        # Checks if list is in the first element (ring loop)
+        if index == 0:
+            prev_fof_index = len(fof_list) - 1
+        else:
+            prev_fof_index = index - 1
+    
+        if fof.user.name:
+            user_name = fof.user.name
+        else:
+            user_name = "Unknown user"
+        
+        fof_date = fof.pub_date
+        return render_to_response('uploader/fof_viewer.html', {'type':"feed_fof",'hide_arrows': 0, 'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
+
+def feed(request, facebook_id_value, index):
+    index = int(index)
+
     # Attempts to find the user by its facebook ID:
     try: 
         user = User.objects.get(facebook_id = facebook_id_value)
-        
+
         # Gets a list of friends from this user (assuming the data is not duplicated)
         friends_list = Friends.objects.filter(friend_1_id = user.id)
 
@@ -639,55 +677,55 @@ def feed(request, facebook_id_value, index):
             # if friend_2 is user, friend_1 is the friend id
             else:
                 friend_fof_list = FOF.objects.filter(user_id = friend.friend_1_id)[:1000]
-            
+
             # Populates a general list of FOFs from all friends
             fof_list = chain(fof_list, friend_fof_list)
-            
+
             i = i + 1
-        
+
         # Adds user's FOFs to the list
         user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
         fof_list = chain(fof_list, user_fof_list)
-        
+
         # Sorts list using the publish date
         # NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
         # this is the pulo from the gato!
         fof_list = sorted(fof_list, key=lambda instance: instance.pub_date, reverse=True)
-        
+
         try:
             # Determines which is the FOF that needs to be shown
             current_fof = fof_list[index]
-        
+
         except (IndexError):
             # Current user hasn't got any friends. Let's redirect him/her to the featured_fofs page!           
             return HttpResponseRedirect('/uploader/0/featured_fof/') 
-                       
+
         else:
             # Finds the correspondent FOF in the database
             fof = FOF.objects.get(name = current_fof)
             frame_list = fof.frame_set.all().order_by('index')[:5]
-        
+
             # Checks if list reached its end (ring loop)
             if len(fof_list) - 1 == index:
                 next_fof_index = 0
             else:
                 next_fof_index = index + 1
-    
+
             # Checks if list is in the first element (ring loop)
             if index == 0:
                 prev_fof_index = len(fof_list) - 1
             else:
                 prev_fof_index = index - 1
-        
+
             if fof.user.name:
                 user_name = fof.user.name
             else:
                 user_name = "Unknown user"
-            
+
             fof_date = fof.pub_date
             return render_to_response('uploader/fof_viewer.html', {'type':"feed_fof",'hide_arrows': 0, 'device_id_value':facebook_id_value, 'mobile_link':"/uploader/"+facebook_id_value+"/m_feed/"+str(index)+"/",'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
- 
- 
+
+
 def m_feed(request, facebook_id_value, index):
     index = int(index)
 
