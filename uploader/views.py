@@ -962,6 +962,8 @@ def login(request):
     # Lets find this user or create a new one if necessary
     try:
         user = User.objects.get(facebook_id=user_facebook_id)
+        user.device_id = device_id_value
+        user.save()
     except (KeyError, User.DoesNotExist):
         user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
         user.save()
@@ -1373,3 +1375,54 @@ def json_user_fof(request):
         response_data['fof_list'] = user_fof_array
 
         return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+def sendAlertExample(request):
+    import socket, ssl, json, struct
+
+    # device token returned when the iPhone application
+    # registers to receive alerts
+    deviceToken = '23d9e172dee23a7e42fa148b4dcd621f5a8931c96e2e336d72662984ff007979'
+    #23d9e172 dee23a7e 42fa148b 4dcd621f 5a8931c9 6e2e336d 72662984 ff007979
+    #d65d75d a4cedd23 774c0e88 28a9aab6 b5e9470e a7ad1ad8 dc1e9629 2c585090
+    thePayLoad = {
+         'aps': {
+              'alert':'asd Marina?',
+              'sound':'k1DiveAlarm.caf',
+              'badge':42,
+              },
+         'test_data': { 'foo': 'bar' },
+         }
+
+    # Certificate issued by apple and converted to .pem format with openSSL
+    # Per Apple's Push Notification Guide (end of chapter 3), first export the cert in p12 format
+    # openssl pkcs12 -in cert.p12 -out cert.pem -nodes 
+    #   when prompted "Enter Import Password:" hit return
+    #
+    print "1"
+    theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
+    # 
+    theHost = ( 'gateway.sandbox.push.apple.com', 2195 )
+
+    # 
+    data = json.dumps( thePayLoad )
+
+    # Clear out spaces in the device token and convert to hex
+    deviceToken = deviceToken.replace(' ','')
+    #byteToken = bytes.fromhex( deviceToken ) # Python 3
+    byteToken = deviceToken.decode('hex') # Python 2
+
+    theFormat = '!BH32sH%ds' % len(data)
+    theNotification = struct.pack( theFormat, 0, 32, byteToken, len(data), data )
+
+    # Create our connection using the certfile saved locally
+    ssl_sock = ssl.wrap_socket( socket.socket( socket.AF_INET, socket.SOCK_STREAM ), certfile = theCertfile )
+    ssl_sock.connect( theHost )
+
+    # Write out our data
+    ssl_sock.write( theNotification )
+
+    # Close the connection -- apple would prefer that we keep
+    # a connection open and push data as needed.
+    ssl_sock.close()
+
+    return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
