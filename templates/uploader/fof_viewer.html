@@ -2,6 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta property="og:title" content="dyfocus" />
+	<meta property="og:description"content="Animated images with multiple focus points."/>	
+	
+	{% for frame in frame_list %}
+		{% if frame.index == 0 %}
+			<meta property="og:image" content="{{frame}}" />
+		{% endif %}	
+    {% endfor %}	
+
 	<title>dyfoc.us - share your moments!</title>
 	<!--[if IE]>
 	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
