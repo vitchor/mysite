@@ -193,7 +193,7 @@ function resize(embed_link, fofWidth, fofHeight, currentFof) {
 	
 	document.getElementById(fofWidth).value = width
 	
-	var myvar = "<iframe src= 'http://dyfoc.us/uploader/"+currentFof+
+	var myvar = "<iframe src= 'http://dyfoc.us/uploader/"+current_fof+
 		"/embedded_fof/"+height+"/height/' width="+width+" height="+height+" frameborder='no' "+
 		"scrolling='no' marginwidth='0' marginheight='0' vspace='0' hspace='0'></iframe>";
 	document.getElementById(embed_link).value = myvar;

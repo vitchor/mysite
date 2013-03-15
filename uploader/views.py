@@ -54,13 +54,10 @@ return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 """
 @csrf_exempt
 def follow(request):
-    
     """ Test Request:
         $ curl -d json='{"follower_facebook_id": 100001077656862, "feed_facebook_id":640592329}' http://localhost:8000/uploader/follow/
     """
-    
     response_data = {}
-    new_friend = {}
     
     json_request = json.loads(request.POST['json'])
     follower_facebook_id = json_request['follower_facebook_id']
@@ -68,8 +65,7 @@ def follow(request):
 
     try:
         follower_user = User.objects.get(facebook_id=follower_facebook_id)
-        feed_user = User.objects.get(facebook_id=feed_facebook_id)
-        new_friend[""] = 
+        feed_user = User.objects.get(facebook_id=feed_facebook_id)·
         fof["user_facebook_id"] = fof_user.facebook_id
         try:
             test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
@@ -79,10 +75,10 @@ def follow(request):
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             friend_relation.save()
             response_data["result"] = "ok: friends row created."
-        
+
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
-        
+
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
