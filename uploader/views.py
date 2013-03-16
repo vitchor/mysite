@@ -1497,7 +1497,7 @@ def json_user_fof(request):
         
 def sendAlertExample(request):
     
-    sendAlert(2, 2, 100000370417687, "asdasd", 0, 0)
+    sendAlert(2, 7, 640592329, "Dan commented on your fof: asdasd", 1, 372)
     
     return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     
@@ -1507,68 +1507,69 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
     # device token returned when the iPhone application
     # registers to receive alerts
     
-    try:
-        user = User.objects.get(id=receiver_id_value)
-        deviceToken = user.device_id
+    if not receiver_id_value == sender_id_value:
+        try:
+            user = User.objects.get(id=receiver_id_value)
+            deviceToken = user.device_id
         
-        #Add new row for the table Device_Notification
-        notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, sender_facebook_id = sender_facebook_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)
-        notification.save()
+            #Add new row for the table Device_Notification
+            notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, sender_facebook_id = sender_facebook_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)
+            notification.save()
         
-        notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
+            notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
         
-        read_notifications = 0
-        for notification in notifications:
-            if not notification.was_read:
-                read_notifications = read_notifications + 1
+            read_notifications = 0
+            for notification in notifications:
+                if not notification.was_read:
+                    read_notifications = read_notifications + 1
         
-        #deviceToken = '23d9e172dee23a7e42fa148b4dcd621f5a8931c96e2e336d72662984ff007979'
-        #23d9e172 dee23a7e 42fa148b 4dcd621f 5a8931c9 6e2e336d 72662984 ff007979
-        #d65d75d a4cedd23 774c0e88 28a9aab6 b5e9470e a7ad1ad8 dc1e9629 2c585090
-        thePayLoad = {
-             'aps': {
-                  'alert': message_value,
-                  'sound':'k1DiveAlarm.caf',
-                  'badge':read_notifications,
-                  },
-             'test_data': { 'foo': 'bar' },
-             }
+            #deviceToken = '23d9e172dee23a7e42fa148b4dcd621f5a8931c96e2e336d72662984ff007979'
+            #23d9e172 dee23a7e 42fa148b 4dcd621f 5a8931c9 6e2e336d 72662984 ff007979
+            #d65d75d a4cedd23 774c0e88 28a9aab6 b5e9470e a7ad1ad8 dc1e9629 2c585090
+            thePayLoad = {
+                 'aps': {
+                      'alert': message_value,
+                      'sound':'k1DiveAlarm.caf',
+                      'badge':read_notifications,
+                      },
+                 'test_data': { 'foo': 'bar' },
+                 }
 
-        # Certificate issued by apple and converted to .pem format with openSSL
-        # Per Apple's Push Notification Guide (end of chapter 3), first export the cert in p12 format
-        # openssl pkcs12 -in cert.p12 -out cert.pem -nodes 
-        #   when prompted "Enter Import Password:" hit return
-        #
-        print "1"
-        theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
-        #theCertfile = '/Users/mac/mysite/uploader/prod_cert.pem'
-        # 
-        theHost = ( 'gateway.sandbox.push.apple.com', 2195 )
+            # Certificate issued by apple and converted to .pem format with openSSL
+            # Per Apple's Push Notification Guide (end of chapter 3), first export the cert in p12 format
+            # openssl pkcs12 -in cert.p12 -out cert.pem -nodes 
+            #   when prompted "Enter Import Password:" hit return
+            #
+            print "1"
+            theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
+            #theCertfile = '/Users/mac/mysite/uploader/prod_cert.pem'
+            # 
+            theHost = ( 'gateway.sandbox.push.apple.com', 2195 )
 
-        # 
-        data = json.dumps( thePayLoad )
+            # 
+            data = json.dumps( thePayLoad )
 
-        # Clear out spaces in the device token and convert to hex
-        deviceToken = deviceToken.replace(' ','')
-        #byteToken = bytes.fromhex( deviceToken ) # Python 3
-        byteToken = deviceToken.decode('hex') # Python 2
+            # Clear out spaces in the device token and convert to hex
+            deviceToken = deviceToken.replace(' ','')
+            #byteToken = bytes.fromhex( deviceToken ) # Python 3
+            byteToken = deviceToken.decode('hex') # Python 2
 
-        theFormat = '!BH32sH%ds' % len(data)
-        theNotification = struct.pack( theFormat, 0, 32, byteToken, len(data), data )
+            theFormat = '!BH32sH%ds' % len(data)
+            theNotification = struct.pack( theFormat, 0, 32, byteToken, len(data), data )
 
-        # Create our connection using the certfile saved locally
-        ssl_sock = ssl.wrap_socket( socket.socket( socket.AF_INET, socket.SOCK_STREAM ), certfile = theCertfile )
-        ssl_sock.connect( theHost )
+            # Create our connection using the certfile saved locally
+            ssl_sock = ssl.wrap_socket( socket.socket( socket.AF_INET, socket.SOCK_STREAM ), certfile = theCertfile )
+            ssl_sock.connect( theHost )
 
-        # Write out our data
-        ssl_sock.write( theNotification )
+            # Write out our data
+            ssl_sock.write( theNotification )
 
-        # Close the connection -- apple would prefer that we keep
-        # a connection open and push data as needed.
-        ssl_sock.close()
+            # Close the connection -- apple would prefer that we keep
+            # a connection open and push data as needed.
+            ssl_sock.close()
         
-    except (KeyError, User.DoesNotExist):
-        i = 0
+        except (KeyError, User.DoesNotExist):
+            i = 0
         
 @csrf_exempt
 def read_notification(request):
@@ -1611,8 +1612,6 @@ def read_notification(request):
                 
             response_data["result"] = "ok"
             
-            
-                
         except (KeyError, User.DoesNotExist):
             response_data["result"] = "error"
             
