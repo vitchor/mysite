@@ -56,3 +56,12 @@ class Comment(models.Model):
     comment = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
     
+class Device_Notification(models.Model):
+    receiver = models.ForeignKey(User, related_name='user_receiver')
+    sender = models.ForeignKey(User, related_name='user_sender')
+    sender_facebook_id = models.CharField(max_length=200)
+    message = models.CharField(max_length=200)
+    trigger_type = models.IntegerField() # 0 = liked your fof, 1 = commented on your fof, 2 = started following you, 3 = commented on a fof that you've commented
+    trigger_id = models.IntegerField()
+    was_read = models.IntegerField() # 0 = no, 1 = yes
+    pub_date = models.DateTimeField('date published')
