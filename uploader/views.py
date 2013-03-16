@@ -940,7 +940,7 @@ def comment(request):
             notification_message = notification_message + " commented on your fof: \""
             notification_message = notification_message + comment_message
             notification_message = notification_message + "\"."
-            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 0, 0)
+            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
 
         except (KeyError, FOF.DoesNotExist):
             # Nothing to do here
@@ -995,7 +995,7 @@ def like(request):
                 notification_message = ""
                 notification_message = notification_message + firstname
                 notification_message = notification_message + " liked your FOF."
-                sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 0, 0)
+                sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 0, fof.id)
             
         except (KeyError, FOF.DoesNotExist):
             # Nothing to do here
@@ -1086,7 +1086,7 @@ def login(request):
     user_notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
     
     for notification in user_notifications:
-        response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read})
+        response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read, "trigger_type":notification.trigger_type, "trigger_id":notification.trigger_id})
         
     # Lets populate the friends table with the new information
     
@@ -1590,8 +1590,7 @@ def read_notification(request):
             
             if not str(notifications[0].id) == str(notification_id):
                 for notification in notifications:
-                    response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read})
-            
+                    response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read,"trigger_id":notification.trigger_id,"trigger_type":notification.trigger_type})
             
             notification_was_reached = False
             for notification in notifications:
