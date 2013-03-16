@@ -65,7 +65,7 @@ def follow(request):
 
     try:
         follower_user = User.objects.get(facebook_id=follower_facebook_id)
-        feed_user = User.objects.get(facebook_id=feed_facebook_id)·
+        feed_user = User.objects.get(facebook_id=feed_facebook_id)
         fof["user_facebook_id"] = fof_user.facebook_id
         try:
             test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
