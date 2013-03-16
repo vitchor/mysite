@@ -32,6 +32,89 @@ def index(request):
                                context_instance=RequestContext(request))
 
 
+"""
+   featured_fof_array = [];
+   fof = {}
+        
+        ["user_name"] = fof_user.name
+        fof["user_facebook_id"] = fof_user.facebook_id
+        fof["id"] = fof_object.id
+        fof["fof_name"] = fof_object.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        featured_fof_array.append(fof)
+
+        response_data['fof_list'] = featured_fof_array
+   
+return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+"""
+@csrf_exempt
+def follow(request):
+    """ Test Request:
+        $ curl -d json='{"follower_facebook_id": 100001077656862, "feed_facebook_id":640592329}' http://localhost:8000/uploader/follow/
+    """
+    response_data = {}
+    
+    json_request = json.loads(request.POST['json'])
+    follower_facebook_id = json_request['follower_facebook_id']
+    feed_facebook_id = json_request['feed_facebook_id']
+
+    try:
+        follower_user = User.objects.get(facebook_id=follower_facebook_id)
+        feed_user = User.objects.get(facebook_id=feed_facebook_id)·
+        fof["user_facebook_id"] = fof_user.facebook_id
+        try:
+            test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
+            response_data["result"] = "ok: friends row already existed."
+        except (KeyError, Friends.DoesNotExist):
+            # It doesn't exists, lets create it:
+            friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
+            friend_relation.save()
+            response_data["result"] = "ok: friends row created."
+
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = "error: invalid users."
+
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+
+@csrf_exempt
+def unfollow(request):
+
+    """ Test Request:
+        $ curl -d json='{"follower_facebook_id": 100001077656862, "feed_facebook_id":640592329}' http://localhost:8000/uploader/unfollow/
+    """
+
+    response_data = {}
+
+    json_request = json.loads(request.POST['json'])
+    unfollower_facebook_id = json_request['follower_facebook_id']
+    feed_facebook_id = json_request['feed_facebook_id']
+
+    try:
+        unfollower_user = User.objects.get(facebook_id=unfollower_facebook_id)
+        feed_user = User.objects.get(facebook_id=feed_facebook_id)
+
+        try:
+            test_friends = Friends.objects.get(friend_1_id = unfollower_user.id, friend_2_id = feed_user.id)
+            test_friends.delete();
+            response_data["result"] = "ok: follow relation deleted."
+        except (KeyError, Friends.DoesNotExist):
+            # It doesn't exists, lets create it:
+            response_data["result"] = "ok: follow relation didn't exist before you tried to delete."
+
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = "error: invalid users."
+
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+    
 @csrf_exempt
 def image(request):
     
