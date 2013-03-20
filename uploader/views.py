@@ -31,6 +31,9 @@ def index(request):
     return render_to_response('uploader/index.html', {},
                                context_instance=RequestContext(request))
 
+def privacy_policy(request):
+    return render_to_response('uploader/privacy_policy.html', {}, context_instance=RequestContext(request))
+
 
 """
    featured_fof_array = [];
