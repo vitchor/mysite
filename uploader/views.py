@@ -1547,7 +1547,7 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
             #theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
             theCertfile = '/home/ubuntu/mysite/uploader/prod_cert.pem'
             # 
-            theHost = ( 'gateway.sandbox.push.apple.com', 2195 )
+            theHost = ( 'gateway.push.apple.com', 2195 )
 
             # 
             data = json.dumps( thePayLoad )
