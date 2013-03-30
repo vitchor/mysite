@@ -76,9 +76,12 @@ def follow(request):
             response_data["result"] = "ok: friends row already existed."
             response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
         except (KeyError, Friends.DoesNotExist):
-            # It doesn't exists, lets create it:
+            # It doesn't exist, lets create it:
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             friend_relation.save()
+            # Updates the Followers and Following counters:
+            follower_user.following_count += 1
+            feed_user.followers_count += 1
             response_data["result"] = "ok: friends row created."
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
@@ -109,6 +112,9 @@ def unfollow(request):
         try:
             test_friends = Friends.objects.get(friend_1_id = unfollower_user.id, friend_2_id = feed_user.id)
             test_friends.delete();
+            # Updates the Followers and Following counters:
+            unfollower_user.following_count -= 1
+            feed_user.followers_count -= 1
             response_data["result"] = "ok: follow relation deleted."
             response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
         except (KeyError, Friends.DoesNotExist):
@@ -118,10 +124,51 @@ def unfollow(request):
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
 
-
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+'''       
+@csrf_exempt
+def test(request):
+    followers_count(38)
+    following_count(38)
     
+    response_data = {}
     
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+'''
+
+# Converts from Facebook ID to Dyfocus ID (tested and working):
+def fb_id_to_df_id(user_fb_id):
+    try:
+        user = User.objects.get(facebook_id=user_fb_id)
+    except (KeyError, User.DoesNotExist):
+        return 0
+    else:
+        return user.id
+        
+# Calculates the number of users the user given by user_id follows:
+def following_calc(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except (KeyError, User.DoesNotExist):
+        return 0
+    else:
+        following = Friends.objects.filter(friend_1_id = user_id).count()
+        user.following_count = following
+        user.save()
+        return following
+
+# Calculates the number of users that follow the user given by user_id:
+def followers_calc(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except (KeyError, User.DoesNotExist):
+        return 0
+    else:
+        followers = Friends.objects.filter(friend_2_id = user_id).count()
+        user.followers_count = followers
+        user.save()
+        return followers
+
 @csrf_exempt
 def image(request):
     
