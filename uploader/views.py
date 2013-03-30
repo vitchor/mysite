@@ -61,6 +61,8 @@ def follow(request):
         $ curl -d json='{"follower_facebook_id": 100001077656862, "feed_facebook_id":640592329}' http://localhost:8000/uploader/follow/
     """
     response_data = {}
+    response_data["result"]=[]
+    response_data["friend"]=[]
     
     json_request = json.loads(request.POST['json'])
     follower_facebook_id = json_request['follower_facebook_id']
@@ -69,16 +71,15 @@ def follow(request):
     try:
         follower_user = User.objects.get(facebook_id=follower_facebook_id)
         feed_user = User.objects.get(facebook_id=feed_facebook_id)
-        fof["user_facebook_id"] = fof_user.facebook_id
         try:
             test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             response_data["result"] = "ok: friends row already existed."
+            response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exists, lets create it:
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             friend_relation.save()
             response_data["result"] = "ok: friends row created."
-
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
 
@@ -94,7 +95,9 @@ def unfollow(request):
     """
 
     response_data = {}
-
+    response_data["result"]=[]
+    response_data["friend"]=[]
+    
     json_request = json.loads(request.POST['json'])
     unfollower_facebook_id = json_request['follower_facebook_id']
     feed_facebook_id = json_request['feed_facebook_id']
@@ -107,6 +110,7 @@ def unfollow(request):
             test_friends = Friends.objects.get(friend_1_id = unfollower_user.id, friend_2_id = feed_user.id)
             test_friends.delete();
             response_data["result"] = "ok: follow relation deleted."
+            response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exists, lets create it:
             response_data["result"] = "ok: follow relation didn't exist before you tried to delete."
@@ -481,8 +485,7 @@ def user_info(request):
             try:
                 user_friend_object = User.objects.get(id = friend.friend_2_id)
 
-                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
-
+                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
             except (KeyError, User.DoesNotExist):
                 # Nothing to do here
                 j = 0
@@ -1124,7 +1127,7 @@ def login(request):
         try:
             #Populates a friends list
             user_friend_object = User.objects.get(id = friend.friend_2_id)
-            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
+            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name})
             
             #Populates a general list of FOFs from all friends
             friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
