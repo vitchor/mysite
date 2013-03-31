@@ -156,8 +156,12 @@ def following_calc(user_id):
     except (KeyError, User.DoesNotExist):
         return -1
     else:
+        print "Using following_calc for user", user.name
         following = Friends.objects.filter(friend_1_id = user_id).count()
-        user.following_count = following
+        if following is None:
+            user.following_count = 0
+        else:
+            user.following_count = following
         user.save()
         return following
 
@@ -168,10 +172,50 @@ def followers_calc(user_id):
     except (KeyError, User.DoesNotExist):
         return -1
     else:
+        print "Using followers_calc for user", user.name
         followers = Friends.objects.filter(friend_2_id = user_id).count()
-        user.followers_count = followers
+        if followers is None:
+            user.followers_count = 0;
+        else:
+            user.followers_count = followers
         user.save()
         return followers
+        
+# Returns a JSON object containing the number of followers and folowees of a determined user:
+@csrf_exempt
+def how_many_follow(request):
+    """ Test Request:
+           $ curl -d json='{"facebook_id": 100001077656862}' http://localhost:8000/uploader/how_many_follow/
+    """
+    
+    response_data = {}
+    response_data["result"]=[]
+    response_data["followers"]=[]
+    response_data["following"]=[]
+    
+    
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['facebook_id']
+    
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = "error: user not found"
+    else:
+        following = user.following_count
+        if following is None:
+            following = following_calc(user.id)
+        
+        followers = user.followers_count
+        if followers is None:
+            followers = followers_calc(user.id)
+            
+        response_data["result"] = "data fetched with no errors"
+        response_data["followers"] = followers
+        response_data["following"] = following
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 
 @csrf_exempt
 def image(request):
@@ -1134,6 +1178,10 @@ def login(request):
         user.device_id = device_id_value
         user.save()
     except (KeyError, User.DoesNotExist):
+        # if no information about user's origin is sent, he/she is using an older version of the app and therefore came from FB
+        if user_id_origin is None:
+            user_id_origin = 1
+        
         user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email, id_origin = user_id_origin)
         
         # if the user does not come from facebook, its facebook_id will be equal to its id
