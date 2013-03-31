@@ -125,16 +125,19 @@ def unfollow(request):
         response_data["result"] = "error: invalid users."
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-'''       
+      
 @csrf_exempt
 def test(request):
-    followers_count(38)
-    following_count(38)
     
     response_data = {}
     
+    users = User.objects.all()
+    
+    for user in users:
+        user.id_origin = 1
+        user.save()
+    
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-'''
 
 # Converts from Facebook ID to Dyfocus ID (tested and working):
 def fb_id_to_df_id(user_fb_id):
@@ -150,7 +153,7 @@ def following_calc(user_id):
     try:
         user = User.objects.get(id=user_id)
     except (KeyError, User.DoesNotExist):
-        return 0
+        return -1
     else:
         following = Friends.objects.filter(friend_1_id = user_id).count()
         user.following_count = following
@@ -162,7 +165,7 @@ def followers_calc(user_id):
     try:
         user = User.objects.get(id=user_id)
     except (KeyError, User.DoesNotExist):
-        return 0
+        return -1
     else:
         followers = Friends.objects.filter(friend_2_id = user_id).count()
         user.followers_count = followers
@@ -1122,6 +1125,7 @@ def login(request):
     user_name = json_request['name']
     user_facebook_id = json_request['facebook_id']
     user_email = json_request['email']
+    user_id_origin = ['id_origin']
 
     # Lets find this user or create a new one if necessary
     try:
@@ -1129,7 +1133,12 @@ def login(request):
         user.device_id = device_id_value
         user.save()
     except (KeyError, User.DoesNotExist):
-        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
+        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email, id_origin = user_id_origin)
+        
+        # if the user does not come from facebook, its facebook_id will be equal to its id
+        if user_id_origin == 0:
+            user.facebook_id = user.id
+            
         user.save()
         
     
@@ -1174,7 +1183,16 @@ def login(request):
         try:
             #Populates a friends list
             user_friend_object = User.objects.get(id = friend.friend_2_id)
-            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name})
+            if user_friend_object.followers_count is None:
+                followers = followers_calc(user_friend_object.id)
+            else:
+                followers = user_friend_object.followers_count
+            if user_friend_object.following_count is None:
+                following = following_calc(user_friend_object.id)
+            else:
+                following = user_friend_object.following_count
+                
+            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers":followers, "following":following})
             
             #Populates a general list of FOFs from all friends
             friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
@@ -1313,7 +1331,8 @@ def user_web_info(request):
             try:
                 user = User.objects.get(facebook_id = user_facebook_id)
             except (KeyError, User.DoesNotExist):
-                user = User(name = user_name, device_id = '', facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email)
+                user_id_origin = 1 # user came from Facebook
+                user = User(name = user_name, device_id = '', facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email, id_origin = user_id_origin)
                 result = "User not found - Creating one"
                 print result
                 user.save()

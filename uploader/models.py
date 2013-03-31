@@ -12,6 +12,14 @@ class User(models.Model):
     pub_date = models.DateTimeField('date published')
     followers_count = models.IntegerField(null=True)
     following_count = models.IntegerField(null=True)
+
+    # Describes the origin of the social_id (named temporarily facebook_id):
+    # 0: none (social_id = dyfocus native user id)
+    # 1: facebook
+    # 2: other
+    # TODO: rename it to social_id within the entire application
+    id_origin = models.IntegerField()
+    
     def __unicode__(self):
         return self.device_id
 
