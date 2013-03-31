@@ -74,14 +74,15 @@ def follow(request):
         try:
             test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             response_data["result"] = "ok: friends row already existed."
-            response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
+            response_data["friend"].append({"facebook_id":feed_user.facebook_id,"name":feed_user.name})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exist, lets create it:
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = feed_user.id)
             friend_relation.save()
             # Updates the Followers and Following counters:
-            follower_user.following_count += 1
-            feed_user.followers_count += 1
+            following_calc(follower_user.id)
+            followers_calc(feed_user.id)
+            
             response_data["result"] = "ok: friends row created."
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
@@ -113,10 +114,10 @@ def unfollow(request):
             test_friends = Friends.objects.get(friend_1_id = unfollower_user.id, friend_2_id = feed_user.id)
             test_friends.delete();
             # Updates the Followers and Following counters:
-            unfollower_user.following_count -= 1
-            feed_user.followers_count -= 1
+            following_calc(unfollower_user.id)
+            followers_calc(feed_user.id)
             response_data["result"] = "ok: follow relation deleted."
-            response_data["friend"].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
+            response_data["friend"].append({"facebook_id":feed_user.facebook_id,"name":feed_user.name})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exists, lets create it:
             response_data["result"] = "ok: follow relation didn't exist before you tried to delete."
@@ -1667,9 +1668,9 @@ def read_notification(request):
             
             notification_was_reached = False
             for notification in notifications:
-                print "LOOP"
+                #print "LOOP"
                 if not notification_was_reached:
-                    print "IDS"
+                    #print "IDS"
                     print notification.id
                     print notification_id
                     print notification.id == notification_id
