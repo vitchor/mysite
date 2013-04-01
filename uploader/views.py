@@ -156,7 +156,7 @@ def following_calc(user_id):
     except (KeyError, User.DoesNotExist):
         return -1
     else:
-        print "Using following_calc for user", user.name
+        #print "Using following_calc for user", user.name
         following = Friends.objects.filter(friend_1_id = user_id).count()
         if following is None:
             user.following_count = 0
@@ -172,7 +172,7 @@ def followers_calc(user_id):
     except (KeyError, User.DoesNotExist):
         return -1
     else:
-        print "Using followers_calc for user", user.name
+        #print "Using followers_calc for user", user.name
         followers = Friends.objects.filter(friend_2_id = user_id).count()
         if followers is None:
             user.followers_count = 0;
