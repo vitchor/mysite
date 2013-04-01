@@ -1747,3 +1747,73 @@ def read_notification(request):
         
         
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+@csrf_exempt
+def retrieve_user_info(request):
+    """ Test Request:
+           $ curl -d json='{"facebook_id": 100000754383534}' http://localhost:8000/uploader/retrieve_user_info/
+    """
+    
+    # Gets facebook_id from POST request
+    json_request = json.loads(request.POST['json'])
+    user_facebook_id = json_request['facebook_id']
+    
+    # Initializes response data vector
+    response_data = {}
+    
+    try:
+        user = User.objects.get(facebook_id=user_facebook_id)
+    
+    except (KeyError, User.DoesNotExist):
+        response_data['result'] = "error: user not found"
+        
+    else:
+        response_data['name'] = user.name
+        response_data['facebook_id'] = user.facebook_id
+        response_data['id_origin'] = user.id_origin
+        response_data['following'] = user.following_count
+        response_data['followers'] = user.followers_count
+        
+        user_fof_list = user.fof_set.all().order_by('-pub_date')
+        user_fof_array = []
+        
+        for user_fof in user_fof_list:
+            fof = {}
+            
+            frame_list = user_fof.frame_set.all().order_by('index')[:5]
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+            
+            if user_fof.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+                
+            likes = user_fof.like_set.all()
+            comments = user_fof.comment_set.all()
+            
+            try:
+                Like.objects.get(fof_id = user_fof.id, user_id = user.id)
+                fof['liked'] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof['liked'] = "0"
+            
+            fof['user_name'] = user_fof.user.name
+            fof['user_facebook_id'] = user_fof.user.facebook_id
+            fof['id'] = user_fof.id
+            fof['fof_name'] = user_fof.name
+            fof['frames'] = frames
+            fof['pub_date'] = pub_date
+            
+            fof['comments'] = len(comments)
+            fof['likes'] = len(likes)
+            
+            user_fof_array.append(fof)
+        
+        response_data['user_fof_list'] = user_fof_array
+        response_data['result'] = "Fetched data with no errors"
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
