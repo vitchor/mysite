@@ -82,7 +82,7 @@ def follow(request):
             # Updates the Followers and Following counters:
             following_calc(follower_user.id)
             followers_calc(feed_user.id)
-            
+            response_data["friend"].append({"facebook_id":feed_user.facebook_id,"name":feed_user.name})
             response_data["result"] = "ok: friends row created."
     except (KeyError, User.DoesNotExist):
         response_data["result"] = "error: invalid users."
