@@ -24,6 +24,7 @@ from django.utils import timezone
 from django.utils import simplejson as json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core import serializers
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
@@ -148,7 +149,20 @@ def fb_id_to_df_id(user_fb_id):
         return 0
     else:
         return user.id
+
+def update_user_following_and_follower_values(user_object):
+    
+    if user_object.followers_count is None:
+        user_object.followers_count = followers_calc(user_friend_object.id)
+    
+    if user_object.following_count is None:
+        user_object.following_count = following_calc(user_friend_object.id)
         
+    user_object.save()
+    
+    return user_object
+
+
 # Calculates the number of users the user given by user_id follows:
 def following_calc(user_id):
     try:
@@ -536,54 +550,27 @@ def user_fb_info(request):
 @csrf_exempt
 def user_info(request):
     
+    # $ curl -d json='{"user_id": 2}' http://localhost:8000/uploader/user_info/
+    
     json_request = json.loads(request.POST['json'])
+    user_id_value = json_request['user_facebook_id']
     
-    device_id_value = json_request['device_id']
-    user_name = json_request['name']
-    user_facebook_id = json_request['facebook_id']
-    user_email = json_request['email']
-    
-    # Lets find this user or create a new one if necessary
-    try:
-        user = User.objects.get(facebook_id=user_facebook_id)
-    except (KeyError, User.DoesNotExist):
-        user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email) 
-        user.save()
-           
-           
-    # Lets populate the friends table with the new information
-    for friend in json_request['friends']:
-        try: 
-            # Is there any user with the same facebook_id as the requesting user friend is?
-            user_friend = User.objects.get(facebook_id = friend['facebook_id'])
-
-            # Yes! They are friends! Let's add a new row to the friends model!...
-            # ...First lets checkout if that friend row doesn't exists already:
-            try:
-                Friends.objects.get(friend_1_id = user.id, friend_2_id = user_friend.id)
-            except (KeyError, Friends.DoesNotExist):
-                # It doesn't exists, lets create it:
-                friend_relation = Friends(friend_1_id = user.id, friend_2_id = user_friend.id)
-                friend_relation.save()
-
-        except (KeyError, User.DoesNotExist):
-            # Nothing to do here
-            j = 0
-           
-    
-    # Now lets returns the list of the requesting user dyfocus friends
     response_data = {}
-    response_data['friends_list'] = []
-
-    for friend in Friends.objects.all():
-        if friend.friend_1_id == user.id:
-            try:
-                user_friend_object = User.objects.get(id = friend.friend_2_id)
-
-                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id,"name":user_friend_object.name,"pub_date":user_friend_object.pub_date})
-            except (KeyError, User.DoesNotExist):
-                # Nothing to do here
-                j = 0
+    
+    try:
+        user = User.objects.get(facebook_id=user_id_value)
+        
+        user = update_user_following_and_follower_values(user)
+        
+        user_fof_array = get_user_fofs(user)
+        response_data['person'] = {"facebook_id":user.facebook_id, "name":user.name, "id_origin":user.id_origin, "followers_count":user.followers_count, "following_count":user.following_count, "id":user.id}
+    
+        response_data['person_FOF_array'] = user_fof_array
+        
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = user_id_value
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
     
@@ -1192,6 +1179,8 @@ def login(request):
         
     
     response_data = {}
+    
+    response_data['user_following_count'] = following_calc(user.id)
     response_data['notification_list'] = []
     
     user_notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
@@ -1241,7 +1230,7 @@ def login(request):
             else:
                 following = user_friend_object.following_count
                 
-            response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers":followers, "following":following})
+            response_data['friends_list'].append({"id":user_friend_object.id, "facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers_count":followers, "following_count":following})
             
             #Populates a general list of FOFs from all friends
             friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
@@ -1570,51 +1559,57 @@ def json_user_fof(request):
     
     else:
     
-        user_fof_array = []
-        user_fof_list = user.fof_set.all().order_by('-pub_date')
-    
-        for user_fof in user_fof_list:
-            fof = {}
-
-            # Add this fof to the user_fof_array
-            frame_list = user_fof.frame_set.all().order_by('index')[:5]
-
-            frames = []
-            for frame in frame_list:
-                frames.append({"frame_url":frame.url,"frame_index":frame.index})
-
-
-            if user_fof.pub_date is None:
-                pub_date = "null"
-            else:
-                raw_pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
-                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
-
-            likes = user_fof.like_set.all()
-
-            comments = user_fof.comment_set.all()
-
-            try :
-                Like.objects.get(fof_id = user_fof.id, user_id = user.id)
-                fof["liked"] = "1"
-            except (KeyError, Like.DoesNotExist):
-                fof["liked"] = "0"
-
-            fof["user_name"] = user_fof.user.name
-            fof["user_facebook_id"] = user_fof.user.facebook_id
-            fof["id"] = user_fof.id
-            fof["fof_name"] = user_fof.name
-            fof["frames"] = frames
-            fof["pub_date"] = pub_date
-
-            fof["comments"] = len(comments)
-            fof["likes"] = len(likes)
-
-            user_fof_array.append(fof)
+        user_fof_array = get_user_fofs(user)
             
         response_data['fof_list'] = user_fof_array
 
         return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+def get_user_fofs(user):
+    
+    user_fof_array = []
+    user_fof_list = user.fof_set.all().order_by('-pub_date')
+
+    for user_fof in user_fof_list:
+        fof = {}
+
+        # Add this fof to the user_fof_array
+        frame_list = user_fof.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+
+        if user_fof.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(user_fof.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        likes = user_fof.like_set.all()
+
+        comments = user_fof.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = user_fof.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"
+
+        fof["user_name"] = user_fof.user.name
+        fof["user_facebook_id"] = user_fof.user.facebook_id
+        fof["id"] = user_fof.id
+        fof["fof_name"] = user_fof.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        user_fof_array.append(fof)
+
+    return user_fof_array
         
 def sendAlertExample(request):
     
