@@ -153,10 +153,10 @@ def fb_id_to_df_id(user_fb_id):
 def update_user_following_and_follower_values(user_object):
     
     if user_object.followers_count is None:
-        user_object.followers_count = followers_calc(user_friend_object.id)
-    
+        user_object.followers_count = followers_calc(user_object.id)
+        
     if user_object.following_count is None:
-        user_object.following_count = following_calc(user_friend_object.id)
+        user_object.following_count = following_calc(user_object.id)
         
     user_object.save()
     
