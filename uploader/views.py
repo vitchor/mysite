@@ -1301,6 +1301,7 @@ def login(request):
     user_fof_list = user.fof_set.all().order_by('-pub_date')
     
     if len(user_fof_list) is 0:
+        user_fof_list = []
         hard_coded_fof = FOF.objects.get(id=124)
         hard_coded_fof.user_id = user.id
         user_fof_list.append(hard_coded_fof)
