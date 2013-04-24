@@ -1157,7 +1157,7 @@ def login(request):
     user_name = json_request['name']
     user_facebook_id = json_request['facebook_id']
     user_email = json_request['email']
-    user_id_origin = ['id_origin']
+    user_id_origin = json_request['id_origin']
 
     # Lets find this user or create a new one if necessary
     try:
