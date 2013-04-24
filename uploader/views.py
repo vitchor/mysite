@@ -1157,7 +1157,7 @@ def login(request):
     user_name = json_request['name']
     user_facebook_id = json_request['facebook_id']
     user_email = json_request['email']
-    user_id_origin = json_request['id_origin']
+    #user_id_origin = json_request['id_origin']
 
     # Lets find this user or create a new one if necessary
     try:
@@ -1166,14 +1166,20 @@ def login(request):
         user.save()
     except (KeyError, User.DoesNotExist):
         # if no information about user's origin is sent, he/she is using an older version of the app and therefore came from FB
-        if user_id_origin is None:
-            user_id_origin = 1
+
+        # TODO /// ADD AFTER FIXED APP ///
+        #if user_id_origin is None:
+        #    user_id_origin = 1
+        
+        # TODO /// REMOVE AFTER FIXED APP ///
+        user_id_origin = 1
         
         user = User(device_id = device_id_value, name = user_name, facebook_id = user_facebook_id, pub_date=timezone.now(), email = user_email, id_origin = user_id_origin)
-        
+
+        # TODO /// ADD AFTER FIXED APP ///
         # if the user does not come from facebook, its facebook_id will be equal to its id
-        if user_id_origin == 0:
-            user.facebook_id = user.id
+        #if user_id_origin == 0:
+        #    user.facebook_id = user.id
             
         user.save()
         
@@ -1293,6 +1299,11 @@ def login(request):
     # creating the user fof array
     user_fof_array = []
     user_fof_list = user.fof_set.all().order_by('-pub_date')
+    
+    if len(user_fof_list) is 0:
+        hard_coded_fof = FOF.objects.get(id=124)
+        hard_coded_fof.user_id = user.id
+        user_fof_list.append(hard_coded_fof)
     
     # Lets create the feed fof list
     
