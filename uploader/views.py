@@ -1185,8 +1185,6 @@ def login(request):
         
     
     response_data = {}
-    
-    response_data['user_following_count'] = following_calc(user.id)
     response_data['notification_list'] = []
     
     user_notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
@@ -1219,6 +1217,9 @@ def login(request):
 
     # Now lets returns the list of the requesting user dyfocus friends
 
+    response_data['user_following_count'] = following_calc(user.id)
+    response_data['user_followers_count'] = followers_calc(user.id)
+    
     response_data['friends_list'] = []
 
     feed_fof_list = ''
