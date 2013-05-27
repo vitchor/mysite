@@ -237,7 +237,6 @@ def image(request):
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
-    user_device_id = request.POST['device_id']
     user_facebook_id = request.POST['facebook_id']
     user_facebook_name = request.POST['facebook_name']
     user_facebook_email = request.POST['facebook_email']
@@ -250,7 +249,7 @@ def image(request):
     try:
         frame_user = User.objects.get(facebook_id=user_facebook_id)
     except (KeyError, User.DoesNotExist):
-        frame_user = User(name=user_facebook_name, facebook_id=user_facebook_id, email=user_facebook_name,  device_id=user_device_id, pub_date=timezone.now())
+        frame_user = User(name=user_facebook_name, facebook_id=user_facebook_id, email=user_facebook_name, pub_date=timezone.now())
         frame_user.save()
     
     #Gets/Creates fof
