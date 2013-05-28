@@ -342,7 +342,6 @@ def image(request):
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
-    user_device_id = request.POST['device_id']
     user_facebook_id = request.POST['facebook_id']
     user_facebook_name = request.POST['facebook_name']
     user_facebook_email = request.POST['facebook_email']
@@ -355,7 +354,7 @@ def image(request):
     try:
         frame_user = User.objects.get(facebook_id=user_facebook_id)
     except (KeyError, User.DoesNotExist):
-        frame_user = User(name=user_facebook_name, facebook_id=user_facebook_id, email=user_facebook_name,  device_id=user_device_id, pub_date=timezone.now())
+        frame_user = User(name=user_facebook_name, facebook_id=user_facebook_id, email=user_facebook_name, pub_date=timezone.now())
         frame_user.save()
     
     #Gets/Creates fof
@@ -1396,8 +1395,6 @@ def login(request):
         
     
     response_data = {}
-    
-    response_data['user_following_count'] = following_calc(user.id)
     response_data['notification_list'] = []
     
     user_notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
@@ -1430,6 +1427,9 @@ def login(request):
 
     # Now lets returns the list of the requesting user dyfocus friends
 
+    response_data['user_following_count'] = following_calc(user.id)
+    response_data['user_followers_count'] = followers_calc(user.id)
+    
     response_data['friends_list'] = []
 
     feed_fof_list = ''
