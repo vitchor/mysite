@@ -56,6 +56,44 @@ def privacy_policy(request):
    
 return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 """
+
+@csrf_exempt
+def user_follow(request):
+    """ Test Request:
+        $ curl -d json='{"person_id": 2, "follower_id":100}' http://localhost:8000/uploader/user_follow/
+    """
+    
+    response_data = {}
+    response_data["result"]=[]
+    response_data["friend"]=[]
+    
+    json_request = json.loads(request.POST['json'])
+    follower_id = json_request['follower_id']
+    person_id = json_request['person_id']
+    
+    try:
+        follower_user = User.objects.get(id=follower_id)
+        person_user = User.objects.get(id=person_id)
+        
+        try:
+            test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = person_user.id)
+            response_data["result"] = "ok: friends row already existed."
+            response_data["friend"].append({"facebook_id":person_user.facebook_id,"name":person_user.name})
+        except (KeyError, Friends.DoesNotExist):
+            # It doesn't exist, lets create it:
+            friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = person_user.id)
+            friend_relation.save()
+            # Updates the Followers and Following counters:
+            following_calc(follower_user.id)
+            followers_calc(person_user.id)
+            response_data["friend"].append({"facebook_id":person_user.facebook_id,"name":person_user.name})
+            response_data["result"] = "ok: friends row created."
+        
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = "error: invalid users."
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
 @csrf_exempt
 def follow(request):
     """ Test Request:
@@ -68,7 +106,7 @@ def follow(request):
     json_request = json.loads(request.POST['json'])
     follower_facebook_id = json_request['follower_facebook_id']
     feed_facebook_id = json_request['feed_facebook_id']
-
+    
     try:
         follower_user = User.objects.get(facebook_id=follower_facebook_id)
         feed_user = User.objects.get(facebook_id=feed_facebook_id)
@@ -92,6 +130,42 @@ def follow(request):
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 
+@csrf_exempt
+def user_unfollow(request):
+
+    """ Test Request:
+        $ curl -d json='{"follower_facebook_id": 100001077656862, "feed_facebook_id":640592329}' http://localhost:8000/uploader/unfollow/
+    """
+
+    response_data = {}
+    response_data["result"]=[]
+    response_data["friend"]=[]
+
+    json_request = json.loads(request.POST['json'])
+    unfollower_id = json_request['unfollower_id']
+    person_id = json_request['person_id']
+
+    try:
+        unfollower_user = User.objects.get(id=unfollower_id)
+        feed_user = User.objects.get(id=person_id)
+
+        try:
+            test_friends = Friends.objects.get(friend_1_id = unfollower_user.id, friend_2_id = feed_user.id)
+            test_friends.delete();
+            # Updates the Followers and Following counters:
+            following_calc(unfollower_user.id)
+            followers_calc(feed_user.id)
+            response_data["result"] = "ok: follow relation deleted."
+            response_data["friend"].append({"facebook_id":feed_user.facebook_id,"name":feed_user.name})
+        except (KeyError, Friends.DoesNotExist):
+            # It doesn't exists, lets create it:
+            response_data["result"] = "ok: follow relation didn't exist before you tried to delete."
+
+    except (KeyError, User.DoesNotExist):
+        response_data["result"] = "error: invalid users."
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
 @csrf_exempt
 def unfollow(request):
 
@@ -230,6 +304,37 @@ def how_many_follow(request):
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
+@csrf_exempt
+def upload_image(request):
+    
+    print 212
+    #Gets fof info
+    fof_size = request.POST['fof_size']
+    fof_name = request.POST['fof_name']
+    user_id = request.POST['user_id']
+    
+    response_data = {}
+    
+    print 1
+    
+    #Get/Creates user
+    try:
+        print 2
+        user = User.objects.get(id=user_id)
+        print 3        
+        if create_FOF(request, user, fof_name, fof_size):
+            print 4
+            response_data["result"] = "ok"
+        else:
+            print 5
+            response_data["error"] = "server upload error"
+                        
+    except (KeyError, User.DoesNotExist):
+        response_data["error"] = "User does not exist."
+        
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 
 @csrf_exempt
 def image(request):
@@ -257,30 +362,39 @@ def image(request):
     try:
         frame_FOF = FOF.objects.get(name=fof_name)
     except (KeyError, FOF.DoesNotExist):
-        frame_FOF = frame_user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
-    
+        create_FOF(request, frame_user, fof_name, fof_size)
+        
+    return render_to_response('uploader/index.html', {},
+                               context_instance=RequestContext(request))
+                               
+                               
+def create_FOF(request, user, fof_name, fof_size):
+    print 2.2
+    frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
+    print 2.3    
     #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
     b = conn.get_bucket('dyfocus')
-    
+    print 2.4
     #Creates all frames at once
     for i in range(int(fof_size)):
-        
+        print 2.5        
         #Actual index image key
         key = 'apiupload_' + str(i)
-        
+        print 2.6
         image = Image.open(cStringIO.StringIO(request.FILES[key].read()))
-        
+        print 2.7
         out_image = cStringIO.StringIO()
+        print 2.72
         image.save(out_image, 'jpeg')
-        
+        print 2.8        
         #Gets information from post
         frame_focal_point_x_key = 'frame_focal_point_x_' + str(i)
         frame_focal_point_y_key = 'frame_focal_point_y_' + str(i)
-        
+        print 2.9        
         frame_focal_point_x = request.POST[frame_focal_point_x_key]
         frame_focal_point_y = request.POST[frame_focal_point_y_key]
-        
+        print 2.10        
         #Creates the image key with the following format:
         #frame_name = <user_facebook_id>_<fof_name>_<frame_index>.jpeg
         frame_name = user_facebook_id
@@ -289,22 +403,22 @@ def image(request):
         frame_name += '_'
         frame_name += str(i)
         frame_name += '.jpeg'
-        
+        print 2.11
         #Creates url:
         #frame_url = <s3_url>/<frame_name>
         frame_url = 'http://s3.amazonaws.com/dyfocus/'
         frame_url += frame_name
-        
+        print 2.12
         frame = frame_FOF.frame_set.create(url = frame_url, index = str(i), focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
-        
+        print 2.13        
         k = b.new_key(frame_name)
-        
+        print 2.14        
         #Note we're setting contents from the in-memory string provided by cStringIO
         k.set_contents_from_string(out_image.getvalue())
+        print 2.15        
     
-    return render_to_response('uploader/index.html', {},
-                               context_instance=RequestContext(request))
-                               
+    return True
+        
                                
 def fof(request, fof_name):
     fof = get_object_or_404(FOF, name=fof_name)
@@ -1149,6 +1263,103 @@ def likes_and_comments(request):
         
 
 @csrf_exempt
+def signup(request):
+    
+    '''
+    curl -d json='{
+           "user_password": "123456",
+           "user_name": "Looot",
+           "user_email": "l@ls.com",
+           "device_id": "123123123123123"
+      }' http://localhost:8000/uploader/signup/
+    '''
+    json_request = json.loads(request.POST['json'])
+    
+    user_password = json_request['user_password']
+    user_name = json_request['user_name']
+    user_email = json_request['user_email']
+    user_device_id = json_request['device_id']
+    
+    response_data = {}
+    
+    try:
+        user = User.objects.get(email=user_email)
+        response_data['error'] = "Email already taken, try another one:"
+        
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+    except (KeyError, User.DoesNotExist):
+        
+        user = User(email = user_email, name = user_name, password = user_password, device_id = user_device_id, pub_date=timezone.now())
+        
+        user.id_origin = 2
+        
+        user.save()
+        
+        featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+        featured_fof_array = []
+
+        for featured_fof in featured_fof_list:
+
+            fof = {}
+
+            frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+                
+            fof_object = featured_fof.fof
+            
+            if fof_object.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+                
+            fof_user = fof_object.user
+            
+            likes = fof_object.like_set.all()
+            
+            comments = fof_object.comment_set.all()
+            
+            try :
+                Like.objects.get(fof_id = fof_object.id, user_id = user.id)
+                fof["liked"] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof["liked"] = "0"
+                
+            fof["user_name"] = fof_user.name
+            fof["user_id"] = fof_user.id
+            fof["user_facebook_id"] = fof_user.facebook_id
+            fof["id"] = fof_object.id
+            fof["fof_name"] = fof_object.name
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+            
+            fof["comments"] = len(comments)
+            fof["likes"] = len(likes)
+            
+            featured_fof_array.append(fof)
+            
+        response_data['featured_fof_list'] = featured_fof_array
+
+        response_data['notification_list'] = []
+        response_data['friends_list'] = []
+        response_data['feed_fof_list'] = []
+        response_data['user_fof_list'] = []
+        
+        response_data['user_name'] = user_name
+        response_data['user_email'] = user_email
+        response_data['user_id'] = user.id
+        response_data['user_following_count'] = 0
+        response_data['user_followers_count'] = 0
+            
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+            
+
+@csrf_exempt
 def login(request):
 
     json_request = json.loads(request.POST['json'])
@@ -1300,11 +1511,12 @@ def login(request):
     user_fof_array = []
     user_fof_list = user.fof_set.all().order_by('-pub_date')
     
-    if len(user_fof_list) is 0:
-        user_fof_list = []
-        hard_coded_fof = FOF.objects.get(id=124)
-        hard_coded_fof.user_id = user.id
-        user_fof_list.append(hard_coded_fof)
+    
+    #if len(user_fof_list) is 0:
+    #    user_fof_list = []
+    #    hard_coded_fof = FOF.objects.get(id=124)
+    #    hard_coded_fof.user_id = user.id
+    #     user_fof_list.append(hard_coded_fof)
     
     # Lets create the feed fof list
     
@@ -1362,6 +1574,7 @@ def login(request):
 
     response_data['feed_fof_list'] = feed_fof_array
     response_data['user_fof_list'] = user_fof_array
+    response_data['user_id'] = user.id  
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
@@ -1397,6 +1610,29 @@ def user_web_info(request):
         message = "No XHR"
     return HttpResponse()
 
+
+@csrf_exempt
+def user_json_feed(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_feed/
+    '''
+
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+
+    response_data = {}
+
+    try:
+        user = User.objects.get(id=user_id)
+        response_data['fof_list'] = get_user_feed_array(user)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
 @csrf_exempt
 def json_feed(request):
     '''
@@ -1412,75 +1648,76 @@ def json_feed(request):
 
     try:
         user = User.objects.get(facebook_id=user_facebook_id)
-
+        response_data['fof_list'] = get_user_feed_array(user)
+        
     except (KeyError, User.DoesNotExist):
         response_data['error'] = "User could not be found"
 
-    else:
-        user_friends = Friends.objects.filter(Q(friend_1_id = user.id))
-
-        feed_fof_list = ''
-
-        for friend in user_friends:
-
-            #Populates a general list of FOFs from all friends
-            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
-            feed_fof_list = chain(feed_fof_list, friend_fof_list)
-
-        # Adds personal FOFs to the feed list
-        user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
-        feed_fof_list = chain(feed_fof_list, user_fof_list)
-
-        # Sorts the list
-        feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
-        feed_fof_array = []
-
-        for feed_fof in feed_fof_list:
-
-            fof = {}
-
-            # Add this fof to the user_fof_array
-            frame_list = feed_fof.frame_set.all().order_by('index')[:5]
-
-            frames = []
-            for frame in frame_list:
-                frames.append({"frame_url":frame.url,"frame_index":frame.index})
-
-            if feed_fof.pub_date is None:
-                pub_date = "null"
-            else:
-                raw_pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
-                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
-
-            likes = feed_fof.like_set.all()
-
-            comments = feed_fof.comment_set.all()
-
-            try :
-                Like.objects.get(fof_id = feed_fof.id, user_id = user.id)
-                fof["liked"] = "1"
-            except (KeyError, Like.DoesNotExist):
-                fof["liked"] = "0"
-
-            fof["user_name"] = feed_fof.user.name
-            fof["fof_name"] = feed_fof.name
-            fof["user_facebook_id"] = feed_fof.user.facebook_id
-            fof["id"] = feed_fof.id
-            fof["frames"] = frames
-            fof["pub_date"] = pub_date
-
-            fof["comments"] = len(comments)
-            fof["likes"] = len(likes)
-
-            feed_fof_array.append(fof)
-
-            #if feed_fof.user == user:
-            #    user_fof_array.append(fof)
-
-
-        response_data['fof_list'] = feed_fof_array
-
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+
+def get_user_feed_array(user):
+    
+    user_friends = Friends.objects.filter(Q(friend_1_id = user.id))
+
+    feed_fof_list = ''
+
+    for friend in user_friends:
+
+        #Populates a general list of FOFs from all friends
+        friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
+        feed_fof_list = chain(feed_fof_list, friend_fof_list)
+
+    # Adds personal FOFs to the feed list
+    user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+    feed_fof_list = chain(feed_fof_list, user_fof_list)
+
+    # Sorts the list
+    feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
+    feed_fof_array = []
+
+    for feed_fof in feed_fof_list:
+
+        fof = {}
+
+        # Add this fof to the user_fof_array
+        frame_list = feed_fof.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        if feed_fof.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        likes = feed_fof.like_set.all()
+
+        comments = feed_fof.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = feed_fof.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"
+
+        fof["user_name"] = feed_fof.user.name
+        fof["fof_name"] = feed_fof.name
+        fof["user_facebook_id"] = feed_fof.user.facebook_id
+        fof["id"] = feed_fof.id
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        feed_fof_array.append(fof)
+
+        #if feed_fof.user == user:
+        #    user_fof_array.append(fof)
+    return feed_fof_array
 
 @csrf_exempt
 def json_featured_fof(request):
@@ -1533,7 +1770,7 @@ def json_featured_fof(request):
                 Like.objects.get(fof_id = fof_object.id, user_id = user.id)
                 fof["liked"] = "1"
             except (KeyError, Like.DoesNotExist):
-                fof["liked"] = "0"            
+                fof["liked"] = "0"
 
        
             fof["user_name"] = fof_user.name
@@ -1551,6 +1788,32 @@ def json_featured_fof(request):
             response_data['fof_list'] = featured_fof_array
        
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+    
+@csrf_exempt
+def json_user_id_fof(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_user_fof/
+    '''
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+    response_data = {}
+
+    try:
+        user = User.objects.get(id=user_id)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+
+    else:
+
+        user_fof_array = get_user_fofs(user)
+
+        response_data['fof_list'] = user_fof_array
+
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
 def json_user_fof(request):
@@ -1699,62 +1962,100 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
         except (KeyError, User.DoesNotExist):
             i = 0
         
+    
 @csrf_exempt
-def read_notification(request):
-    response_data = {}
+def user_read_notification(request):
     
     json_request = json.loads(request.POST['json'])
     notification_id = json_request['notification_id']
     user_id = json_request['user_id']
     read_all = json_request['read_all'] == "1"
     
-    response_data['notification_list'] = []
+    if read_all:
+        try:
+            user = User.objects.get(id=user_id)
+            
+            return read_user_notifications(user, notification_id)
+        
+        except (KeyError, User.DoesNotExist):
+            response_data = {}
+            response_data['notification_list'] = []
+            response_data["result"] = "error"
+            
+            return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    else:
+        return read_notification_object(notification_id)
     
-    print read_all
+
+@csrf_exempt
+def read_notification(request):
+    
+    json_request = json.loads(request.POST['json'])
+    notification_id = json_request['notification_id']
+    user_id = json_request['user_id']
+    read_all = json_request['read_all'] == "1"
     
     if read_all:
         try:
             user = User.objects.get(facebook_id=user_id)
-            notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
             
-            if not str(notifications[0].id) == str(notification_id):
-                for notification in notifications:
-                    response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read,"trigger_id":notification.trigger_id,"trigger_type":notification.trigger_type})
-            
-            notification_was_reached = False
-            for notification in notifications:
-                #print "LOOP"
-                if not notification_was_reached:
-                    #print "IDS"
-                    print notification.id
-                    print notification_id
-                    print notification.id == notification_id
-                    if str(notification.id) == str(notification_id):
-                        notification_was_reached = True
-                        notification.was_read = 1
-                        notification.save()
-                
-                else:
-                    notification.was_read = 1
-                    notification.save()
-                
-            response_data["result"] = "ok"
-            
+            return read_user_notifications(user, notification_id)
+       
         except (KeyError, User.DoesNotExist):
+            response_data = {}
+            response_data['notification_list'] = []
             response_data["result"] = "error"
+            
+            return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
             
     else:
-        try:
-            notification = Device_Notification.objects.get(id = notification_id)
+        return read_notification_object(notification_id)
+        
+
+@csrf_exempt
+def read_user_notifications(user, notification_id):
+    response_data = {}
+    response_data['notification_list'] = []
+
+    notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
+    
+    if not str(notifications[0].id) == str(notification_id):
+        for notification in notifications:
+            response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read,"trigger_id":notification.trigger_id,"trigger_type":notification.trigger_type})
+    
+    notification_was_reached = False
+    for notification in notifications:
+        #print "LOOP"
+        if not notification_was_reached:
+            #print "IDS"
+            if str(notification.id) == str(notification_id):
+                notification_was_reached = True
+                notification.was_read = 1
+                notification.save()
+        
+        else:
             notification.was_read = 1
             notification.save()
-            response_data["result"] = "ok"
-        except (KeyError, Device_Notification.DoesNotExist):
-            response_data["result"] = "error"
         
-        
-    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    response_data["result"] = "ok"
     
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+            
+@csrf_exempt
+def read_notification_object(notification_id):
+    response_data = {}
+    response_data['notification_list'] = []
+    
+    try:
+        notification = Device_Notification.objects.get(id = notification_id)
+        notification.was_read = 1
+        notification.save()
+        response_data["result"] = "ok"
+    except (KeyError, Device_Notification.DoesNotExist):
+        response_data["result"] = "error"
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 @csrf_exempt
 def retrieve_user_info(request):
     """ Test Request:
