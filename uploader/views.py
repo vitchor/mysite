@@ -306,8 +306,7 @@ def how_many_follow(request):
 
 @csrf_exempt
 def upload_image(request):
-    
-    print 212
+
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
@@ -315,19 +314,61 @@ def upload_image(request):
     
     response_data = {}
     
-    print 1
-    
     #Get/Creates user
     try:
-        print 2
+        
         user = User.objects.get(id=user_id)
-        print 3        
-        if create_FOF(request, user, fof_name, fof_size):
-            print 4
+        
+        #Gets/Creates fof
+        try:
+            frame_FOF = FOF.objects.get(name=fof_name)
+        except (KeyError, FOF.DoesNotExist):
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
+        
+        #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
+        b = conn.get_bucket('dyfocus')
+        
+        #Creates all frames at once
+        for i in range(int(fof_size)):
+            
+            #Actual index image key
+            key = 'apiupload_' + str(i)
+            
+            image = Image.open(cStringIO.StringIO(request.FILES[key].read()))
+            
+            out_image = cStringIO.StringIO()
+            image.save(out_image, 'jpeg')
+            
+            #Gets information from post
+            frame_focal_point_x_key = 'frame_focal_point_x_' + str(i)
+            frame_focal_point_y_key = 'frame_focal_point_y_' + str(i)
+            
+            frame_focal_point_x = request.POST[frame_focal_point_x_key]
+            frame_focal_point_y = request.POST[frame_focal_point_y_key]
+            
+            #Creates the image key with the following format:
+            #frame_name = <user_id>_<fof_name>_<frame_index>.jpeg
+            frame_name = user_id
+            frame_name += '_'
+            frame_name += fof_name
+            frame_name += '_'
+            frame_name += str(i)
+            frame_name += '.jpeg'
+            
+            #Creates url:
+            #frame_url = <s3_url>/<frame_name>
+            frame_url = 'http://s3.amazonaws.com/dyfocus/'
+            frame_url += frame_name
+            
+            frame = frame_FOF.frame_set.create(url = frame_url, index = str(i), focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
+            
+            k = b.new_key(frame_name)
+            
+            #Note we're setting contents from the in-memory string provided by cStringIO
+            k.set_contents_from_string(out_image.getvalue())
+            
             response_data["result"] = "ok"
-        else:
-            print 5
-            response_data["error"] = "server upload error"
                         
     except (KeyError, User.DoesNotExist):
         response_data["error"] = "User does not exist."
@@ -411,33 +452,33 @@ def image(request):
                                    
                                
                                
-def create_FOF(request, user, fof_name, fof_size):
-    print 2.2
+"""def create_FOF(request, user, fof_name, fof_size):
+
     frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
-    print 2.3    
+
     #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
     b = conn.get_bucket('dyfocus')
-    print 2.4
+
     #Creates all frames at once
     for i in range(int(fof_size)):
-        print 2.5        
+         
         #Actual index image key
         key = 'apiupload_' + str(i)
-        print 2.6
+   
         image = Image.open(cStringIO.StringIO(request.FILES[key].read()))
-        print 2.7
+        
         out_image = cStringIO.StringIO()
-        print 2.72
+
         image.save(out_image, 'jpeg')
-        print 2.8        
+         
         #Gets information from post
         frame_focal_point_x_key = 'frame_focal_point_x_' + str(i)
         frame_focal_point_y_key = 'frame_focal_point_y_' + str(i)
-        print 2.9        
+            
         frame_focal_point_x = request.POST[frame_focal_point_x_key]
         frame_focal_point_y = request.POST[frame_focal_point_y_key]
-        print 2.10        
+               
         #Creates the image key with the following format:
         #frame_name = <user_facebook_id>_<fof_name>_<frame_index>.jpeg
         frame_name = user_facebook_id
@@ -446,23 +487,23 @@ def create_FOF(request, user, fof_name, fof_size):
         frame_name += '_'
         frame_name += str(i)
         frame_name += '.jpeg'
-        print 2.11
+        
         #Creates url:
         #frame_url = <s3_url>/<frame_name>
         frame_url = 'http://s3.amazonaws.com/dyfocus/'
         frame_url += frame_name
-        print 2.12
+        
         frame = frame_FOF.frame_set.create(url = frame_url, index = str(i), focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
-        print 2.13        
+               
         k = b.new_key(frame_name)
-        print 2.14        
+              
         #Note we're setting contents from the in-memory string provided by cStringIO
         k.set_contents_from_string(out_image.getvalue())
-        print 2.15        
+       
     
     return True
-        
-                               
+"""
+
 def fof(request, fof_name):
     fof = get_object_or_404(FOF, name=fof_name)
     
