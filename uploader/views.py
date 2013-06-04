@@ -748,7 +748,7 @@ def user_fb_info(request):
 @csrf_exempt
 def user_info(request):
     
-    # $ curl -d json='{"user_id": 2}' http://localhost:8000/uploader/user_info/
+    # $ curl -d json='{"user_facebook_id": 2}' http://localhost:8000/uploader/user_info/
     
     json_request = json.loads(request.POST['json'])
     user_id_value = json_request['user_facebook_id']
@@ -772,6 +772,34 @@ def user_info(request):
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
     
+
+@csrf_exempt
+def user_id_info(request):
+    # $ curl -d json='{"user_id": 2}' http://localhost:8000/uploader/user_id_info/
+
+    json_request = json.loads(request.POST['json'])
+    user_id_value = json_request['user_id']
+
+    response_data = {}
+
+    try:
+        user = User.objects.get(id=user_id_value)
+
+        user = update_user_following_and_follower_values(user)
+
+        user_fof_array = get_user_fofs(user)
+        response_data['person'] = {"facebook_id":user.facebook_id, "name":user.name, "id_origin":user.id_origin, "followers_count":user.followers_count, "following_count":user.following_count, "id":user.id}
+
+        response_data['person_FOF_array'] = user_fof_array
+
+    except (KeyError, User.DoesNotExist):
+        response_data["error"] = "User not found"
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+
     
 def json_fof(request, device_id_value, fof_name_value):
     
@@ -1237,6 +1265,64 @@ def comment(request):
         response_data["error"] = "User doesn't exist"
 
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+@csrf_exempt
+def user_comment(request):
+    """ 
+    curl -d json='{
+        "facebook_id": "100000370417687",
+        "fof_id": "96964.057167",
+        "comment_message": "QUE LEGAAAL! "
+    }' http://localhost:8000/uploader/comment/
+    """
+    
+    response_data = {}
+    
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+    comment_message = json_request['comment_message']
+    fof_id = json_request['fof_id']
+    
+    try:
+        user = User.objects.get(id=user_id)
+        
+        try:
+            fof = FOF.objects.get(id=fof_id)
+            
+            comment = Comment()
+            comment.user_id = user.id
+            comment.fof_id = fof.id
+            comment.comment = comment_message
+            comment.pub_date = timezone.now()
+            comment.save()
+            response_data["result"] = "ok"
+            
+            firstname = user.name
+            for a in firstname:
+                if a == " ":
+                    firstname = firstname[0: firstname.index(a)]
+                    break
+                    
+            if len(comment_message) > 20:
+                    comment_message = comment_message[0:20]
+                    comment_message = comment_message + "..."
+            
+            notification_message = ""
+            notification_message = notification_message + firstname
+            notification_message = notification_message + " commented on your fof: \""
+            notification_message = notification_message + comment_message
+            notification_message = notification_message + "\"."
+            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
+            
+        except (KeyError, FOF.DoesNotExist):
+            # Nothing to do here
+            response_data["error"] = "FOF doesn't exist"
+            
+    except (KeyError, User.DoesNotExist):
+        # Nothing to do here
+        response_data["error"] = "User doesn't exist"
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")    
         
 @csrf_exempt
 def like(request):    
@@ -1294,6 +1380,62 @@ def like(request):
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
+def user_like(request):    
+    """ 
+    curl -d json='{
+        "user_id": "2",
+        "fof_id": "50"
+    }' http://localhost:8000/uploader/like/ 
+    """
+    
+    response_data = {}
+    
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+    fof_id = json_request['fof_id']
+    
+    try:
+        user = User.objects.get(id=user_id)
+        
+        try:
+            fof = FOF.objects.get(id=fof_id)
+            
+            try:
+                Like.objects.get(user_id = user.id, fof_id = fof.id)
+                response_data["error"] = "like already exists"
+                
+            except (KeyError, Like.DoesNotExist):
+                # Nothing to do here
+                like = Like()
+                like.user_id = user.id
+                like.fof_id = fof.id
+                like.pub_date = timezone.now()
+                like.save()
+                response_data["result"] = "ok"
+                
+                firstname = user.name
+                for a in firstname:
+                    if a == " ":
+                        firstname = firstname[0: firstname.index(a)]
+                        break
+                        
+                notification_message = ""
+                notification_message = notification_message + firstname
+                notification_message = notification_message + " liked your FOF."
+                sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 0, fof.id)
+                
+        except (KeyError, FOF.DoesNotExist):
+            # Nothing to do here
+            response_data["error"] = "FOF doesn't exist"
+            
+    except (KeyError, User.DoesNotExist):
+        # Nothing to do here
+        response_data["error"] = "User doesn't exist"
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+
+@csrf_exempt
 def likes_and_comments(request):
     '''
     curl -d json='{
@@ -1331,7 +1473,7 @@ def likes_and_comments(request):
                 raw_pub_date =  json.dumps(like.pub_date, cls=DjangoJSONEncoder)
                 pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
             
-            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id,"user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
+            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id, "user_id":like.user.id, "user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
         
         for comment in comments:
             
@@ -1341,7 +1483,7 @@ def likes_and_comments(request):
                 raw_pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
                 pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
                 
-            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id,"user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
+            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id, "user_id":comment.user.id, "user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
         
@@ -1579,6 +1721,7 @@ def login(request):
 
        
         fof["user_name"] = fof_user.name
+        fof["user_id"] = fof_user.id
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
         fof["fof_name"] = fof_object.name
@@ -1642,6 +1785,7 @@ def login(request):
             fof["liked"] = "0"
             
         fof["user_name"] = feed_fof.user.name
+        fof["user_id"] = feed_fof.user.id
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
         fof["fof_name"] = feed_fof.name
@@ -1771,6 +1915,7 @@ def login_user(request):
 
 
         fof["user_name"] = fof_user.name
+        fof["user_id"] = fof_user.id
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
         fof["fof_name"] = fof_object.name
@@ -1834,6 +1979,7 @@ def login_user(request):
             fof["liked"] = "0"
 
         fof["user_name"] = feed_fof.user.name
+        fof["user_id"] = feed_fof.user.id
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
         fof["fof_name"] = feed_fof.name
@@ -1985,6 +2131,7 @@ def get_user_feed_array(user):
 
         fof["user_name"] = feed_fof.user.name
         fof["fof_name"] = feed_fof.name
+        fof["user_id"] = feed_fof.user.id
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
         fof["frames"] = frames
@@ -2054,6 +2201,7 @@ def json_featured_fof(request):
 
        
             fof["user_name"] = fof_user.name
+            fof["user_id"] = fof_user.id
             fof["user_facebook_id"] = fof_user.facebook_id
             fof["id"] = fof_object.id
             fof["fof_name"] = fof_object.name
@@ -2153,6 +2301,7 @@ def get_user_fofs(user):
             fof["liked"] = "0"
 
         fof["user_name"] = user_fof.user.name
+        fof["user_id"] = user_fof.user.id
         fof["user_facebook_id"] = user_fof.user.facebook_id
         fof["id"] = user_fof.id
         fof["fof_name"] = user_fof.name
