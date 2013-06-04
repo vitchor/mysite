@@ -1662,6 +1662,201 @@ def login(request):
     response_data['user_id'] = user.id  
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+    
+@csrf_exempt
+def login_user(request):
+
+    json_request = json.loads(request.POST['json'])
+    
+    user_device_id = json_request['device_id']
+    user_email = json_request['user_email']
+    user_password = json_request['user_password']
+    
+    response_data = {}
+
+    # Lets find this user or create a new one if necessary
+    try:
+        user = User.objects.get(email=user_email)
+        
+        if user.password == user_password :
+            print "pepepe"
+            user.device_id = user_device_id
+            user.save()
+        else:
+            print "pepepealalal"
+            response_data["error"] = "Email/Password doesn't match"
+            return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+    except (KeyError, User.DoesNotExist):
+        response_data["error"] = "Email/Password doesn't match"
+        return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
+    response_data['notification_list'] = []
+
+    user_notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
+
+    for notification in user_notifications:
+        response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read, "trigger_type":notification.trigger_type, "trigger_id":notification.trigger_id})
+
+
+    # Now lets returns the list of the requesting user dyfocus friends
+
+    response_data['user_following_count'] = following_calc(user.id)
+    response_data['user_followers_count'] = followers_calc(user.id)
+
+    response_data['friends_list'] = []
+
+    feed_fof_list = ''
+
+    user_friends = Friends.objects.filter(Q(friend_1_id = user.id))
+    
+    for friend in user_friends:
+        try:
+            #Populates a friends list
+            user_friend_object = User.objects.get(id = friend.friend_2_id)
+            if user_friend_object.followers_count is None:
+                followers = followers_calc(user_friend_object.id)
+            else:
+                followers = user_friend_object.followers_count
+            if user_friend_object.following_count is None:
+                following = following_calc(user_friend_object.id)
+            else:
+                following = user_friend_object.following_count
+
+            response_data['friends_list'].append({"id":user_friend_object.id, "facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers_count":followers, "following_count":following})
+
+            #Populates a general list of FOFs from all friends
+            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
+            feed_fof_list = chain(feed_fof_list, friend_fof_list)
+
+        except (KeyError, User.DoesNotExist):
+            # Nothing to do here
+            j = 0
+
+
+    featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+    featured_fof_array = [];
+
+    for featured_fof in featured_fof_list:
+
+        fof = {}
+
+        frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        fof_object = featured_fof.fof
+
+        if fof_object.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        fof_user = fof_object.user
+
+        likes = fof_object.like_set.all()
+
+        comments = fof_object.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = fof_object.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"            
+
+
+        fof["user_name"] = fof_user.name
+        fof["user_facebook_id"] = fof_user.facebook_id
+        fof["id"] = fof_object.id
+        fof["fof_name"] = fof_object.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        featured_fof_array.append(fof)
+
+        response_data['featured_fof_list'] = featured_fof_array
+
+    # creating the user fof array
+    user_fof_array = []
+    user_fof_list = user.fof_set.all().order_by('-pub_date')
+
+
+    #if len(user_fof_list) is 0:
+    #    user_fof_list = []
+    #    hard_coded_fof = FOF.objects.get(id=124)
+    #    hard_coded_fof.user_id = user.id
+    #     user_fof_list.append(hard_coded_fof)
+
+    # Lets create the feed fof list
+
+    # Adds user's FOFs to the list
+    feed_fof_list = chain(feed_fof_list, user_fof_list)
+
+    #Sorts list using the publish date
+	# NOTE: this converts from QuerySet to list - some of the methods from QuerySet won't be available!
+	# this is the pulo from the gato!
+    feed_fof_list = sorted(feed_fof_list, key=lambda instance: instance.pub_date, reverse=True)
+    feed_fof_array = []
+
+    for feed_fof in feed_fof_list:
+
+        fof = {}
+
+        # Add this fof to the user_fof_array
+        frame_list = feed_fof.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        if feed_fof.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(feed_fof.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        likes = feed_fof.like_set.all()
+
+        comments = feed_fof.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = feed_fof.id, user_id = user.id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"
+
+        fof["user_name"] = feed_fof.user.name
+        fof["user_facebook_id"] = feed_fof.user.facebook_id
+        fof["id"] = feed_fof.id
+        fof["fof_name"] = feed_fof.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        feed_fof_array.append(fof)
+
+        if feed_fof.user == user:
+            user_fof_array.append(fof)
+
+
+    response_data['feed_fof_list'] = feed_fof_array
+    response_data['user_fof_list'] = user_fof_array
+    response_data['user_id'] = user.id  
+    response_data['user_name'] = user.name
+    response_data['user_email'] = user.email
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 
 @csrf_exempt
 def user_web_info(request):
@@ -2104,24 +2299,27 @@ def read_user_notifications(user, notification_id):
 
     notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
     
-    if not str(notifications[0].id) == str(notification_id):
+    if len(notifications) > 0 :
+        
+        if not str(notifications[0].id) == str(notification_id):
+            for notification in notifications:
+                response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read,"trigger_id":notification.trigger_id,"trigger_type":notification.trigger_type})
+                
+        notification_was_reached = False
         for notification in notifications:
-            response_data['notification_list'].append({"message":notification.message,"user_facebook_id":notification.sender_facebook_id, "notification_id":notification.id, "was_read":notification.was_read,"trigger_id":notification.trigger_id,"trigger_type":notification.trigger_type})
-    
-    notification_was_reached = False
-    for notification in notifications:
-        #print "LOOP"
-        if not notification_was_reached:
-            #print "IDS"
-            if str(notification.id) == str(notification_id):
-                notification_was_reached = True
+            #print "LOOP"
+            if not notification_was_reached:
+                #print "IDS"
+                if str(notification.id) == str(notification_id):
+                    notification_was_reached = True
+                    notification.was_read = 1
+                    notification.save()
+                    
+            else:
                 notification.was_read = 1
                 notification.save()
-        
-        else:
-            notification.was_read = 1
-            notification.save()
-        
+                
+    
     response_data["result"] = "ok"
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
