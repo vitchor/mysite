@@ -78,7 +78,7 @@ def user_follow(request):
         try:
             test_friends = Friends.objects.get(friend_1_id = follower_user.id, friend_2_id = person_user.id)
             response_data["result"] = "ok: friends row already existed."
-            response_data["friend"].append({"facebook_id":person_user.facebook_id,"name":person_user.name})
+            response_data["friend"].append({"facebook_id":person_user.facebook_id, "user_id":person_user.id, "name":person_user.name})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exist, lets create it:
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = person_user.id)
@@ -86,7 +86,7 @@ def user_follow(request):
             # Updates the Followers and Following counters:
             following_calc(follower_user.id)
             followers_calc(person_user.id)
-            response_data["friend"].append({"facebook_id":person_user.facebook_id,"name":person_user.name})
+            response_data["friend"].append({"facebook_id":person_user.facebook_id, "user_id":person_user.id, "name":person_user.name})
             response_data["result"] = "ok: friends row created."
         
     except (KeyError, User.DoesNotExist):
@@ -156,7 +156,7 @@ def user_unfollow(request):
             following_calc(unfollower_user.id)
             followers_calc(feed_user.id)
             response_data["result"] = "ok: follow relation deleted."
-            response_data["friend"].append({"facebook_id":feed_user.facebook_id,"name":feed_user.name})
+            response_data["friend"].append({"facebook_id":feed_user.facebook_id, "user_id":feed_user.id, "name":feed_user.name})
         except (KeyError, Friends.DoesNotExist):
             # It doesn't exists, lets create it:
             response_data["result"] = "ok: follow relation didn't exist before you tried to delete."
@@ -788,7 +788,7 @@ def user_id_info(request):
         user = update_user_following_and_follower_values(user)
 
         user_fof_array = get_user_fofs(user)
-        response_data['person'] = {"facebook_id":user.facebook_id, "name":user.name, "id_origin":user.id_origin, "followers_count":user.followers_count, "following_count":user.following_count, "id":user.id}
+        response_data['person'] = {"facebook_id":user.facebook_id, "name":user.name, "id_origin":user.id_origin, "followers_count":user.followers_count, "following_count":user.following_count, "id":user.id, "user_id":user.id}
 
         response_data['person_FOF_array'] = user_fof_array
 
@@ -906,7 +906,7 @@ def user_fb_friends(request):
             try:
                 user_friend_object = User.objects.get(id = friend.friend_2_id)
                 
-                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id})
+                response_data['friends_list'].append({"facebook_id":user_friend_object.facebook_id, "user_id":user_friend_object.id})
                 
             except (KeyError, User.DoesNotExist):
                 # Nothing to do here
@@ -2217,6 +2217,77 @@ def json_featured_fof(request):
        
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
     
+    
+@csrf_exempt
+def user_json_featured_fof(request):
+    '''
+    curl -d json='{
+        "user_facebook_id": "100000370417687"
+    }' http://localhost:8080/uploader/json_featured_fof/
+    '''
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+    response_data = {}
+
+    try:
+        user = User.objects.get(id=user_id)
+
+    except (KeyError, User.DoesNotExist):
+        response_data['error'] = "User could not be found"
+
+    else:
+        featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
+
+        featured_fof_array = [];
+
+        for featured_fof in featured_fof_list:
+
+            fof = {}
+
+            frame_list = featured_fof.fof.frame_set.all().order_by('index')[:5]
+
+            frames = []
+            for frame in frame_list:
+                frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+            fof_object = featured_fof.fof
+
+            if fof_object.pub_date is None:
+                pub_date = "null"
+            else:
+                raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+                pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+
+            fof_user = fof_object.user
+
+            likes = fof_object.like_set.all()
+
+            comments = fof_object.comment_set.all()
+
+            try :
+                Like.objects.get(fof_id = fof_object.id, user_id = user.id)
+                fof["liked"] = "1"
+            except (KeyError, Like.DoesNotExist):
+                fof["liked"] = "0"
+
+
+            fof["user_name"] = fof_user.name
+            fof["user_id"] = fof_user.id
+            fof["user_facebook_id"] = fof_user.facebook_id
+            fof["id"] = fof_object.id
+            fof["fof_name"] = fof_object.name
+            fof["frames"] = frames
+            fof["pub_date"] = pub_date
+
+            fof["comments"] = len(comments)
+            fof["likes"] = len(likes)
+
+            featured_fof_array.append(fof)
+
+            response_data['fof_list'] = featured_fof_array
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
     
 @csrf_exempt
 def json_user_id_fof(request):
