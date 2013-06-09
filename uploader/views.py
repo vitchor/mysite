@@ -1682,10 +1682,12 @@ def login(request):
             friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id).all().order_by('-pub_date')
             friend_fof_list = []
             
+            
+            max_number_of_fofs = 30
             index = 0
-            if friend_fof_list_values.count() > 30:
+            if friend_fof_list_values.count() > max_number_of_fofs:
                 
-                while index < 30:
+                while index < max_number_of_fofs:
                     friend_fof_list.append(friend_fof_list_values[index])
                     index = index + 1
                 
