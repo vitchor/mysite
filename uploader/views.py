@@ -1679,26 +1679,26 @@ def login(request):
             #Populates a general list of FOFs from all friends
             
             
-            friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id)
+            friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id).all().order_by('-pub_date')
             friend_fof_list = []
             
             index = 0
             if friend_fof_list_values.count() > 30:
+                
                 while index < 30:
-                    print friend_fof_list
-                    print index
                     friend_fof_list.append(friend_fof_list_values[index])
                     index = index + 1
                 
+                
                 feed_fof_list = chain(feed_fof_list, friend_fof_list)
             else :
+                print "nem"
                 feed_fof_list = chain(feed_fof_list, friend_fof_list_values)
             
         except (KeyError, User.DoesNotExist):
             # Nothing to do here
             j = 0
-
-
+    
     featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
     featured_fof_array = []
