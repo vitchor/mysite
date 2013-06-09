@@ -1587,7 +1587,7 @@ def signup(request):
 
 @csrf_exempt
 def login(request):
-
+    
     json_request = json.loads(request.POST['json'])
 
     device_id_value = json_request['device_id']
@@ -1677,9 +1677,23 @@ def login(request):
             response_data['friends_list'].append({"id":user_friend_object.id, "facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers_count":followers, "following_count":following})
             
             #Populates a general list of FOFs from all friends
-            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:50].order_by('-pub_date')
-            feed_fof_list = chain(feed_fof_list, friend_fof_list)
-
+            
+            
+            friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id)
+            friend_fof_list = []
+            
+            index = 0
+            if friend_fof_list_values.count() > 30:
+                while index < 30:
+                    print friend_fof_list
+                    print index
+                    friend_fof_list.append(friend_fof_list_values[index])
+                    index = index + 1
+                
+                feed_fof_list = chain(feed_fof_list, friend_fof_list)
+            else :
+                feed_fof_list = chain(feed_fof_list, friend_fof_list_values)
+            
         except (KeyError, User.DoesNotExist):
             # Nothing to do here
             j = 0
@@ -1687,7 +1701,7 @@ def login(request):
 
     featured_fof_list = Featured_FOF.objects.all().order_by('-rank')
 
-    featured_fof_array = [];
+    featured_fof_array = []
 
     for featured_fof in featured_fof_list:
 
