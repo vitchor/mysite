@@ -1070,6 +1070,74 @@ def embedded_fof_height(request, fof_name_value, fof_height_value):
 
     return render_to_response('uploader/fof_embedded.html', {'fof_height_value':fof_height_value, 'frame_list':frame_list, 'current_fof':fof_name_value, 'user_name':user_name}, context_instance=RequestContext(request))
 
+@csrf_exempt
+def trending_fofs(request):
+    """
+    curl -d json='{
+       "user_id": "2",
+   }' http://localhost:8000/uploader/trending/
+   curl -d json='{"user_id": "2"}' http://localhost:8000/uploader/trending/
+   """
+
+    trending_fof_list = FOF.objects.all().order_by('-pub_date')
+    
+    json_request = json.loads(request.POST['json'])
+    user_id = json_request['user_id']
+    
+    response_data = {}
+    
+    max_number_of_fofs = 100
+    index = 0
+    
+    trending_fof_array = []
+    
+    for trending_fof in trending_fof_list:
+
+        index = index + 1
+        if index > max_number_of_fofs :
+            break
+        
+        fof = {}
+
+        # Add this fof to the user_fof_array
+        frame_list = trending_fof.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        if trending_fof.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(trending_fof.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        likes = trending_fof.like_set.all()
+
+        comments = trending_fof.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = trending_fof.id, user_id = user_id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"
+        
+        fof["user_name"] = trending_fof.user.name
+        fof["fof_name"] = trending_fof.name
+        fof["user_id"] = trending_fof.user.id
+        fof["user_facebook_id"] = trending_fof.user.facebook_id
+        fof["id"] = trending_fof.id
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+
+        trending_fof_array.append(fof)
+        
+    response_data["fof_list"] = trending_fof_array
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 def power_user_feed(request, index):
     index = int(index)
