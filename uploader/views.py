@@ -38,11 +38,25 @@ def privacy_policy(request):
 @csrf_exempt
 def delete_fof(request):
     """ Test Request:
-         $ curl -d json='{"fof_id": 2}' http://localhost:8000/uploader/delete_fof/
+         $ curl -d json='{"fof_id": 664}' http://localhost:8000/uploader/delete_fof/
      """
     json_request = json.loads(request.POST['json'])
     fof_id_value = json_request['fof_id']
     response_data = {}
+    
+    try:
+        user_notifications = Device_Notification.objects.filter(trigger_id = fof_id_value)
+        for notification in user_notifications:
+            if notification.trigger_type <= 1: 
+                notification.delete()
+                
+        if user_notifications.count() != 0:
+            response_data["had_notifications"] = "True"
+        else:
+            response_data["had_notifications"] = "False"
+    except(KeyError, Device_Notification.DoesNotExist):
+        response_data["had_notifications"] = "False"
+        
     try:
         featured_fof = Featured_FOF.objects.get(fof_id = fof_id_value)
         featured_fof.delete()
@@ -53,7 +67,6 @@ def delete_fof(request):
     try:
         my_fof = FOF.objects.get(id = fof_id_value)
         frame_list = my_fof.frame_set.all()
-        frame_list.delete()
         try:
             comment_list = my_fof.comment_set.all()
             comment_list.delete()
@@ -67,6 +80,7 @@ def delete_fof(request):
             response_data["have_likes"] = "True"
         except(KeyError, Like.DoesNotExist):
             response_data["have_likes"] = "False"
+        frame_list.delete()
         my_fof.delete()
         
         response_data["result"] = "OK"
