@@ -146,7 +146,7 @@ def send_forgot_password_email(request):
         reponseString = reponseString + user.name
         reponseString = reponseString + ", <br/><br/>Your password is: "
         reponseString = reponseString + user.password
-        reponseString = reponseString + ". <br/><br/>If you have any questions or suggestions we would be glad to hear them. Thanks,"
+        reponseString = reponseString + "<br/><br/>If you have any questions or suggestions we would be glad to hear them. Thanks,"
         reponseString = reponseString + "<br/>Dyfocus Team."
         
         email = EmailMessage("Forgot Password Response", reponseString, to=[user_email])
@@ -155,7 +155,7 @@ def send_forgot_password_email(request):
         response_data["result"] ="ok"
         
     except (KeyError, User.DoesNotExist):
-        response_data["error"] = "Invalid email"
+        response_data["error"] = "Email not registered in our system:"
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
