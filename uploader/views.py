@@ -25,6 +25,7 @@ from django.utils import simplejson as json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
+from django.core.mail import EmailMessage
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
@@ -56,6 +57,35 @@ def privacy_policy(request):
    
 return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 """
+@csrf_exempt
+def send_forgot_password_email(request):
+    """ Test Request:
+        $ curl -d json='{"user_email": "vitchor@gmail.com"}' http://localhost:8000/uploader/send_forgot_password_email/
+    """
+    json_request = json.loads(request.POST['json'])
+    user_email = json_request['user_email']
+    
+    response_data = {}
+    
+    try:
+        user = User.objects.get(email=user_email)
+        
+        reponseString = "Hello "
+        reponseString = reponseString + user.name
+        reponseString = reponseString + ", <br/><br/>Your password is: "
+        reponseString = reponseString + user.password
+        reponseString = reponseString + ". <br/><br/>If you have any questions or suggestions we would be glad to hear them. Thanks,"
+        reponseString = reponseString + "<br/>Dyfocus Team."
+        
+        email = EmailMessage("Forgot Password Response", reponseString, to=[user_email])
+        email.content_subtype = "html"
+        email.send()
+        response_data["result"] ="ok"
+        
+    except (KeyError, User.DoesNotExist):
+        response_data["error"] = "Invalid email"
+    
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
 def user_follow(request):
@@ -1015,10 +1045,8 @@ def embedded_fof_height(request, fof_name_value, fof_height_value):
 @csrf_exempt
 def trending_fofs(request):
     """
-    curl -d json='{
-       "user_id": "2",
-   }' http://localhost:8000/uploader/trending/
    curl -d json='{"user_id": "2"}' http://localhost:8000/uploader/trending/
+   curl -d json='{"user_id": "2"}' http://dyfoc.us/uploader/trending/
    """
 
     trending_fof_list = FOF.objects.all().order_by('-pub_date')
