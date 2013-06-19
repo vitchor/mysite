@@ -36,27 +36,99 @@ def index(request):
 def privacy_policy(request):
     return render_to_response('uploader/privacy_policy.html', {}, context_instance=RequestContext(request))
 
-
-"""
-   featured_fof_array = [];
-   fof = {}
+@csrf_exempt
+def delete_fof(request):
+    """ Test Request:
+         $ curl -d json='{"fof_id": 664}' http://localhost:8000/uploader/delete_fof/
+     """
+    json_request = json.loads(request.POST['json'])
+    fof_id_value = json_request['fof_id']
+    response_data = {}
+    
+    try:
+        user_notifications = Device_Notification.objects.filter(trigger_id = fof_id_value)
+        for notification in user_notifications:
+            if notification.trigger_type <= 1: 
+                notification.delete()
+                
+        if user_notifications.count() != 0:
+            response_data["had_notifications"] = "True"
+        else:
+            response_data["had_notifications"] = "False"
+    except(KeyError, Device_Notification.DoesNotExist):
+        response_data["had_notifications"] = "False"
         
-        ["user_name"] = fof_user.name
-        fof["user_facebook_id"] = fof_user.facebook_id
-        fof["id"] = fof_object.id
-        fof["fof_name"] = fof_object.name
-        fof["frames"] = frames
-        fof["pub_date"] = pub_date
+    try:
+        featured_fof = Featured_FOF.objects.get(fof_id = fof_id_value)
+        featured_fof.delete()
+        response_data["is_featured"] = "True"
+    except(KeyError, Featured_FOF.DoesNotExist):
+        response_data["is_featured"] = "False"
 
-        fof["comments"] = len(comments)
-        fof["likes"] = len(likes)
+    try:
+        my_fof = FOF.objects.get(id = fof_id_value)
+        frame_list = my_fof.frame_set.all()
+        try:
+            comment_list = my_fof.comment_set.all()
+            comment_list.delete()
+            response_data["have_comments"] = "True"
+        except(KeyError, Comment.DoesNotExist):
+            response_data["have_comments"] = "False"
+            
+        try:
+            like_list = my_fof.like_set.all()
+            like_list.delete()
+            response_data["have_likes"] = "True"
+        except(KeyError, Like.DoesNotExist):
+            response_data["have_likes"] = "False"
+        frame_list.delete()
+        my_fof.delete()
+        
+        response_data["result"] = "OK"
+    except (KeyError, FOF.DoesNotExist):
+        response_data["error"] = "FOF Not Found"
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
-        featured_fof_array.append(fof)
+@csrf_exempt
+def delete_comment(request):
+    """ Test Request:
+         $ curl -d json='{"comment_id": 2}' http://localhost:8000/uploader/delete_comment/
+     """
+    response_data = {}
+    
+    json_request = json.loads(request.POST['json'])
+    comment_id_value = json_request['comment_id']
+    
+    try:
+        comment = Comment.objects.get(id = comment_id_value)
+        comment.delete()
+        response_data["result"] = "Comment deleted successfully"
+    except(KeyError, Comment.DoesNotExist):
+        response_data["error"] = "Comment Not Found"
 
-        response_data['fof_list'] = featured_fof_array
-   
-return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
-"""
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+@csrf_exempt
+def delete_like(request):
+    """ Test Request:
+         $ curl -d json='{"user_id": 74, "fof_id": 352}' http://localhost:8000/uploader/delete_like/
+     """
+    response_data = {}
+
+    json_request = json.loads(request.POST['json'])
+    user_id_value = json_request['user_id']
+    fof_id_value = json_request['fof_id']
+    
+    try:
+        like = Like.objects.get(user_id = user_id_value, fof_id = fof_id_value)
+        like.delete()
+        response_data["result"] = "Like deleted successfully"
+    except(KeyError, Like.DoesNotExist):
+        response_data["error"] = "Like Not Found"
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+
 @csrf_exempt
 def send_forgot_password_email(request):
     """ Test Request:
@@ -1365,11 +1437,7 @@ def comment(request):
 @csrf_exempt
 def user_comment(request):
     """ 
-    curl -d json='{
-        "facebook_id": "100000370417687",
-        "fof_id": "96964.057167",
-        "comment_message": "QUE LEGAAAL! "
-    }' http://localhost:8000/uploader/comment/
+    curl -d json='{"user_id": "2","fof_id": "418","comment_message": "QUE LEGAAAL! "}' http://localhost:8000/uploader/user_comment/
     """
     
     response_data = {}
@@ -1392,24 +1460,25 @@ def user_comment(request):
             comment.pub_date = timezone.now()
             comment.save()
             response_data["result"] = "ok"
+            response_data["comment_id"] = comment.id
             
             firstname = user.name
             for a in firstname:
                 if a == " ":
                     firstname = firstname[0: firstname.index(a)]
                     break
-                    
             if len(comment_message) > 20:
                     comment_message = comment_message[0:20]
                     comment_message = comment_message + "..."
-            
             notification_message = ""
             notification_message = notification_message + firstname
             notification_message = notification_message + " commented on your fof: \""
             notification_message = notification_message + comment_message
             notification_message = notification_message + "\"."
-            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
-            
+            try:
+                sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
+            except:
+                response_data["error"] = "Could not send alert notification"
         except (KeyError, FOF.DoesNotExist):
             # Nothing to do here
             response_data["error"] = "FOF doesn't exist"
@@ -1569,8 +1638,8 @@ def likes_and_comments(request):
                 raw_pub_date =  json.dumps(like.pub_date, cls=DjangoJSONEncoder)
                 pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
             
-            response_data["like_list"].append({"user_facebook_id":like.user.facebook_id, "user_id":like.user.id, "user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
-        
+            response_data["like_list"].append({"like_id":like.id, "user_facebook_id":like.user.facebook_id, "user_id":like.user.id, "user_name":like.user.name,"fof_id":fof.id,"pub_date":pub_date})
+            
         for comment in comments:
             
             if comment.pub_date is None:
@@ -1578,8 +1647,8 @@ def likes_and_comments(request):
             else:
                 raw_pub_date =  json.dumps(comment.pub_date, cls=DjangoJSONEncoder)
                 pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
-                
-            response_data["comment_list"].append({"user_facebook_id":comment.user.facebook_id, "user_id":comment.user.id, "user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
+            
+            response_data["comment_list"].append({"comment_id":comment.id, "user_facebook_id":comment.user.facebook_id, "user_id":comment.user.id, "user_name":comment.user.name,"fof_id":fof.id,"pub_date":pub_date,"comment":comment.comment})
     
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
         
@@ -1790,7 +1859,6 @@ def login(request):
                 
                 feed_fof_list = chain(feed_fof_list, friend_fof_list)
             else :
-                print "nem"
                 feed_fof_list = chain(feed_fof_list, friend_fof_list_values)
             
         except (KeyError, User.DoesNotExist):
@@ -2543,7 +2611,6 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
             # openssl pkcs12 -in cert.p12 -out cert.pem -nodes 
             #   when prompted "Enter Import Password:" hit return
             #
-            print "1"
             #theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
             theCertfile = '/home/ubuntu/mysite/uploader/prod_cert.pem'
             # 
