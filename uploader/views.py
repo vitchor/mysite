@@ -231,7 +231,8 @@ def user_follow(request):
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = person_user.id)
             friend_relation.save()
             
-            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 2, fof.id)
+            notification_message = follower_user.name + " started following you."
+            sendAlert(person_id, follower_user.id, follower_user.facebook_id, notification_message, 2, follower_user.id)
             # Updates the Followers and Following counters:
             following_calc(follower_user.id)
             followers_calc(person_user.id)
@@ -2629,10 +2630,8 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
 
             #Add new row for the table Device_Notification
             if sender_facebook_id_value :
-
                 notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, sender_facebook_id = sender_facebook_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)
             else:
-
                 notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)                
 
             notification.save()
