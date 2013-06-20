@@ -1857,6 +1857,9 @@ def login(request):
                 # It doesn't exists, lets create it:
                 friend_relation = Friends(friend_1_id = user.id, friend_2_id = user_friend.id)
                 friend_relation.save()
+                
+                notification_message = user.name + " started following you."
+                sendAlert(user_friend.id, user.id, user.facebook_id, notification_message, 2, user.id)
 
         except (KeyError, User.DoesNotExist):
             # Nothing to do here
