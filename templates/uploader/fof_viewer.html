@@ -9,8 +9,8 @@
 		{% if frame.index == 0 %}
 			<meta property="og:image" content="{{frame}}" />
 		{% endif %}	
-    {% endfor %}	
-
+    {% endfor %}
+	
 	<title>dyfoc.us - share your moments!</title>
 	<!--[if IE]>
 	<style type="text/css" media="all">.borderitem {border-style: solid;}</style>
@@ -42,6 +42,7 @@
 	</script>
 </head>
 <body> 
+	
 	<div id="fb-root"></div>
 	<script type="text/javascript">
 		bodyScript();
@@ -85,6 +86,15 @@
 				<script type="text/javascript"> homefade();</script>
 					
 				<!-- START OF share, like, send and embed buttons 		-->
+				
+				{% if type == "power_feed_fof" %}
+					<form name="input" action="/uploader/set_featured/" method="post">
+						Add to featured with rank: <input type="text" name="rank">
+						<input type="submit" value="Submit">
+						<input type="hidden"value="{{fof_id}}" name="fof_id">
+					</form>
+				{% endif %}
+				
 				<div id="all_buttons">
 					<div id="fb_buttons">
 						<div class="share" > <img src = "{{ STATIC_URL }}images/share_facebook.png" id="share_button" type='button_count'></div>
@@ -96,7 +106,7 @@
 							<a class = "btn btn-small btn-link" data-toggle="collapse" data-parent="#accordion2" href="#collapse" style="margin-top: -2px; margin-left: -5px;" >
 								Embed
 							</a>
-						</div>								
+						</div>
 					</div>
 				</div>		
 					

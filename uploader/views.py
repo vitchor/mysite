@@ -29,7 +29,22 @@ from django.core.mail import EmailMessage
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
-
+@csrf_exempt
+def set_featured(request):
+    
+    fof_id_value = request.POST['fof_id']
+    rank_value = request.POST['rank']
+    
+    try:
+        featured_fof = Featured_FOF.objects.get(fof_id = fof_id_value)
+        featured_fof.rank = rank_value
+        featured_fof.save()
+    except(KeyError, Featured_FOF.DoesNotExist):
+        friend_relation = Featured_FOF(fof_id = fof_id_value, rank = rank_value)
+        friend_relation.save()
+        
+    return HttpResponse(status=204)
+    
 def flash_fof(request,fof_id):
     
     try:
@@ -52,7 +67,7 @@ def flash_fof(request,fof_id):
                 break
         
             
-    except(KeyError, Featured_FOF.DoesNotExist):
+    except(KeyError, FOF.DoesNotExist):
         response_data["error"] = "FOF does not exist"
         
     return render_to_response('uploader/images.xml', {"first_image_url" : first_image_url, "second_image_url" : second_image_url},
@@ -1247,7 +1262,7 @@ def power_user_feed(request, index):
             user_name = "Unknown user"
         
         fof_date = fof.pub_date
-        return render_to_response('uploader/fof_viewer.html', {'type':"power_feed_fof",'hide_arrows': 0, 'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name}, context_instance=RequestContext(request))
+        return render_to_response('uploader/fof_viewer.html', {'type':"power_feed_fof",'hide_arrows': 0, 'frame_list':frame_list,'next_fof_name':next_fof_index, 'prev_fof_name':prev_fof_index, 'fof_date':fof.pub_date, 'current_fof':fof.name, 'user_name':user_name, 'fof_id':fof.id}, context_instance=RequestContext(request))
 
 def feed(request, facebook_id_value, index):
     index = int(index)
