@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GALLERY>
+	
+	<image src="{{first_image_url}}" />
+	<image src="{{second_image_url}}" />
+</GALLERY>

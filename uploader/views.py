@@ -29,6 +29,36 @@ from django.core.mail import EmailMessage
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
+
+def flash_fof(request,fof_id):
+    
+    try:
+        fof = FOF.objects.get(id = fof_id)
+
+        index = 0
+        
+        first_image_url = ""
+        second_image_url = ""
+        
+        for frame in fof.frame_set.all():
+            
+            if index == 0:
+                first_image_url = frame.url
+                index = index + 1
+            elif index == 1:
+                second_image_url = frame.url
+                index = index + 1
+            else :
+                break
+        
+            
+    except(KeyError, Featured_FOF.DoesNotExist):
+        response_data["error"] = "FOF does not exist"
+        
+    return render_to_response('uploader/images.xml', {"first_image_url" : first_image_url, "second_image_url" : second_image_url},
+                               context_instance=RequestContext(request))
+
+
 def index(request):
     return render_to_response('uploader/index.html', {},
                                context_instance=RequestContext(request))

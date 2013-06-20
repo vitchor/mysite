@@ -56,6 +56,7 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<facebook_id_value>\S+)/m_feed/(?P<index>\S+)/$', 'm_feed'),
     url(r'^fof_not_found/$', 'fof_not_found'),
     url(r'^featured/$', 'list_featured'),
-    url(r'^send_forgot_password_email/$', 'send_forgot_password_email'),    
+    url(r'^send_forgot_password_email/$', 'send_forgot_password_email'),
+    url(r'^(?P<fof_id>\S+)/flash_fof/$', 'flash_fof'),
     #url(r'^saywhat/$', 'test'),
 )
