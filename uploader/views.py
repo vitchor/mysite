@@ -1501,6 +1501,50 @@ def user_comment(request):
         try:
             fof = FOF.objects.get(id=fof_id)
             
+            firstname = user.name
+            for a in firstname:
+                if a == " ":
+                    firstname = firstname[0: firstname.index(a)]
+                    break
+            if len(comment_message) > 20:
+                    comment_message = comment_message[0:20]
+                    comment_message = comment_message + "..."
+            
+            #Lets send an alert to all users that also commented on this fof.
+            users_alerted = []
+            notification_message = ""
+            notification_message = notification_message + firstname
+            notification_message = notification_message + " also commented on a fof: \""
+            notification_message = notification_message + comment_message
+            notification_message = notification_message + "\"."
+            for comment in fof.comment_set.all() :
+                if comment.user_id != user.id:
+                    print users_alerted
+                    try:
+                        user_already_there = users_alerted.index(comment.user_id)
+                        #do nothing we've already sent an notification
+                    except ValueError:                    
+                        sendAlert(comment.user_id, user.id, user.facebook_id, notification_message, 3, fof.id)
+                        users_alerted.append(comment.user_id)
+                        
+            
+            #Lets send an alert to all users that liked this fof.
+            notification_message = ""
+            notification_message = notification_message + firstname
+            notification_message = notification_message + " commented on a fof that you liked: \""
+            notification_message = notification_message + comment_message
+            notification_message = notification_message + "\"."
+            for like in fof.like_set.all() :
+                print users_alerted
+                if like.user_id != user.id:
+                    try:
+                        user_already_there = users_alerted.index(like.user_id)
+                        # do nothing, we've already sent an notification
+                    except ValueError:
+                        sendAlert(like.user_id, user.id, user.facebook_id, notification_message, 4, fof.id)
+                        users_alerted.append(like.user_id)
+                        
+            
             comment = Comment()
             comment.user_id = user.id
             comment.fof_id = fof.id
@@ -1510,14 +1554,7 @@ def user_comment(request):
             response_data["result"] = "ok"
             response_data["comment_id"] = comment.id
             
-            firstname = user.name
-            for a in firstname:
-                if a == " ":
-                    firstname = firstname[0: firstname.index(a)]
-                    break
-            if len(comment_message) > 20:
-                    comment_message = comment_message[0:20]
-                    comment_message = comment_message + "..."
+            
             notification_message = ""
             notification_message = notification_message + firstname
             notification_message = notification_message + " commented on your fof: \""
