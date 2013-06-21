@@ -136,6 +136,7 @@ def flash_fof_share(request, fof_name_value):
          return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     
     else:
+        fof_thumbnail_url = ""
         fof_id = fof.id
         fof_flash_url = "http://dyfoc.us/static/flash/FlashFOFViewer.swf?fofId=" + str(fof_id)
         
