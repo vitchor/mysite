@@ -286,7 +286,10 @@ def user_follow(request):
             friend_relation.save()
             
             notification_message = follower_user.name + " started following you."
+            """
+            WAIT FOR APP RELASE TO UNCOMMEN IT ////// TODO
             sendAlert(person_id, follower_user.id, follower_user.facebook_id, notification_message, 2, follower_user.id)
+            """
             # Updates the Followers and Following counters:
             following_calc(follower_user.id)
             followers_calc(person_user.id)
@@ -1564,6 +1567,8 @@ def user_comment(request):
                     comment_message = comment_message[0:20]
                     comment_message = comment_message + "..."
             
+            """
+            WAIT FOR APP RELEASE TO UNCOMMENT IT //// TODO
             #Lets send an alert to all users that also commented on this fof.
             users_alerted = []
             notification_message = ""
@@ -1598,6 +1603,7 @@ def user_comment(request):
                         sendAlert(like.user_id, user.id, user.facebook_id, notification_message, 4, fof.id)
                         users_alerted.append(like.user_id)
                         
+            """
             
             comment = Comment()
             comment.user_id = user.id
@@ -1950,7 +1956,11 @@ def login(request):
                 friend_relation.save()
                 
                 notification_message = user.name + " started following you."
+                
+                """
+                WAIT FOR APP RELEASE TO UNCOMMENT IT //// TODO
                 sendAlert(user_friend.id, user.id, user.facebook_id, notification_message, 2, user.id)
+                """
 
         except (KeyError, User.DoesNotExist):
             # Nothing to do here
