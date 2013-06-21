@@ -146,7 +146,7 @@ def flash_fof_share(request, fof_name_value):
             else:
                 break
         
-        return render_to_response('uploader/images.xml', {"fof_flash_url" : fof_flash_url, "fof_thumbnail_url" : fof_thumbnail_url},
+        return render_to_response('uploader/flash_fof_share.html', {"fof_flash_url" : fof_flash_url, "fof_thumbnail_url" : fof_thumbnail_url},
                                     context_instance=RequestContext(request))
 
 
