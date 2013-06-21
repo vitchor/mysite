@@ -30,6 +30,60 @@ from django.core.mail import EmailMessage
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
 @csrf_exempt
+def get_fof_json(request):
+    
+    json_request = json.loads(request.POST['json'])
+    fof_id = json_request["fof_id"]
+    user_id = json_request["user_id"]
+    response_data = {}
+    
+    try:
+        fof_object = FOF.objects.get(id = fof_id)
+        
+        fof = {}
+
+        frame_list = fof_object.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        if fof_object.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        fof_user = fof_object.user
+
+        likes = fof_object.like_set.all()
+
+        comments = fof_object.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = fof_object.id, user_id = user_id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"            
+
+        fof["user_name"] = fof_user.name
+        fof["user_id"] = fof_user.id
+        fof["user_facebook_id"] = fof_user.facebook_id
+        fof["id"] = fof_object.id
+        fof["fof_name"] = fof_object.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+        
+        response_data["fof"] = fof
+    except(KeyError, FOF.DoesNotExist):
+        response_data["error"] = "Fof doesn't exist."
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+@csrf_exempt
 def set_featured(request):
     
     fof_id_value = request.POST['fof_id']
@@ -230,6 +284,9 @@ def user_follow(request):
             # It doesn't exist, lets create it:
             friend_relation = Friends(friend_1_id = follower_user.id, friend_2_id = person_user.id)
             friend_relation.save()
+            
+            notification_message = follower_user.name + " started following you."
+            sendAlert(person_id, follower_user.id, follower_user.facebook_id, notification_message, 2, follower_user.id)
             # Updates the Followers and Following counters:
             following_calc(follower_user.id)
             followers_calc(person_user.id)
@@ -1498,6 +1555,50 @@ def user_comment(request):
         try:
             fof = FOF.objects.get(id=fof_id)
             
+            firstname = user.name
+            for a in firstname:
+                if a == " ":
+                    firstname = firstname[0: firstname.index(a)]
+                    break
+            if len(comment_message) > 20:
+                    comment_message = comment_message[0:20]
+                    comment_message = comment_message + "..."
+            
+            #Lets send an alert to all users that also commented on this fof.
+            users_alerted = []
+            notification_message = ""
+            notification_message = notification_message + firstname
+            notification_message = notification_message + " also commented on a fof: \""
+            notification_message = notification_message + comment_message
+            notification_message = notification_message + "\"."
+            for comment in fof.comment_set.all() :
+                if comment.user_id != user.id:
+                    print users_alerted
+                    try:
+                        user_already_there = users_alerted.index(comment.user_id)
+                        #do nothing we've already sent an notification
+                    except ValueError:                    
+                        sendAlert(comment.user_id, user.id, user.facebook_id, notification_message, 3, fof.id)
+                        users_alerted.append(comment.user_id)
+                        
+            
+            #Lets send an alert to all users that liked this fof.
+            notification_message = ""
+            notification_message = notification_message + firstname
+            notification_message = notification_message + " commented on a fof that you liked: \""
+            notification_message = notification_message + comment_message
+            notification_message = notification_message + "\"."
+            for like in fof.like_set.all() :
+                print users_alerted
+                if like.user_id != user.id:
+                    try:
+                        user_already_there = users_alerted.index(like.user_id)
+                        # do nothing, we've already sent an notification
+                    except ValueError:
+                        sendAlert(like.user_id, user.id, user.facebook_id, notification_message, 4, fof.id)
+                        users_alerted.append(like.user_id)
+                        
+            
             comment = Comment()
             comment.user_id = user.id
             comment.fof_id = fof.id
@@ -1507,23 +1608,14 @@ def user_comment(request):
             response_data["result"] = "ok"
             response_data["comment_id"] = comment.id
             
-            firstname = user.name
-            for a in firstname:
-                if a == " ":
-                    firstname = firstname[0: firstname.index(a)]
-                    break
-            if len(comment_message) > 20:
-                    comment_message = comment_message[0:20]
-                    comment_message = comment_message + "..."
+            
             notification_message = ""
             notification_message = notification_message + firstname
             notification_message = notification_message + " commented on your fof: \""
             notification_message = notification_message + comment_message
             notification_message = notification_message + "\"."
-            try:
-                sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
-            except:
-                response_data["error"] = "Could not send alert notification"
+            sendAlert(fof.user_id, user.id, user.facebook_id, notification_message, 1, fof.id)
+          
         except (KeyError, FOF.DoesNotExist):
             # Nothing to do here
             response_data["error"] = "FOF doesn't exist"
@@ -1856,6 +1948,9 @@ def login(request):
                 # It doesn't exists, lets create it:
                 friend_relation = Friends(friend_1_id = user.id, friend_2_id = user_friend.id)
                 friend_relation.save()
+                
+                notification_message = user.name + " started following you."
+                sendAlert(user_friend.id, user.id, user.facebook_id, notification_message, 2, user.id)
 
         except (KeyError, User.DoesNotExist):
             # Nothing to do here
@@ -2619,7 +2714,6 @@ def sendAlertExample(request):
     
 def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, message_value, trigger_type_value, trigger_id_value):
     import socket, ssl, json, struct
-
     # device token returned when the iPhone application
     # registers to receive alerts
     
@@ -2627,18 +2721,22 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
         try:
             user = User.objects.get(id=receiver_id_value)
             deviceToken = user.device_id
-        
+
             #Add new row for the table Device_Notification
-            notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, sender_facebook_id = sender_facebook_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)
+            if sender_facebook_id_value :
+                notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, sender_facebook_id = sender_facebook_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)
+            else:
+                notification = Device_Notification(receiver_id = receiver_id_value, sender_id = sender_id_value, message = message_value, trigger_type = trigger_type_value, trigger_id = trigger_id_value,  pub_date=timezone.now(), was_read = 0)                
+
             notification.save()
-        
+
             notifications = Device_Notification.objects.filter(Q(receiver_id = user.id)).order_by('-pub_date')
-        
+
             read_notifications = 0
             for notification in notifications:
                 if not notification.was_read:
                     read_notifications = read_notifications + 1
-        
+
             #deviceToken = '23d9e172dee23a7e42fa148b4dcd621f5a8931c96e2e336d72662984ff007979'
             #23d9e172 dee23a7e 42fa148b 4dcd621f 5a8931c9 6e2e336d 72662984 ff007979
             #d65d75d a4cedd23 774c0e88 28a9aab6 b5e9470e a7ad1ad8 dc1e9629 2c585090
@@ -2657,32 +2755,32 @@ def sendAlert(receiver_id_value, sender_id_value, sender_facebook_id_value, mess
             #   when prompted "Enter Import Password:" hit return
             #
             #theCertfile = '/Users/mac/mysite/uploader/apple_push_notification_dev.pem'
-            theCertfile = '/home/ubuntu/mysite/uploader/prod_cert.pem'
-            # 
-            theHost = ( 'gateway.push.apple.com', 2195 )
 
-            # 
-            data = json.dumps( thePayLoad )
+            if not deviceToken == "null":
+                
+                theCertfile = '/home/ubuntu/mysite/uploader/prod_cert.pem'
+                # 
+                theHost = ( 'gateway.push.apple.com', 2195 )
+                # 
+                data = json.dumps( thePayLoad )
+                # Clear out spaces in the device token and convert to hex
+                deviceToken = deviceToken.replace(' ','')
+                #byteToken = bytes.fromhex( deviceToken ) # Python 3
+                byteToken = deviceToken.decode('hex') # Python 2
+                theFormat = '!BH32sH%ds' % len(data)
+                theNotification = struct.pack( theFormat, 0, 32, byteToken, len(data), data )
 
-            # Clear out spaces in the device token and convert to hex
-            deviceToken = deviceToken.replace(' ','')
-            #byteToken = bytes.fromhex( deviceToken ) # Python 3
-            byteToken = deviceToken.decode('hex') # Python 2
+                # Create our connection using the certfile saved locally
+                ssl_sock = ssl.wrap_socket( socket.socket( socket.AF_INET, socket.SOCK_STREAM ), certfile = theCertfile )
+                ssl_sock.connect( theHost )
 
-            theFormat = '!BH32sH%ds' % len(data)
-            theNotification = struct.pack( theFormat, 0, 32, byteToken, len(data), data )
+                # Write out our data
+                ssl_sock.write( theNotification )
 
-            # Create our connection using the certfile saved locally
-            ssl_sock = ssl.wrap_socket( socket.socket( socket.AF_INET, socket.SOCK_STREAM ), certfile = theCertfile )
-            ssl_sock.connect( theHost )
-
-            # Write out our data
-            ssl_sock.write( theNotification )
-
-            # Close the connection -- apple would prefer that we keep
-            # a connection open and push data as needed.
-            ssl_sock.close()
-        
+                # Close the connection -- apple would prefer that we keep
+                # a connection open and push data as needed.
+                ssl_sock.close()
+            
         except (KeyError, User.DoesNotExist):
             i = 0
         
