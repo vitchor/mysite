@@ -137,7 +137,7 @@ def flash_fof_share(request, fof_name_value):
     
     else:
         fof_id = fof.id
-        fof_flash_url = "http://dyfoc.us/static/flash/FlashFOFViewer.swf?fofId=" + fof_id
+        fof_flash_url = "http://dyfoc.us/static/flash/FlashFOFViewer.swf?fofId=" + str(fof_id)
         
         for frame in fof.frame_set.all():
             if index == 0:
