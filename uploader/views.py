@@ -127,6 +127,28 @@ def flash_fof(request,fof_id):
     return render_to_response('uploader/images.xml', {"first_image_url" : first_image_url, "second_image_url" : second_image_url},
                                context_instance=RequestContext(request))
 
+def flash_fof_share(request, fof_name_value):
+    
+    try:
+         fof = FOF.objects.get(name = fof_name_value)
+         
+    except(KeyError, FOF.DoesNotExist):
+         return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
+    
+    else:
+        fof_thumbnail_url = ""
+        fof_id = fof.id
+        fof_flash_url = "http://dyfoc.us/static/flash/FlashFOFViewer.swf?fofId=" + str(fof_id)
+        
+        for frame in fof.frame_set.all():
+            if index == 0:
+                fof_thumbnail_url = frame.url
+            else:
+                break
+        
+        return render_to_response('uploader/flash_fof_share.html', {"fof_flash_url" : fof_flash_url, "fof_thumbnail_url" : fof_thumbnail_url},
+                                    context_instance=RequestContext(request))
+
 
 def index(request):
     return render_to_response('uploader/index.html', {},
