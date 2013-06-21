@@ -136,6 +136,8 @@ def flash_fof_share(request, fof_name_value):
          return render_to_response('uploader/fof_not_found.html', {}, context_instance=RequestContext(request))
     
     else:
+        index = 0
+        
         fof_thumbnail_url = ""
         fof_id = fof.id
         fof_flash_url = "http://dyfoc.us/static/flash/FlashFOFViewer.swf?fofId=" + str(fof_id)
@@ -143,6 +145,7 @@ def flash_fof_share(request, fof_name_value):
         for frame in fof.frame_set.all():
             if index == 0:
                 fof_thumbnail_url = frame.url
+                index += 1
             else:
                 break
         
