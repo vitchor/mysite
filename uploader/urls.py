@@ -59,5 +59,6 @@ urlpatterns = patterns('uploader.views',
     url(r'^send_forgot_password_email/$', 'send_forgot_password_email'),
     url(r'^(?P<fof_id>\S+)/flash_fof/$', 'flash_fof'),
     url(r'^set_featured/$', 'set_featured'),
+    url(r'^get_fof_json/$', 'get_fof_json'),    
     #url(r'^saywhat/$', 'test'),
 )
