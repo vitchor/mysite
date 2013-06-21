@@ -30,6 +30,60 @@ from django.core.mail import EmailMessage
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
 @csrf_exempt
+def get_fof_json(request):
+    
+    json_request = json.loads(request.POST['json'])
+    fof_id = json_request["fof_id"]
+    user_id = json_request["user_id"]
+    response_data = {}
+    
+    try:
+        fof_object = FOF.objects.get(id = fof_id)
+        
+        fof = {}
+
+        frame_list = fof_object.frame_set.all().order_by('index')[:5]
+
+        frames = []
+        for frame in frame_list:
+            frames.append({"frame_url":frame.url,"frame_index":frame.index})
+
+        if fof_object.pub_date is None:
+            pub_date = "null"
+        else:
+            raw_pub_date =  json.dumps(fof_object.pub_date, cls=DjangoJSONEncoder)
+            pub_date = raw_pub_date[6:8] + "/" + raw_pub_date[9:11] + "/" + raw_pub_date[1:5]
+
+        fof_user = fof_object.user
+
+        likes = fof_object.like_set.all()
+
+        comments = fof_object.comment_set.all()
+
+        try :
+            Like.objects.get(fof_id = fof_object.id, user_id = user_id)
+            fof["liked"] = "1"
+        except (KeyError, Like.DoesNotExist):
+            fof["liked"] = "0"            
+
+        fof["user_name"] = fof_user.name
+        fof["user_id"] = fof_user.id
+        fof["user_facebook_id"] = fof_user.facebook_id
+        fof["id"] = fof_object.id
+        fof["fof_name"] = fof_object.name
+        fof["frames"] = frames
+        fof["pub_date"] = pub_date
+
+        fof["comments"] = len(comments)
+        fof["likes"] = len(likes)
+        
+        response_data["fof"] = fof
+    except(KeyError, FOF.DoesNotExist):
+        response_data["error"] = "Fof doesn't exist."
+        
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+    
+@csrf_exempt
 def set_featured(request):
     
     fof_id_value = request.POST['fof_id']
