@@ -1909,6 +1909,24 @@ def signup(request):
         response_data['feed_fof_list'] = []
         response_data['user_fof_list'] = []
         
+        firstname = user.name
+        for a in firstname:
+            if a == " ":
+                firstname = firstname[0: firstname.index(a)]
+                break
+                
+        reponseString = "Hi "
+        reponseString = reponseString + user.name
+        reponseString = reponseString + ", <br/><br/>We're really glad to have you in the family."
+        reponseString = reponseString + "<br/>If you have any questions or suggestions we would be glad to hear them. Thanks,"
+        reponseString = reponseString + "<br/> Victor Oliveira<br/>dyfocus co-founder.<br/> <a href=\"https://www.facebook.com/dyfocus\">https://www.facebook.com/dyfocus<a/><br/><a href=\"http://dyfoc.us/\">http://dyfoc.us/<a/>"
+        
+        title = "Welcome " + firstname
+        
+        email = EmailMessage(title, reponseString, to=[user.email])
+        email.content_subtype = "html"
+        email.send()
+        
         response_data['user_name'] = user_name
         response_data['user_email'] = user_email
         response_data['user_id'] = user.id
