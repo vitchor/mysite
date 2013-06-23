@@ -70,6 +70,7 @@ def get_fof_json(request):
         fof["user_id"] = fof_user.id
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
+        fof["is_private"] = fof_object.is_private
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
@@ -543,6 +544,7 @@ def upload_image(request):
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
     user_id = request.POST['user_id']
+    is_private_value = request.POST['is_private']
     
     response_data = {}
     
@@ -555,7 +557,7 @@ def upload_image(request):
         try:
             frame_FOF = FOF.objects.get(name=fof_name)
         except (KeyError, FOF.DoesNotExist):
-            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
         
         #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
         conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
@@ -1251,7 +1253,7 @@ def trending_fofs(request):
    curl -d json='{"user_id": "2"}' http://dyfoc.us/uploader/trending/
    """
 
-    trending_fof_list = FOF.objects.all().order_by('-pub_date')
+    trending_fof_list = FOF.objects.filter(is_private = 0).order_by('-pub_date')
     
     json_request = json.loads(request.POST['json'])
     user_id = json_request['user_id']
@@ -1299,6 +1301,7 @@ def trending_fofs(request):
         fof["user_id"] = trending_fof.user.id
         fof["user_facebook_id"] = trending_fof.user.facebook_id
         fof["id"] = trending_fof.id
+        fof["is_private"] = trending_fof.is_private
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
@@ -1893,6 +1896,7 @@ def signup(request):
             fof["user_id"] = fof_user.id
             fof["user_facebook_id"] = fof_user.facebook_id
             fof["id"] = fof_object.id
+            fof["is_private"] = fof_object.is_private
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
@@ -2037,7 +2041,7 @@ def login(request):
             #Populates a general list of FOFs from all friends
             
             
-            friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id).all().order_by('-pub_date')
+            friend_fof_list_values = FOF.objects.filter(user_id = friend.friend_2_id,  is_private = 0).all().order_by('-pub_date')
             friend_fof_list = []
             
             
@@ -2097,6 +2101,7 @@ def login(request):
         fof["user_id"] = fof_user.id
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
+        fof["is_private"] = fof_object.is_private
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
@@ -2164,16 +2169,16 @@ def login(request):
         fof["fof_name"] = feed_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
-
+        fof["ïs_private"] = feed_fof.is_private
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
         
-        feed_fof_array.append(fof)
+        if feed_fof.is_private == 0:
+            feed_fof_array.append(fof)
         
         if feed_fof.user == user:
             user_fof_array.append(fof)
         
-
     response_data['feed_fof_list'] = feed_fof_array
     response_data['user_fof_list'] = user_fof_array
     response_data['user_id'] = user.id  
@@ -2291,6 +2296,7 @@ def login_user(request):
         fof["user_id"] = fof_user.id
         fof["user_facebook_id"] = fof_user.facebook_id
         fof["id"] = fof_object.id
+        fof["is_private"] = fof_object.is_private
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
@@ -2355,6 +2361,7 @@ def login_user(request):
         fof["user_id"] = feed_fof.user.id
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
+        fof["is_private"] = feed_fof.is_private
         fof["fof_name"] = feed_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
@@ -2464,11 +2471,11 @@ def get_user_feed_array(user):
     for friend in user_friends:
 
         #Populates a general list of FOFs from all friends
-        friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
+        friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id, is_private = 0)[:1000]            
         feed_fof_list = chain(feed_fof_list, friend_fof_list)
 
     # Adds personal FOFs to the feed list
-    user_fof_list = FOF.objects.filter(user_id = user.id)[:1000]
+    user_fof_list = FOF.objects.filter(user_id = user.id, is_private = 0)[:1000]
     feed_fof_list = chain(feed_fof_list, user_fof_list)
 
     # Sorts the list
@@ -2507,6 +2514,7 @@ def get_user_feed_array(user):
         fof["user_id"] = feed_fof.user.id
         fof["user_facebook_id"] = feed_fof.user.facebook_id
         fof["id"] = feed_fof.id
+        fof["is_private"] = feed_fof.is_private
         fof["frames"] = frames
         fof["pub_date"] = pub_date
 
@@ -2577,6 +2585,7 @@ def json_featured_fof(request):
             fof["user_id"] = fof_user.id
             fof["user_facebook_id"] = fof_user.facebook_id
             fof["id"] = fof_object.id
+            fof["is_private"] = fof_object.is_private
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
@@ -2649,6 +2658,7 @@ def user_json_featured_fof(request):
             fof["user_id"] = fof_user.id
             fof["user_facebook_id"] = fof_user.facebook_id
             fof["id"] = fof_object.id
+            fof["is_private"] = fof_object.is_private
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
@@ -2748,6 +2758,7 @@ def get_user_fofs(user):
         fof["user_id"] = user_fof.user.id
         fof["user_facebook_id"] = user_fof.user.facebook_id
         fof["id"] = user_fof.id
+        fof["is_private"] = user_fof.is_private
         fof["fof_name"] = user_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
@@ -2989,6 +3000,7 @@ def retrieve_user_info(request):
             fof['user_name'] = user_fof.user.name
             fof['user_facebook_id'] = user_fof.user.facebook_id
             fof['id'] = user_fof.id
+            fof['is_private'] = user_fof.is_private
             fof['fof_name'] = user_fof.name
             fof['frames'] = frames
             fof['pub_date'] = pub_date
