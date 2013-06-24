@@ -2249,7 +2249,7 @@ def login_user(request):
             response_data['friends_list'].append({"id":user_friend_object.id, "facebook_id":user_friend_object.facebook_id, "name":user_friend_object.name, "id_origin":user_friend_object.id_origin, "followers_count":followers, "following_count":following})
 
             #Populates a general list of FOFs from all friends
-            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id)[:1000]            
+            friend_fof_list = FOF.objects.filter(user_id = friend.friend_2_id, is_private = 0)[:1000]            
             feed_fof_list = chain(feed_fof_list, friend_fof_list)
 
         except (KeyError, User.DoesNotExist):
@@ -2369,7 +2369,8 @@ def login_user(request):
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
 
-        feed_fof_array.append(fof)
+        if feed_fof.is_private == 0:
+            feed_fof_array.append(fof)
 
         if feed_fof.user == user:
             user_fof_array.append(fof)
