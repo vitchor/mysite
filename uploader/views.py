@@ -100,10 +100,10 @@ def set_featured(request):
         
     return HttpResponse(status=204)
     
-def flash_fof(request,fof_id):
+def flash_fof(request,fof_name):
     
     try:
-        fof = FOF.objects.get(id = fof_id)
+        fof = FOF.objects.get(name = fof_name)
 
         index = 0
         
