@@ -30,6 +30,34 @@ from django.core.mail import EmailMessage
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
 @csrf_exempt
+def send_support_email(request):
+    
+    #$ curl -d json='{}' http://localhost:8000/uploader/send_support_email/
+    users = User.objects.all().order_by('-id')
+    for user in users:
+        print user.id
+        if user.id > 2249 :
+            reponseString = "Hi "
+            reponseString = reponseString + user.name
+            reponseString = reponseString + ", <br/><br/>We've just fixed a bug that was blocking the image upload. If you had any problems with the image upload, please try again now."
+            reponseString = reponseString + "<br/><br/>Sorry for the incovenience. Thanks,"
+            reponseString = reponseString + "<br/><br/> Victor Oliveira<br/>dyfocus co-founder.<br/> <a href=\"https://www.facebook.com/dyfocus\">https://www.facebook.com/dyfocus<a/><br/><a href=\"http://dyfoc.us/\">http://dyfoc.us/<a/>"
+
+            title = "Major bug fixed at image uploading"
+
+            email = EmailMessage(title, reponseString, to=[user.email])
+            email.content_subtype = "html"
+            email.send()
+            
+            print user.name
+            
+        else: 
+            break
+        
+        
+    return HttpResponse(json.dumps({"result" : "ok"}), mimetype="aplication/json")
+
+@csrf_exempt
 def get_fof_json(request):
     
     json_request = json.loads(request.POST['json'])
