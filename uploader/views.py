@@ -558,7 +558,7 @@ def upload_image(request):
             frame_FOF = FOF.objects.get(name=fof_name)
         except (KeyError, FOF.DoesNotExist):
             #frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
-            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = 0)
         
         #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
         conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
@@ -2170,7 +2170,7 @@ def login(request):
         fof["fof_name"] = feed_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
-        fof["ïs_private"] = feed_fof.is_private
+        fof["is_private"] = feed_fof.is_private
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
         
