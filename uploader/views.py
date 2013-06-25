@@ -544,7 +544,7 @@ def upload_image(request):
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
     user_id = request.POST['user_id']
-    is_private_value = request.POST['is_private']
+    #is_private_value = request.POST['is_private']
     
     response_data = {}
     
@@ -557,7 +557,8 @@ def upload_image(request):
         try:
             frame_FOF = FOF.objects.get(name=fof_name)
         except (KeyError, FOF.DoesNotExist):
-            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
+            #frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0)
         
         #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
         conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
