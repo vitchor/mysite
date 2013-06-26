@@ -29,6 +29,12 @@ from django.core.mail import EmailMessage
 
 from uploader.models import User, FOF, Frame, Featured_FOF, Friends, Like, Comment, Device_Notification
 
+
+@csrf_exempt
+def uploade_profile_image(request):
+    print 1
+    
+
 @csrf_exempt
 def send_support_email(request):
     
@@ -568,13 +574,85 @@ def how_many_follow(request):
     return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
 
 @csrf_exempt
+def upload_private_image(request):
+
+    #Gets fof info
+    fof_size = request.POST['fof_size']
+    fof_name = request.POST['fof_name']
+    user_id = request.POST['user_id']
+    is_private_value = request.POST['is_private']
+
+    response_data = {}
+
+    #Get/Creates user
+    try:
+
+        user = User.objects.get(id=user_id)
+
+        #Gets/Creates fof
+        try:
+            frame_FOF = FOF.objects.get(name=fof_name)
+        except (KeyError, FOF.DoesNotExist):
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
+
+        #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+        conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
+        b = conn.get_bucket('dyfocus')
+
+        #Creates all frames at once
+        for i in range(int(fof_size)):
+
+            #Actual index image key
+            key = 'apiupload_' + str(i)
+
+            image = Image.open(cStringIO.StringIO(request.FILES[key].read()))
+
+            out_image = cStringIO.StringIO()
+            image.save(out_image, 'jpeg')
+
+            #Gets information from post
+            frame_focal_point_x_key = 'frame_focal_point_x_' + str(i)
+            frame_focal_point_y_key = 'frame_focal_point_y_' + str(i)
+
+            frame_focal_point_x = request.POST[frame_focal_point_x_key]
+            frame_focal_point_y = request.POST[frame_focal_point_y_key]
+
+            #Creates the image key with the following format:
+            #frame_name = <user_id>_<fof_name>_<frame_index>.jpeg
+            frame_name = user_id
+            frame_name += '_'
+            frame_name += fof_name
+            frame_name += '_'
+            frame_name += str(i)
+            frame_name += '.jpeg'
+
+            #Creates url:
+            #frame_url = <s3_url>/<frame_name>
+            frame_url = 'http://s3.amazonaws.com/dyfocus/'
+            frame_url += frame_name
+
+            frame = frame_FOF.frame_set.create(url = frame_url, index = str(i), focal_point_x = frame_focal_point_x, focal_point_y = frame_focal_point_y)
+
+            k = b.new_key(frame_name)
+
+            #Note we're setting contents from the in-memory string provided by cStringIO
+            k.set_contents_from_string(out_image.getvalue())
+
+            response_data["result"] = "ok"
+
+    except (KeyError, User.DoesNotExist):
+        response_data["error"] = "User does not exist."
+
+
+    return HttpResponse(json.dumps(response_data), mimetype="aplication/json")
+        
+@csrf_exempt
 def upload_image(request):
 
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
     user_id = request.POST['user_id']
-    #is_private_value = request.POST['is_private']
     
     response_data = {}
     
@@ -587,7 +665,6 @@ def upload_image(request):
         try:
             frame_FOF = FOF.objects.get(name=fof_name)
         except (KeyError, FOF.DoesNotExist):
-            #frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
             frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = 0)
         
         #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:

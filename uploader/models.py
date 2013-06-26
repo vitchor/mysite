@@ -37,7 +37,7 @@ class FOF(models.Model):
     size = models.IntegerField()
     pub_date = models.DateTimeField('date published')
     view_count = models.IntegerField()
-    is_private = models.IntegerField()
+    is_private = models.IntegerField() # 0 -> not private // 1 -> private
     def __unicode__(self):
         return self.name
 
