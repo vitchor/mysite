@@ -61,6 +61,6 @@ urlpatterns = patterns('uploader.views',
     url(r'^(?P<fof_name_value>\S+)/flash_fof_share/$', 'flash_fof_share'),
     url(r'^set_featured/$', 'set_featured'),
     url(r'^get_fof_json/$', 'get_fof_json'),
-    url(r'^send_support_email/$', 'send_support_email'),
+    url(r'^upload_private_image/$', 'upload_private_image'),
     #url(r'^saywhat/$', 'test'),
 )
