@@ -161,7 +161,7 @@ def flash_fof(request,fof_name):
     except(KeyError, FOF.DoesNotExist):
         response_data["error"] = "FOF does not exist"
         
-    return render_to_response('uploader/images.xml', {"first_image_url" : first_image_url, "second_image_url" : second_image_url},
+    return render_to_response('uploader/images.xml', {"first_image_url" : first_image_url, "second_image_url" : second_image_url, "fof_name" : fof_name },
                                context_instance=RequestContext(request))
 
 def flash_fof_share(request, fof_name_value):
