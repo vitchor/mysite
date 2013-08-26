@@ -577,17 +577,16 @@ def how_many_follow(request):
 @csrf_exempt
 def upload_private_image(request):
 
-    print request.POST
-
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
     user_id = request.POST['user_id']
     is_private_value = request.POST['is_private']
-    fof_description = request.POST['fof_description']
     
-    print fof_description
-
+    try:
+        fof_description = request.POST['fof_description']
+    except:
+        fof_description = ""
 
     response_data = {}
 
