@@ -110,6 +110,7 @@ def get_fof_json(request):
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
+        fof["fof_description"] = fof_object.description
 
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
@@ -576,11 +577,17 @@ def how_many_follow(request):
 @csrf_exempt
 def upload_private_image(request):
 
+    print request.POST
+
     #Gets fof info
     fof_size = request.POST['fof_size']
     fof_name = request.POST['fof_name']
     user_id = request.POST['user_id']
     is_private_value = request.POST['is_private']
+    fof_description = request.POST['fof_description']
+    
+    print fof_description
+
 
     response_data = {}
 
@@ -593,7 +600,7 @@ def upload_private_image(request):
         try:
             frame_FOF = FOF.objects.get(name=fof_name)
         except (KeyError, FOF.DoesNotExist):
-            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value)
+            frame_FOF = user.fof_set.create(name = fof_name, size = fof_size, pub_date=timezone.now(), view_count = 0, is_private = is_private_value, description = fof_description)
 
         #Connect to S3, with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
         conn = S3Connection('AKIAIFPFKLTD5HLWDI2A', 'zrCRXDSD3FKTJwJ3O5m/dsZstL/Ki0NyF6GZKHQi')
@@ -1412,7 +1419,7 @@ def trending_fofs(request):
         fof["is_private"] = trending_fof.is_private
         fof["frames"] = frames
         fof["pub_date"] = pub_date
-
+        fof["fof_description"] = trending_fof.description
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
 
@@ -2008,7 +2015,7 @@ def signup(request):
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
-            
+            fof["fof_drescription"] = fof_object.description
             fof["comments"] = len(comments)
             fof["likes"] = len(likes)
             
@@ -2213,7 +2220,7 @@ def login(request):
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
-
+        fof["fof_description"] = fof_object.description
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
 
@@ -2280,6 +2287,7 @@ def login(request):
         fof["is_private"] = feed_fof.is_private
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
+        fof["fof_description"] = feed_fof.description
         
         if feed_fof.is_private == 0:
             feed_fof_array.append(fof)
@@ -2408,6 +2416,7 @@ def login_user(request):
         fof["fof_name"] = fof_object.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
+        fof["fof_description"] = fof_object.description
 
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
@@ -2473,6 +2482,7 @@ def login_user(request):
         fof["fof_name"] = feed_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
+        fof["fof_description"] = feed_fof.description
 
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
@@ -2626,6 +2636,7 @@ def get_user_feed_array(user):
         fof["is_private"] = feed_fof.is_private
         fof["frames"] = frames
         fof["pub_date"] = pub_date
+        fof["fof_description"] = feed_fof.description
 
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
@@ -2698,6 +2709,7 @@ def json_featured_fof(request):
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
+            fof["fof_description"] = fof_object.description
 
             fof["comments"] = len(comments)
             fof["likes"] = len(likes)
@@ -2771,6 +2783,7 @@ def user_json_featured_fof(request):
             fof["fof_name"] = fof_object.name
             fof["frames"] = frames
             fof["pub_date"] = pub_date
+            fof["fof_description"] = fof_object.description
 
             fof["comments"] = len(comments)
             fof["likes"] = len(likes)
@@ -2871,6 +2884,7 @@ def get_user_fofs(user):
         fof["fof_name"] = user_fof.name
         fof["frames"] = frames
         fof["pub_date"] = pub_date
+        fof["fof_description"] = user_fof.description
 
         fof["comments"] = len(comments)
         fof["likes"] = len(likes)
@@ -3113,6 +3127,7 @@ def retrieve_user_info(request):
             fof['fof_name'] = user_fof.name
             fof['frames'] = frames
             fof['pub_date'] = pub_date
+            fof['fof_description'] = user_fof.description
             
             fof['comments'] = len(comments)
             fof['likes'] = len(likes)

@@ -38,6 +38,7 @@ class FOF(models.Model):
     pub_date = models.DateTimeField('date published')
     view_count = models.IntegerField()
     is_private = models.IntegerField() # 0 -> not private // 1 -> private
+    description = models.CharField(max_length=300)
     def __unicode__(self):
         return self.name
 
