@@ -5,7 +5,7 @@ Instalar e configurar nome e email
 (primeira parte de https://help.github.com/articles/set-up-git)
 Criar e adicionar chave ssh ao github (https://help.github.com/articles/generating-ssh-keys)
 
-2. Instalar mysql (http://techxplorer.com/2011/03/03/installing-mysql-on-mac-os-x/)
+2. Instalar mysql (http://www.macminivault.com/mysql-mountain-lion/)
 *Se nao achar o egg : sudo ln -s /usr/local/mysql/lib/libmysqlclient.18.dylib /usr/lib/libmysqlclient.18.dylib
 
 3. Restore mysql db:
